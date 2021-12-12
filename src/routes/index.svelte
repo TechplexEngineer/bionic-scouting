@@ -4,6 +4,14 @@
 
 <script lang="ts">
 	import Counter from '$lib/Counter.svelte';
+	import { BluetoothSerial } from 'bionic-bt-serial';
+	// import { Plugins } from '@capacitor/core';
+
+	async function clickMe() {
+		let p = BluetoothSerial.getBondedDevices({value: "test"});
+		// p.then(console.log)
+		console.log("RESULT", await p)
+	}
 </script>
 
 <svelte:head>
@@ -19,8 +27,10 @@
 			</picture>
 		</div>
 
-		to your new<br />SvelteKit app
+		Fred your new<br />SvelteKit app
 	</h1>
+
+	<button class="btn btn-primary" on:click={clickMe}>Click Me</button>
 
 	<h2>
 		try editing <strong>src/routes/index.svelte</strong>

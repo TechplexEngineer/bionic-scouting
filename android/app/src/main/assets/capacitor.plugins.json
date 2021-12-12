@@ -1,1 +1,6 @@
-[]
+[
+	{
+		"pkg": "bionic-bt-serial",
+		"classpath": "org.team4909.scouting.BluetoothSerialPlugin"
+	}
+]
