@@ -36,3 +36,11 @@ npm run build
 ```
 
 > You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+
+
+## Capacitor
+
+NOTE: Device mus be conected to the same network as the host computer
+npm run dev -- --host
+npx cap sync
+HOST=10.42.0.5 npx cap run android
