@@ -1,0 +1,6 @@
+{
+	"appId": "org.team4909.BionicScout",
+	"appName": "sveltekit-cap",
+	"webDir": "build",
+	"bundledWebRuntime": false
+}
