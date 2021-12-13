@@ -1,6 +1,12 @@
 <script lang="ts">
+	let document = {}; //seems like a bad idea?
+	import 'bootstrap/dist/css/bootstrap.min.css';
+	import 'bootstrap/dist/js/bootstrap.min.js';
+
 	import Header from '$lib/header/Header.svelte';
 	import '../app.css';
+
+
 </script>
 
 <Header />
@@ -10,7 +16,7 @@
 </main>
 
 <footer>
-	<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+	{new Date().getFullYear()} &copy; FRC Team 4909 Bionics
 </footer>
 
 <style>
