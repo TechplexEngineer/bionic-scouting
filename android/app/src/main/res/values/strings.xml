@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">sveltekit-cap</string>
-    <string name="title_activity_main">sveltekit-cap</string>
+    <string name="app_name">The Green Alliance</string>
+    <string name="title_activity_main">The Green Alliance</string>
     <string name="package_name">org.team4909.BionicScout</string>
     <string name="custom_url_scheme">org.team4909.BionicScout</string>
 </resources>
