@@ -1,10 +1,14 @@
 <script lang="ts">
-	let document = {}; //seems like a bad idea?
+	import { onMount } from 'svelte'
 	import 'bootstrap/dist/css/bootstrap.min.css';
-	import 'bootstrap/dist/js/bootstrap.min.js';
 
 	import Header from '$lib/header/Header.svelte';
 	import '../app.css';
+
+	onMount(async () => {
+		await import('bootstrap/js/dist/dropdown')
+		await import('bootstrap/js/dist/collapse')
+	})
 
 
 </script>

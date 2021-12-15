@@ -1,10 +1,6 @@
 {
 	"appId": "org.team4909.BionicScout",
-	"appName": "sveltekit-cap",
+	"appName": "The Green Alliance",
 	"webDir": "build",
-	"bundledWebRuntime": false,
-	"server": {
-		"url": "http://10.42.0.5:3000",
-		"cleartext": true
-	}
+	"bundledWebRuntime": false
 }

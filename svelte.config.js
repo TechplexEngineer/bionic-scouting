@@ -20,8 +20,8 @@ const config = {
 				}
 			}
 		}
+		// ,ssr: false //disable server side rendering
 	},
-	ssr: false //disable server side rendering
 };
 
 export default config;
