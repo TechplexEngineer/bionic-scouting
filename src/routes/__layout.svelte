@@ -1,17 +1,21 @@
 <script lang="ts">
+	import { Styles } from 'sveltestrap';
+
 	import { onMount } from 'svelte'
-	import 'bootstrap/dist/css/bootstrap.min.css';
+	// import 'bootstrap/dist/css/bootstrap.min.css';
 
 	import Header from '$lib/header/Header.svelte';
 	import '../app.css';
 
-	onMount(async () => {
-		await import('bootstrap/js/dist/dropdown')
-		await import('bootstrap/js/dist/collapse')
-	})
+	// onMount(async () => {
+	// 	await import('bootstrap/js/dist/dropdown')
+	// 	await import('bootstrap/js/dist/collapse')
+	// })
 
-
+	
 </script>
+
+<Styles />
 
 <Header />
 

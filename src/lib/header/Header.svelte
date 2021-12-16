@@ -21,7 +21,7 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li><a class="dropdown-item" href="/match/objective" class:active={$page.path === '/match/objective'}>Objective</a></li>
-							<li><a class="dropdown-item" href="/match/objective" class:active={$page.path === '/match/qualitative'}>Qualitative</a></li>
+							<li><a class="dropdown-item" href="/match/subjective" class:active={$page.path === '/match/subjective'}>Subjective</a></li>
 						</ul>
 					</li>
 
@@ -31,7 +31,7 @@
 						</a>
 						<ul class="dropdown-menu">
 							<li><a class="dropdown-item" href="/pit/objective" class:active={$page.path === '/pit/objective'}>Objective</a></li>
-							<li><a class="dropdown-item" href="/pit/objective" class:active={$page.path === '/pit/qualitative'}>Qualitative</a></li>
+							<li><a class="dropdown-item" href="/pit/subjective" class:active={$page.path === '/pit/subjective'}>Subjective</a></li>
 						</ul>
 					</li>
 
@@ -46,8 +46,7 @@
 							<li><a class="dropdown-item" href="/bluetooth" class:active={$page.path === '/bluetooth'}>Bluetooth</a></li>
 							<li><a class="dropdown-item" href="/settings" class:active={$page.path === '/settings'}>Settings</a></li>
 							<li><hr class="dropdown-divider"></li>
-							<li><a class="dropdown-item" href="/settings" class:active={$page.path === '/setup'}>Setup</a></li>
-<!--							<li><a class="dropdown-item" href="#">Another action</a></li>-->
+							<li><a class="dropdown-item" href="/setup" class:active={$page.path === '/setup'}>Setup</a></li>
 						</ul>
 					</li>
 				</ul>
