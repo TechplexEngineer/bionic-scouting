@@ -1,3 +1,7 @@
+<svelte:head>
+	<title>Match Preview</title>
+</svelte:head>
+
 <script lang="ts">
 	import { Column, Table } from 'sveltestrap';
 	import { Matches } from '$lib/matches';

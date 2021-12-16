@@ -1,3 +1,7 @@
+<svelte:head>
+	<title>Bluetooth Settings</title>
+</svelte:head>
+
 <script context="module" lang="ts">
 	import {BluetoothSerial, BTDevice} from 'bionic-bt-serial';
 </script>

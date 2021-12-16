@@ -40,7 +40,7 @@ npm run build
 
 ## Capacitor
 
-NOTE: Device mus be conected to the same network as the host computer
+NOTE: Device mus be connected to the same network as the host computer
 npm run dev -- --host
 npx cap sync
 HOST=10.42.0.5 npx cap run android

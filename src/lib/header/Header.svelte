@@ -34,7 +34,7 @@
       </NavItem>
 
       <Dropdown nav inNavbar>
-        <DropdownToggle nav caret>Match</DropdownToggle>
+        <DropdownToggle nav caret>Match Scout</DropdownToggle>
         <DropdownMenu end>
           <ActiveDropdownItem href="/match/objective">Objective</ActiveDropdownItem>
           <DropdownItem divider />
@@ -43,7 +43,7 @@
       </Dropdown>
 
       <Dropdown nav inNavbar>
-        <DropdownToggle nav caret>Pit</DropdownToggle>
+        <DropdownToggle nav caret>Pit Scout</DropdownToggle>
         <DropdownMenu end>
           <ActiveDropdownItem href="/pit/objective">Objective</ActiveDropdownItem>
           <DropdownItem divider />
