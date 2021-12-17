@@ -27,16 +27,22 @@
 
 <div class="content">
 	<h1>Match Objective</h1>
-	<Nav tabs class="row">
+	<Nav tabs style="">
 		{#each tabs as tab, index}
-		<NavItem class="col">
+		<NavItem class="flex-grow-1 px-1">
 			<NavLink class="text-center" active={activeTab===index} on:click={() =>{activeTab=index}}>{tab.name}</NavLink>
 		</NavItem>
 		{/each}
-
 	</Nav>
 </div>
 
 <style>
-
+	:global(.nav-tabs) {
+		filter: brightness(90%);
+	}
+	:global(.nav-tabs a.nav-link) {
+		color: #0b4833;
+		background-color: #ccc;
+		border-color: #dee2e6 #dee2e6 #fff;
+	}
 </style>

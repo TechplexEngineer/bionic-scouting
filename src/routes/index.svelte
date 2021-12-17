@@ -3,24 +3,13 @@
 </svelte:head>
 
 <script lang="ts">
-	import Counter from '$lib/Counter.svelte';
-
-
-
+	let deviceName = "Red1"
 </script>
 
-<section>
-	<Counter />
-</section>
+<div class="container-fluid">
+	<h1>This device is <b>{deviceName}</b></h1>
+</div>
 
 <style>
-
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		flex: 1;
-	}
 
 </style>

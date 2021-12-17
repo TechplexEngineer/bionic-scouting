@@ -9,7 +9,6 @@
 	let items = sortedTeams.map(t=>{
 		return {value: t.team_number, label:t.team_number}
 	});
-	console.log(items)
 
 	let value = null;
 

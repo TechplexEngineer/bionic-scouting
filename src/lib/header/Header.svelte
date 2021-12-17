@@ -63,6 +63,7 @@
           <ActiveDropdownItem href="/setup">Setup</ActiveDropdownItem>
         </DropdownMenu>
       </Dropdown>
+      <div class="nav-item">BT</div>
 
     </Nav>
   </Collapse>

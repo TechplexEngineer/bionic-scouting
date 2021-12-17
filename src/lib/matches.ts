@@ -3293,3 +3293,28 @@ export const Matches = [
     "winning_alliance": "blue"
   }
 ];
+
+export const compLevels = {
+    test: 0, // test match
+    pm: 1, //practice match
+    qm: 2, //qualification match
+    ef: 3, //eighth finals
+    qf: 4, //quarter finals
+    sf: 5, //semi finals
+    f: 6,  //finals
+};
+
+export const sortedMatches = Matches.sort((a, b) => {
+    if (compLevels[a.comp_level] !== compLevels[b.comp_level]) {
+        return compLevels[a.comp_level] - compLevels[b.comp_level]
+    }
+    if (a.set_number !== b.set_number) {
+        return a.set_number - b.set_number
+    }
+    if (a.match_number !== b.match_number) {
+        return a.match_number - b.match_number
+    }
+});
+
+
+
