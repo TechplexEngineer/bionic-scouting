@@ -14,7 +14,7 @@
 
 
 <div class="container-fluid">
-	<h1>Match Preview: <a href="/match/{match.key.split('_')[1]}">{match.key.split('_')[1]}</a></h1>
+<!--	<h1>Match Preview: <a href="/match/{match.key.split('_')[1]}">{match.key.split('_')[1]}</a></h1>-->
 
 	<div class="input-group mb-3 row">
 		<button type="button" class="btn btn-primary col" on:click={()=>{

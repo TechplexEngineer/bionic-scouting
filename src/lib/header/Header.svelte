@@ -1,26 +1,25 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+  import ActiveNavLink from "$lib/header/ActiveNavLink.svelte";
+  import ActiveDropdownItem from "$lib/header/ActiveDropdownItem.svelte";
 
-    import ActiveNavLink from "$lib/header/ActiveNavLink.svelte";
-    import ActiveDropdownItem from "$lib/header/ActiveDropdownItem.svelte";
+  import {
+    Collapse,
+    Navbar,
+    NavbarToggler,
+    NavbarBrand,
+    Nav,
+    NavItem,
+    Dropdown,
+    DropdownToggle,
+    DropdownMenu,
+    DropdownItem
+  } from "sveltestrap";
 
-    import {
-		Collapse,
-		Navbar,
-		NavbarToggler,
-		NavbarBrand,
-		Nav,
-		NavItem,
-		Dropdown,
-		DropdownToggle,
-		DropdownMenu,
-		DropdownItem
-	} from 'sveltestrap';
+  let isOpen = false;
 
-	let isOpen = false;
-	function handleUpdate(event) {
-		isOpen = event.detail.isOpen;
-	}
+  function handleUpdate(event) {
+    isOpen = event.detail.isOpen;
+  }
 </script>
 
 <Navbar dark expand="xs" style="background-color: #0b4833;">
@@ -42,14 +41,9 @@
         </DropdownMenu>
       </Dropdown>
 
-      <Dropdown nav inNavbar>
-        <DropdownToggle nav caret>Pit Scout</DropdownToggle>
-        <DropdownMenu end>
-          <ActiveDropdownItem href="/pit/objective">Objective</ActiveDropdownItem>
-          <DropdownItem divider />
-          <ActiveDropdownItem href="/pit/subjective">Subjective</ActiveDropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+      <NavItem>
+        <ActiveNavLink href="/pit">Pit Scout</ActiveNavLink>
+      </NavItem>
 
       <Dropdown nav inNavbar>
         <DropdownToggle nav caret>Tools</DropdownToggle>
@@ -63,10 +57,17 @@
           <ActiveDropdownItem href="/setup">Setup</ActiveDropdownItem>
         </DropdownMenu>
       </Dropdown>
-      <div class="nav-item">BT</div>
+
+      <NavItem>
+        <ActiveNavLink href="/search">Search</ActiveNavLink>
+      </NavItem>
+
 
     </Nav>
   </Collapse>
+  <span class="navbar-text">
+    BT:Connected
+  </span>
 </Navbar>
 
 <!--<header>-->
@@ -117,10 +118,7 @@
 <!--						</ul>-->
 <!--					</li>-->
 <!--				</ul>-->
-<!--				<form class="d-flex">-->
-<!--					<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">-->
-<!--					<button class="btn btn-outline-success" type="submit">Search</button>-->
-<!--				</form>-->
+<!--
 <!--			</Collapse>-->
 
 

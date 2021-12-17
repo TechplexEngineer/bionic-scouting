@@ -1,40 +1,49 @@
 <svelte:head>
-  <title>Match Subjective</title>
+  <title>Pit</title>
 </svelte:head>
 
-<script context="module">
-  // Disable server side rendering for this page
-  export const ssr = false;
-</script>
 <script lang="ts">
-  import Select from "svelte-select";
   import { sortedTeams } from "$lib/teams";
+  import Select from "svelte-select";
 
-  let factNames = ["climber", "drivetrain"];
-  let facts: { name: string, value: string }[] = [
-    { name: "", value: "" } // need to start with at least one to show the form
-  ];
-
-  function handleSelect(event) {
-    console.log("selected item", event.detail.value);
-    // .. do something here 🙂
-  }
-
-  let teams = sortedTeams.map(t => {
+  let items = sortedTeams.map(t => {
     return {
       value: t.team_number,
       label: `${t.team_number}  ${"&nbsp; ".repeat(6 - t.team_number.toString().length)} ${t.nickname}`
     };
   });
 
-  let selectedTeam;
+  let value = null;
+
+  function handleSelect(event) {
+    console.log("selected item", event.detail.value);
+    // .. do something here 🙂
+    console.log("value", value);
+  }
+
+  let factNames = ["climber", "drivetrain"];
+  let facts: { name: string, value: string }[] = [
+    { name: "", value: "" } // need to start with at least one to show the form
+  ];
 </script>
 
 <div class="content">
-  <h1>Match Subjective</h1>
+  <h1>Pit Scout</h1>
 
   <label for="team">Team Number:</label>
-  <Select id="team" items={teams} bind:value={selectedTeam} on:select={handleSelect} />
+  <Select id="team" items={items} bind:value={value} on:select={handleSelect} />
+
+
+  <!--	Robot Photo-->
+  <div class="d-flex mb-2 mt-4">
+    <h3 class="flex-fill">Robot Image</h3>
+    <button class="btn btn-info align-self-end">Take Photo</button>
+  </div>
+
+  <div class="d-flex" style="height: 250px; background-color: #868e96">
+    <div class="w-auto h-auto"></div>
+  </div>
+
   <!-- Notes -->
   <div class="form-floating mt-4">
     <textarea class="form-control" placeholder=" " style="height: 150px"></textarea>
@@ -71,6 +80,8 @@
   <div class="d-flex justify-content-end mt-2">
     <button class="btn btn-success">Save</button>
   </div>
+
+
 </div>
 
 <style>

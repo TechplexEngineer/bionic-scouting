@@ -7,10 +7,7 @@
 	import Header from '$lib/header/Header.svelte';
 	import '../app.css';
 
-	// onMount(async () => {
-	// 	await import('bootstrap/js/dist/dropdown')
-	// 	await import('bootstrap/js/dist/collapse')
-	// })
+	console.log("Layout Scrip");
 
 	
 </script>
@@ -45,10 +42,6 @@
 		justify-content: center;
 		align-items: center;
 		padding: 40px;
-	}
-
-	footer a {
-		font-weight: bold;
 	}
 
 	@media (min-width: 480px) {

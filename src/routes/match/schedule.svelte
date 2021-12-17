@@ -28,7 +28,7 @@
 	{#each sortedMatches as m}
 		<tr>
 			<td>
-				<a href="/match/{m.key.split('_')[1]}">{m.key.split('_')[1].toUpperCase()}</a>
+<!--				<a href="/match/{m.key.split('_')[1]}">{m.key.split('_')[1].toUpperCase()}</a>-->
 			</td>
 
 			{#each m.alliances.red.team_keys as t}
