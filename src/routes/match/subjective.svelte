@@ -6,6 +6,7 @@
   // Disable server side rendering for this page
   export const ssr = false;
 </script>
+
 <script lang="ts">
   import Select from "svelte-select";
   import { sortedTeams } from "$lib/teams";
