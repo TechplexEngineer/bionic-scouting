@@ -1,18 +1,21 @@
-<script lang="ts">
-	import { Styles } from 'sveltestrap';
-
-	import { onMount } from 'svelte'
+<script context="module">
 	import 'bootstrap/dist/css/bootstrap.min.css';
-
-	import Header from '$lib/header/Header.svelte';
 	import '../app.css';
 
-	console.log("Layout Scrip");
-
-	
+	// not sure how else to do this so we only get do init work once
+	import {initCount, init} from "$lib/init";
+	initCount.update(v => {
+		if (v === 0) {
+			//do init
+			init();
+		}
+		return v + 1;
+	});
 </script>
 
-
+<script lang="ts">
+	import Header from '$lib/header/Header.svelte';
+</script>
 
 <Header />
 

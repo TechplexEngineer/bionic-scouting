@@ -62,6 +62,10 @@
         <ActiveNavLink href="/search">Search</ActiveNavLink>
       </NavItem>
 
+      <NavItem>
+        <ActiveNavLink href="/test">test</ActiveNavLink>
+      </NavItem>
+
 
     </Nav>
   </Collapse>

@@ -18,6 +18,9 @@ const config = {
 				fs: {
 					allow: ['capacitor-plugin-bluteooth-serial']
 				}
+			},
+			optimizeDeps: {
+				allowNodeBuiltins: ['pouchdb-browser', 'pouchdb-utils', 'base64id', 'mime-types']
 			}
 		}
 		// ,ssr: false //disable server side rendering
