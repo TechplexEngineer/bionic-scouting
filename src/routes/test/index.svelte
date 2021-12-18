@@ -1,3 +1,8 @@
+<script context="module">
+  // Disable server side rendering for this page
+  export const ssr = false;
+</script>
+
 <script>
   import NoteEditor from './_NoteEditor.svelte';
   import NoteList from './_NoteList.svelte';

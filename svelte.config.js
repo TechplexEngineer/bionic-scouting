@@ -19,12 +19,17 @@ const config = {
 					allow: ['capacitor-plugin-bluteooth-serial']
 				}
 			},
+			resolve: {
+				alias: {
+					events: 'events'
+				}
+			},
 			optimizeDeps: {
 				allowNodeBuiltins: ['pouchdb-browser', 'pouchdb-utils', 'base64id', 'mime-types']
 			}
-		}
-		// ,ssr: false //disable server side rendering
-	},
+		},
+		ssr: false //disable server side rendering
+	}
 };
 
 export default config;
