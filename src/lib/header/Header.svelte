@@ -59,7 +59,8 @@
                     <ActiveDropdownItem href="/settings">Settings</ActiveDropdownItem>
                     <ActiveDropdownItem href="/bluetooth">Bluetooth</ActiveDropdownItem>
                     <DropdownItem divider/>
-                    <ActiveDropdownItem href="/setup">Setup</ActiveDropdownItem>
+                    <ActiveDropdownItem href="/tools/setup">Setup</ActiveDropdownItem>
+                    <ActiveDropdownItem href="/tools/super">Super Setup</ActiveDropdownItem>
                 </DropdownMenu>
             </Dropdown>
 

@@ -32,6 +32,8 @@
 </script>
 
 <div class="content">
+
+    <a class="btn btn-info float-start" href="/myschedule">&lt; My Schedule</a>
     <h1>Match Subjective</h1>
 
     <label for="team">Team Number:</label>

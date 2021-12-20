@@ -1,94 +1,98 @@
 <svelte:head>
-  <title>Match Preview</title>
+    <title>Match Preview</title>
 </svelte:head>
 
 <script context="module">
-  // Disable server side rendering for this page
-  export const ssr = false;
+    // Disable server side rendering for this page
+    export const ssr = false;
 </script>
 
 
 <script lang="ts">
-  import { Column, Table } from "sveltestrap";
-  import { sortedMatches } from "$lib/matches";
+    import {Column, Table} from "sveltestrap";
+    import {sortedMatches} from "$lib/matches";
 
-  let matchNumber = 1;
-  let match = {};
+    let matchNumber = 1;
+    let match = {};
 
-  $: match = sortedMatches[matchNumber - 1];
+    $: match = sortedMatches[matchNumber - 1];
 </script>
 
 
 <div class="container-fluid">
-  <!--	<h1>Match Preview: <a href="/match/{match.key.split('_')[1]}">{match.key.split('_')[1]}</a></h1>-->
+    <!--	<h1>Match Preview: <a href="/match/{match.key.split('_')[1]}">{match.key.split('_')[1]}</a></h1>-->
 
-  <div class="input-group mb-3 row">
-    <button type="button" class="btn btn-primary col" on:click={()=>{
+    <div class="input-group mb-3 row">
+        <button type="button" class="btn btn-primary col" on:click={()=>{
 		if (matchNumber - 1 > 0) {matchNumber -= 1}
 	}}>&lt; Previous
-    </button>
-    <input type="number" class="form-control col" value={matchNumber} on:change={(e)=>{
+        </button>
+        <input type="number" class="form-control col" value={matchNumber} on:change={(e)=>{
 		if (0 <= e.target.value && e.target.value < sortedMatches.length+1) {
 			matchNumber = e.target.value;
 		} else {
 			e.target.value = matchNumber;
 		}
 	}}>
-    <button type="button" class="btn btn-primary col" on:click={()=>{
+        <button type="button" class="btn btn-primary col" on:click={()=>{
 		if (matchNumber + 1 < sortedMatches.length+1) {
 			matchNumber += 1
 		}
 	}}>Next &gt;
-    </button>
-  </div>
+        </button>
+    </div>
 </div>
 
 <!-- Blue -->
 <Table striped>
-  <thead>
-  <tr>
-    <th class="text-primary bluebg">Blue</th>
-    <th>Metric 1</th>
-    <th>Metric 2</th>
-    <th>Metric 3</th>
-  </tr>
-  </thead>
-  <tbody>
-  {#each match.alliances.blue.team_keys as team}
+    <thead>
     <tr>
-      <th scope="row" class="bluebg">
-        <a href="/team/{team.replace('frc','')}">{team.replace('frc', '')}</a>
-      </th>
-      <td>a</td>
-      <td>b</td>
-      <td>c</td>
+        <th class="text-primary bluebg">Blue</th>
+        <th>Drivebase</th>
+        <th>Play Def?</th>
+        <th>Score Loc?</th>
+        <th>Handle Def?</th>
     </tr>
-  {/each}
-  </tbody>
+    </thead>
+    <tbody>
+    {#each match.alliances.blue.team_keys as team}
+        <tr>
+            <th scope="row" class="bluebg">
+                <a href="/team/{team.replace('frc','')}">{team.replace('frc', '')}</a>
+            </th>
+            <td>a</td>
+            <td>b</td>
+            <td>c</td>
+            <td>d</td>
+        </tr>
+    {/each}
+    </tbody>
 </Table>
 
 <!-- Red -->
 <Table striped>
-  <thead>
-  <tr>
-    <th class="text-danger redbg">Red</th>
-    <th>Metric 1</th>
-    <th>Metric 2</th>
-    <th>Metric 3</th>
-  </tr>
-  </thead>
-  <tbody>
-  {#each match.alliances.red.team_keys as team}
+    <thead>
     <tr>
-      <th scope="row" class="redbg">
-        <a href="/team/{team.replace('frc','')}">{team.replace('frc', '')}</a>
-      </th>
-      <td>a</td>
-      <td>b</td>
-      <td>c</td>
+        <th class="text-danger redbg">Red</th>
+        <th>Drivebase</th>
+        <th>Play Def?</th>
+        <th>Score Loc?</th>
+        <th>Handle Def?</th>
     </tr>
-  {/each}
-  </tbody>
+    </thead>
+    <tbody>
+    {#each match.alliances.red.team_keys as team}
+        <tr>
+            <th scope="row" class="redbg">
+                <a href="/team/{team.replace('frc','')}">{team.replace('frc', '')}</a>
+            </th>
+            <td>a</td>
+            <td>b</td>
+            <td>c</td>
+            <td>d</td>
+        </tr>
+    {/each}
+    </tbody>
 </Table>
 
 <style>

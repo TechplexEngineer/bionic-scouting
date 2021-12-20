@@ -2,7 +2,7 @@ import { writable } from 'svelte/store';
 import { createRxDatabase, addDefaultRxPlugins } from 'rxdb';
 import { addPouchPlugin, getRxStoragePouch } from 'rxdb';
 import * as idb from 'pouchdb-adapter-idb';
-import noteSchema from './schema';
+import noteSchema from './schema/note-schema';
 
 /**
  * RxDB ========================================================================
@@ -31,6 +31,5 @@ export const db = () => (dbPromise ? dbPromise : _create());
  */
 
 export const noteList = writable([]);
-export const selectedNote = writable({});
 export const name = writable('');
 export const body = writable('');

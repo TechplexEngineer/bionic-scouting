@@ -1,41 +1,45 @@
 <svelte:head>
-  <title>Match Objective</title>
+    <title>Match Objective</title>
 </svelte:head>
 
 <script context="module">
-  // Disable server side rendering for this page
-  export const ssr = false;
+    // Disable server side rendering for this page
+    export const ssr = false;
 </script>
 
 <script lang="ts">
-  import {
-    Nav,
-    NavItem,
-    NavLink
-  } from "sveltestrap";
+    import {
+        Nav,
+        NavItem,
+        NavLink
+    } from "sveltestrap";
 
-  let activeTab = 0; // start on first tab
+    let activeTab = 0; // start on first tab
+    let currentScout = "John Q. Scout";// @todo
 
-  let tabs = [
-    { name: "Pre" },
-    { name: "Auto" },
-    { name: "Teleop" },
-    { name: "Post" }
-  ];
+    let tabs = [
+        {name: "Pre"},
+        {name: "Auto"},
+        {name: "Teleop"},
+        {name: "Post"}
+    ];
 
 
 </script>
 
 
 <div class="content">
-  <h1>Match Objective</h1>
-  <Nav tabs style="">
-    {#each tabs as tab, index}
-      <NavItem class="flex-grow-1 px-1">
-        <NavLink class="text-center" active={activeTab===index} on:click={()=>{activeTab=index}}>{tab.name}</NavLink>
-      </NavItem>
-    {/each}
-  </Nav>
+    <h3 class="float-start fs-5">Scout: {currentScout}</h3>
+    <h1>Match Objective</h1>
+
+    <Nav tabs style="">
+        {#each tabs as tab, index}
+            <NavItem class="flex-grow-1 px-1">
+                <NavLink class="text-center" active={activeTab===index}
+                         on:click={()=>{activeTab=index}}>{tab.name}</NavLink>
+            </NavItem>
+        {/each}
+    </Nav>
 </div>
 
 <style>

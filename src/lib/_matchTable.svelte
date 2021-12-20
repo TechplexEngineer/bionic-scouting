@@ -1,25 +1,22 @@
-<svelte:head>
-    <title>Match Schedule</title>
-</svelte:head>
-
-<script context="module">
-    // Disable server side rendering for this page
-    export const ssr = false;
-</script>
-
 <script>
     import {Table} from "sveltestrap";
-    import {sortedMatches} from "$lib/matches";
 
-    let ourTeamNumber = 4909;
+    export let match;
+    export let matches;
+    export let ourTeamNumber = 4909; //@todo
+
+
+    let matchesTable = [];
+    if (match) {
+        matchesTable = [match];
+    } else if (matches) {
+        matchesTable = matches;
+    } else {
+        console.warn("match or matches should be set")
+    }
+    console.log(matchesTable);
 </script>
 
-
-<div class="container-fluid">
-    <h1>Match Schedule</h1>
-</div>
-
-<!-- Blue -->
 <Table striped>
     <thead>
     <tr>
@@ -30,21 +27,21 @@
     </tr>
     </thead>
     <tbody>
-    {#each sortedMatches as m}
+    {#each matchesTable as m}
         <tr>
             <td>
-                <a href="/match/{m.key.split('_')[1]}">{m.key.split('_')[1].toUpperCase()}</a>
+                {m.key.split('_')[1].toUpperCase()}
             </td>
 
             {#each m.alliances.red.team_keys as t}
                 <td class="redbg" class:ourTeam={t.replace('frc','') == ourTeamNumber}>
-                    {t.replace('frc', '')}
+                    <a href="/team/{t.replace('frc','')}">{t.replace('frc', '')}</a>
                 </td>
             {/each}
 
             {#each m.alliances.blue.team_keys as t}
                 <td class="bluebg" class:ourTeam={t.replace('frc','') == ourTeamNumber}>
-                    {t.replace('frc', '')}
+                    <a href="/team/{t.replace('frc','')}">{t.replace('frc', '')}</a>
                 </td>
             {/each}
 
@@ -58,7 +55,8 @@
             <td class="bluebg"
                 class:fw-bold={m.alliances.blue.score > m.alliances.red.score}>{m.alliances.blue.score}</td>
             <td class="bluebg"
-                class:fw-bold={m.score_breakdown.blue.rp > m.score_breakdown.red.rp}>{m.score_breakdown.blue.rp} RP
+                class:fw-bold={m.score_breakdown.blue.rp > m.score_breakdown.red.rp}>{m.score_breakdown.blue.rp}
+                RP
             </td>
         </tr>
     {/each}
@@ -76,5 +74,9 @@
 
     .redbg {
         background-color: rgb(244, 204, 204)
+    }
+
+    .redbg a {
+        color: var(--accent-color);
     }
 </style>
