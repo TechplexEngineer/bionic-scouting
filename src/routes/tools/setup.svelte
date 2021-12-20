@@ -68,6 +68,7 @@
     import * as tba from '$lib/tba'
     import Select from "svelte-select";
     import {Table} from "sveltestrap";
+    import {matchSort} from "$lib/matches.js";
 
     async function fetchEventData() {
         console.log("FETCH!", eventName);
@@ -108,7 +109,7 @@
         let selectedEventKey = selectedEvent.value;
         const matches = await tba.getMatches(selectedEventKey);
         console.log(matches);
-        matchesTable = matches;
+        matchesTable = matches.sort(matchSort);
     }
 
     let ourTeamNumber = 4909;
@@ -169,6 +170,7 @@
     {/if}
 
     <h2>3. Pull matches from TBA or load csv</h2>
+    <!--    <input bind:value={currentYear} type="text" placeholder="Season Year" class="form-control mb-2">-->
     <div class="mb-3 d-flex" on:submit|preventDefault={fetchEventData}>
         <div class="flex-fill">
             <Select items={eventsToSelect} bind:value={selectedEvent}/>
