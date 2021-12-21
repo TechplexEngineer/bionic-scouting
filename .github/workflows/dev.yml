@@ -43,10 +43,14 @@ jobs:
           command base64
           echo "${{ secrets.SIGNING_KEYSTORE_B64 }}" | base64 -d > keystore.jks
 
-      - name: Build App
+      - name: Build & Sign App
+        env:
+          SIGNING_STORE_PASSWORD: ${{secrets.SIGNING_STORE_PASSWORD}}
+          SIGNING_KEY_PASSWORD: ${{secrets.SIGNING_KEY_PASSWORD}}
         run: |
           cd android
           ./gradlew bundleRelease
+          #keystore.jks is expected to be in root of project
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v2
