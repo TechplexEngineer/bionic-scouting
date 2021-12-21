@@ -41,7 +41,7 @@ jobs:
         run: |
           which base64
           command base64
-          echo ${{ secrets.SIGNING_KEYSTORE_B64 }} | base64 -d > keystore.jks
+          echo "${{ secrets.SIGNING_KEYSTORE_B64 }}" | base64 -d > keystore.jks
 
       - name: Build App
         run: |
