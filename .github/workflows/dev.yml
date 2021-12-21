@@ -1,0 +1,43 @@
+name: Development Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: # branches to run builds on
+      - 'main'
+      - 'master'
+    paths-ignore: # do not run if these are the only files that have changed
+      - README.md
+      - .gitignore
+      - docs/**
+      - tools/**
+
+jobs:
+  development-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install NPM Deps
+        run: |
+          npm ci
+
+      - name: Build Svelte App
+        run: |
+          npm build
+
+      - name: Copy built assets to android folder
+        run: |
+          npx cap sync
+
+      - name: Set up our JDK environment
+        uses: actions/setup-java@v1.4.3
+        with:
+          java-version: 1.8
+
+      - name: Build App
+        run: |
+          cd android
+          ./gradlew assembleRelease
