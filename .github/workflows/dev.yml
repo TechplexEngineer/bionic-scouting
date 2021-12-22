@@ -89,3 +89,22 @@ jobs:
         with:
           name: Build Artifacts
           path: android/app/build/outputs/
+
+      - name: Get PackageName
+        id: pkg
+        run: |
+          packageName=$(awk -F "=" '/applicationId/ {print $2}' android/gradle.properties)
+          echo "Package Name is: ${packageName}"
+          echo "::set-output name=name::${packageName}"
+
+      - name: Upload to Google Play Alpha
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: ${{ steps.pkg.outouts.name }}
+          releaseFiles: android/app/build/outputs/bundle/release/*.aab
+          track: alpha
+          inAppUpdatePriority: 5 # [0,5] with 5 being highest priority
+#          userFraction: 0.33
+#          whatsNewDirectory: distribution/whatsnew
+#          mappingFile: app/build/outputs/mapping/release/mapping.txt
