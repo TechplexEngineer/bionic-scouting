@@ -40,6 +40,7 @@
   "type": "module",
   "dependencies": {
     "@capacitor/android": "^3.3.3",
+    "@capacitor/app": "^1.0.7",
     "@capacitor/cli": "^3.3.3",
     "@capacitor/core": "^3.3.3",
     "bionic-bt-serial": "^0.0.1",
