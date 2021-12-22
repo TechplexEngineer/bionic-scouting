@@ -97,12 +97,17 @@ jobs:
           echo "Package Name is: ${packageName}"
           echo "::set-output name=name::${packageName}"
 
+      - name: Move bundle to repo root
+        run: |
+          mkdir -p aab
+          cp android/app/build/outputs/bundle/release/*.aab aab/ 
+
       - name: Upload to Google Play Alpha
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJson: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: ${{ steps.pkg.outputs.name }}
-          releaseFiles: android/app/build/outputs/bundle/release/*.aab
+          releaseFiles: aab/*.aab
           track: alpha
           inAppUpdatePriority: 5 # [0,5] with 5 being highest priority
 #          userFraction: 0.33

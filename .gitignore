@@ -9,3 +9,5 @@ node_modules
 .output
 
 .idea
+*.aab
+aab/
