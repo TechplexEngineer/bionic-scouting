@@ -80,6 +80,10 @@ jobs:
             -PversionNumber=$(date '+%s')
           #keystore.jks is expected to be in root of project
 
+      - name: Annotate Version
+        run: |
+          echo "::notice title=Version::${{ steps.version.outputs.version }}"
+
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v2
         with:
