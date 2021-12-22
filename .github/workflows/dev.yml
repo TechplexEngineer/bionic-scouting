@@ -103,7 +103,7 @@ jobs:
           cp android/app/build/outputs/bundle/release/*.aab aab/ 
 
       - name: Upload to Google Play Alpha
-        uses: r0adkll/upload-google-play@v1
+        uses: r0adkll/upload-google-play@v1.0.15
         with:
           serviceAccountJsonPlainText: "${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}"
           packageName: "${{ steps.pkg.outputs.name }}"
