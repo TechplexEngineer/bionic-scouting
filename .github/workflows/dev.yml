@@ -108,8 +108,8 @@ jobs:
           serviceAccountJsonPlainText: "${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}"
           packageName: "${{ steps.pkg.outputs.name }}"
           releaseFiles: aab/*.aab
-          track: alpha
-          inAppUpdatePriority: 5 # [0,5] with 5 being highest priority
+          track: internal
+          inAppUpdatePriority: 5 # [0,5] with 5 being the highest priority
 #          userFraction: 0.33
 #          whatsNewDirectory: distribution/whatsnew
 #          mappingFile: app/build/outputs/mapping/release/mapping.txt
