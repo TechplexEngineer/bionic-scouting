@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import { createRxDatabase, addDefaultRxPlugins } from 'rxdb';
+import { createRxDatabase, addDefaultRxPlugins, RxDatabase } from 'rxdb';
 import { addPouchPlugin, getRxStoragePouch } from 'rxdb';
 import * as idb from 'pouchdb-adapter-idb';
 import noteSchema from './schema/note-schema';
@@ -24,7 +24,7 @@ const _create = async () => {
 	return db;
 };
 
-export const db = () => (dbPromise ? dbPromise : _create());
+export const db = (): Promise<RxDatabase> => (dbPromise ? dbPromise : _create());
 
 /**
  * Svelte Writables ============================================================
@@ -33,3 +33,5 @@ export const db = () => (dbPromise ? dbPromise : _create());
 export const noteList = writable([]);
 export const name = writable('');
 export const body = writable('');
+
+// export function replicateNotes

@@ -1,7 +1,19 @@
-
 import { writable } from 'svelte/store';
-export const initCount = writable(0);
+import * as bt from '$lib/bluetooth';
 
-export const init = ():void => {
-    console.log("Init");
+const initCount = writable(0); // used to make sure init() is only called once
+
+export const init = (): void => {
+	initCount.update((v) => {
+		if (v === 0) {
+			//do init
+			_init();
+		}
+		return v + 1;
+	});
+};
+
+function _init(): void {
+	console.log('Init');
+	// bt.StartConnectedWatcher();
 }

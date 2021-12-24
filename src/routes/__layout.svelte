@@ -7,15 +7,10 @@
 	import { App } from "@capacitor/app";
 
 	// not sure how else to do this so we only get do init work once
-	import { initCount, init } from "$lib/init";
+	import { init } from "$lib/init";
 
-	initCount.update(v => {
-		if (v === 0) {
-			//do init
-			init();
-		}
-		return v + 1;
-	});
+	init();
+
 
 	async function getVersion() {
 		const info = await App.getInfo();
