@@ -1,7 +1,8 @@
 import { BluetoothSerial } from 'bionic-bt-serial';
 import { readable } from 'svelte/store';
-import * as timersPromises from 'timers/promises';
+// import * as timersPromises from 'timers/promises';
 import { v4 as uuidv4 } from 'uuid';
+import { getDb } from '$lib/store';
 
 export const connections = readable([], (set) => {
 	(async () => {
@@ -13,8 +14,6 @@ export const connections = readable([], (set) => {
 
 	return () => clearInterval(handle);
 });
-
-import { getDb } from '$lib/store';
 
 let listnerHandle;
 let db;
@@ -42,8 +41,16 @@ export async function stopMessageCenter(): Promise<void> {
 	}
 }
 
-async function handleIncomingMessage(info: { bytes: ArrayBufferLike }) {
-	const msg = JSON.parse(arrayBufferToString(info.bytes));
+export function isMessageCenterRunning(): boolean {
+	return !!listnerHandle;
+}
+
+async function handleIncomingMessage(info: { bytes: number[] }) {
+	let msgStr = '';
+	for (let i = 0; i < info.bytes.length; i++) {
+		msgStr += String.fromCharCode(info.bytes[i]);
+	}
+	const msg = JSON.parse(msgStr);
 	if (pendingMessageIds[msg.msgId]) {
 		const pendingFn = pendingMessageIds[msg.msgId];
 		pendingFn(msg.data);
@@ -94,8 +101,14 @@ export async function sendMessage(macAddr: string, data, timeoutMs?: number): Pr
 		data: data
 	};
 	const msgStr = JSON.stringify(msg);
-	const msgBuf = stringToArrayBuffer(msgStr);
-	const success = await BluetoothSerial.write({ macAddress: macAddr, data: msgBuf });
+	let msgArr = [];
+	for (let i = 0; i < msgStr.length; i++) {
+		msgArr[i] = msgStr.charCodeAt(i);
+	}
+	const success = await BluetoothSerial.write({
+		macAddress: macAddr,
+		data: msgArr
+	});
 	if (!success) {
 		throw new Error(`unable to send message: ${msg.msgId} - ${JSON.stringify(data)}`);
 	}
@@ -106,11 +119,10 @@ export async function sendMessage(macAddr: string, data, timeoutMs?: number): Pr
 	const prom = new Promise((resolve, _reject) => {
 		pendingMessageIds[msg.msgId] = resolve;
 	});
-	const timeout = timersPromises.setTimeout(
-		timeoutMs,
-		new Error(`Did not receive a reply within the timeout of ${timeoutMs}ms`)
-	);
-	// @todo does thi clean up the memory leak?
+	const timeout = setTimeoutPromise(timeoutMs, (resolve, reject) => {
+		reject(`Did not receive a reply within the timeout of ${timeoutMs}ms`);
+	});
+	// @todo does this clean up the memory leak?
 	// Messages that do not get a reply need to be removed from the pending queue or we have a leak
 	timeout.then(() => {
 		delete pendingMessageIds[msg.msgId];
@@ -118,12 +130,23 @@ export async function sendMessage(macAddr: string, data, timeoutMs?: number): Pr
 	return Promise.race([timeout, prom]);
 }
 
+async function setTimeoutPromise(
+	timeoutMs,
+	callback: (res: (value: unknown) => void, rej: (reason?: any) => void) => void
+) {
+	return new Promise((resolve, reject) => {
+		setTimeout(() => {
+			callback(resolve, reject);
+		}, timeoutMs);
+	});
+}
+
 function stringToArrayBuffer(str: string): ArrayBufferLike {
 	const ret = new Uint8Array(str.length);
 	for (let i = 0; i < str.length; i++) {
 		ret[i] = str.charCodeAt(i);
 	}
-	return ret.buffer;
+	return ret;
 }
 
 //src: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String

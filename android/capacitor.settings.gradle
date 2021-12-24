@@ -6,4 +6,4 @@ include ':capacitor-app'
 project(':capacitor-app').projectDir = new File('../node_modules/@capacitor/app/android')
 
 include ':bionic-bt-serial'
-project(':bionic-bt-serial').projectDir = new File('../node_modules/bionic-bt-serial/android')
+project(':bionic-bt-serial').projectDir = new File('../../bionic-bt-serial/android')

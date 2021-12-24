@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
-import { createRxDatabase, addDefaultRxPlugins, RxDatabase } from 'rxdb';
+import { createRxDatabase, addDefaultRxPlugins } from 'rxdb';
+import type RxDatabase from 'rxdb';
 import { addPouchPlugin, getRxStoragePouch } from 'rxdb';
 import * as idb from 'pouchdb-adapter-idb';
 import noteSchema from './schema/note-schema';

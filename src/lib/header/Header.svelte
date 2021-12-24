@@ -69,7 +69,7 @@
 					<ActiveDropdownItem href="/match/schedule">Match Schedule</ActiveDropdownItem>
 					<DropdownItem divider />
 					<ActiveDropdownItem href="/settings">Settings</ActiveDropdownItem>
-					<ActiveDropdownItem href="/bluetooth">Bluetooth</ActiveDropdownItem>
+					<ActiveDropdownItem href="/tools/bluetooth">Bluetooth</ActiveDropdownItem>
 					<DropdownItem divider />
 					<ActiveDropdownItem href="/tools/setup">Setup</ActiveDropdownItem>
 					<ActiveDropdownItem href="/tools/super">Super Setup</ActiveDropdownItem>
