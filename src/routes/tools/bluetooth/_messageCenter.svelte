@@ -19,8 +19,10 @@
 			return;
 		}
 		const macAddress = sendMessageToItem.value;
-		console.log(macAddress, dataToSend);
-		const res = await bt.sendMessage(macAddress, dataToSend, 5 * 1000);
+		const res = await bt.sendMessage(macAddress, {
+			action: "chat",
+			data: dataToSend
+		}, { timeoutMs: 5 * 1000 });
 		console.log(res);
 	}
 

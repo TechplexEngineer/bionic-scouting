@@ -13,7 +13,7 @@ export const init = (): void => {
 	});
 };
 
-function _init(): void {
+async function _init(): Promise<void> {
 	console.log('Init');
-	// bt.StartConnectedWatcher();
+	await bt.startMessageCenter();
 }

@@ -11,7 +11,6 @@
 
 	init();
 
-
 	async function getVersion() {
 		const info = await App.getInfo();
 		return info.version;
@@ -20,6 +19,12 @@
 
 <script lang="ts">
 	import Header from "$lib/header/Header.svelte";
+
+	import { onDestroy } from "svelte";
+
+	onDestroy(() => {
+		console.log("Layout OnDestroy");
+	});
 </script>
 
 <Header />

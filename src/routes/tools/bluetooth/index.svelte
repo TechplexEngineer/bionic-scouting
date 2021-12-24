@@ -157,10 +157,10 @@
 		listeners.push(await BluetoothSerial.addListener("discovered", (info: BTDevice) => {
 			console.log("event: discovered:", info);
 		}));
-		listeners.push(await BluetoothSerial.addListener("rawData", (info: { bytes: ArrayBufferLike }) => {
-			console.log("event: rawData:", info);
-			dataReceived = [...dataReceived, info.bytes.toString()]; //b/c Svelte reactivity is based on equals sign
-		}));
+		// listeners.push(await BluetoothSerial.addListener("rawData", (info: { bytes: number[], from: BTDevice }) => {
+		// 	console.log("event: rawData:", info);
+		// 	dataReceived = [...dataReceived, info.bytes.toString()]; //b/c Svelte reactivity is based on equals sign
+		// }));
 		listeners.push(await BluetoothSerial.addListener("connected", (info: BTDevice) => {
 			console.log("event: connected:", info);
 		}));
@@ -170,7 +170,6 @@
 		listeners.push(await BluetoothSerial.addListener("connectionLost", (info: BTDevice) => {
 			console.log("event: connectionLost", info);
 		}));
-		console.log(listeners[0], typeof listeners[0]);
 	})();
 
 	//cleanup listeners when page is unloaded
