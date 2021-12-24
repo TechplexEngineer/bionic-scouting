@@ -24,7 +24,9 @@ const _create = async () => {
 	return db;
 };
 
-export const db = (): Promise<RxDatabase> => (dbPromise ? dbPromise : _create());
+export function getDb(): Promise<RxDatabase> {
+	return dbPromise ? dbPromise : _create();
+}
 
 /**
  * Svelte Writables ============================================================

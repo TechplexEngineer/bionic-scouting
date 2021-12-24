@@ -2,13 +2,13 @@
     export let selectedNote;
     import {onMount} from 'svelte';
 
-    import {db, name, body} from '$lib/store';
+    import {getDb, name, body} from '$lib/store';
 
     let db$;
     let noteList = [];
 
     onMount(async () => {
-        db$ = await db();
+        db$ = await getDb();
         db$.notes
             .find()
             .sort({updatedAt: 'desc'})

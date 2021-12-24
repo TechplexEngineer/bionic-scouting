@@ -2,7 +2,7 @@
     import {writable} from "svelte/store";
 
     export let selectedNote = writable({}); //caller is expected to pass in the selected not writeable store
-    import {db, name, body} from '$lib/store';
+    import {getDb, name, body} from '$lib/store';
 
     const isEmptyObject = (obj) => obj && Object.keys(obj).length === 0 && obj.constructor === Object;
 
@@ -19,7 +19,7 @@
     });
 
     const saveNote = async () => {
-        const db$ = await db();
+        const db$ = await getDb();
         if (isEmptyObject($selectedNote)) {
             await db$.notes
                 .insert({

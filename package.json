@@ -52,6 +52,7 @@
     "svelte-select": "^4.4.6",
     "sveltestrap": "^5.6.3",
     "sweetalert2": "^11.3.0",
-    "tba-api-v3client-ts": "^3.8.3"
+    "tba-api-v3client-ts": "^3.8.3",
+    "uuid": "^8.3.2"
   }
 }
