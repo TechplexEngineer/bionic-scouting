@@ -97,9 +97,9 @@
 				</DropdownMenu>
 			</Dropdown>
 
-			<NavItem>
-				<ActiveNavLink href="/search">Search</ActiveNavLink>
-			</NavItem>
+			<!--			<NavItem>-->
+			<!--				<ActiveNavLink href="/search">Search</ActiveNavLink>-->
+			<!--			</NavItem>-->
 
 		</Nav>
 	</Collapse>
