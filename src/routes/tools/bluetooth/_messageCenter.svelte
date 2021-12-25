@@ -55,31 +55,56 @@
 		// console.log(res);
 
 		let db = await getDb();
-		await replicateRxCollection({
+		const replicationState = await replicateRxCollection({
 			collection: notesCollection.notes,
 			replicationIdentifier: "my-notes-replication",
 			// retryTime
 			pull: {
 				async handler(latestPullDocument): Promise<{ documents: any, hasMoreDocuments: boolean }> {
-					const limitPerPull = 10;
-					const minTimestamp = latestPullDocument ? latestPullDocument.updatedAt : 0;
+					let res;
+					try {
+						const limitPerPull = 10;
+						const minTimestamp = latestPullDocument ? latestPullDocument.updatedAt : 0;
 
-					const res = await bt.sendMessage(macAddress, {
-						action: "getNotes",
-						data: "",
-						params: {
-							updatedSince: minTimestamp,
-							limit: limitPerPull
-						}
-					}, { timeoutMs: 5 * 1000 });
-					console.log("getNotes", res);
+						res = await bt.sendMessage(macAddress, {
+							action: "getNotes",
+							data: "",
+							params: {
+								updatedSince: minTimestamp,
+								limit: limitPerPull
+							}
+						}, { timeoutMs: 5 * 1000 });
+
+					} catch (e) {
+						console.log(e);
+						res = [];
+					}
 					return { documents: res, hasMoreDocuments: false };
 				}
 			},
-			push: undefined,
+			push: {
+				batchSize: 5,
+				async handler(docs): Promise<void> {
+
+					try {
+						const res = await bt.sendMessage(macAddress, {
+							action: "putNotes",
+							data: docs,
+							params: {
+								// updatedSince: minTimestamp,
+								// limit: limitPerPull
+							}
+						}, { timeoutMs: 5 * 1000 });
+
+					} catch (e) {
+						console.log(e);
+					}
+					return;
+				}
+			},
 			live: false //false=do one time replication, true=continuously sync changes
 		});
-		// console.log("replication state", replicationState);
+		console.log("replication state", replicationState);
 	}
 
 

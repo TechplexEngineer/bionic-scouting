@@ -79,8 +79,8 @@ async function handleIncomingMessage(info: { bytes: number[]; from: BTDevice }) 
 
 	console.log('Got Message: ', msg);
 	if (pendingMessageIds[msg.msgId]) {
-		const pendingFn = pendingMessageIds[msg.msgId];
-		pendingFn(msg.data);
+		const obj = pendingMessageIds[msg.msgId];
+		obj.resolve(msg.data);
 		delete pendingMessageIds[msg.msgId];
 		return;
 	}
@@ -109,17 +109,26 @@ async function handleIncomingMessage(info: { bytes: number[]; from: BTDevice }) 
 				},
 				{ timeoutMs: -1, responseToMsgId: msg.msgId }
 			);
-			console.log(`Sending getNotesResponse to ${msg.from.macAddress} res: ${reply}`);
 			break;
 		}
 		case 'putNotes':
+			for (const doc of msg.data) {
+				await db.notes.upsert(doc);
+			}
+			await sendMessage(
+				msg.from.macAddress,
+				{
+					action: 'putNotesResponse',
+					data: ''
+				},
+				{ timeoutMs: -1, responseToMsgId: msg.msgId }
+			);
 			break;
 		case 'unknownActionResponse':
-			// console.log('got an unknownActionResponse');
 			// Nothing to do
 			break;
 		default: {
-			const reply = await sendMessage(
+			await sendMessage(
 				msg.from.macAddress,
 				{
 					action: 'unknownActionResponse',
@@ -127,14 +136,12 @@ async function handleIncomingMessage(info: { bytes: number[]; from: BTDevice }) 
 				},
 				{ timeoutMs: -1, responseToMsgId: msg.msgId }
 			);
-			console.log(`Sending unknownActionResponse to ${msg.from.macAddress} res: ${reply}`);
-			console.log(`Unknown Action: ${msg.action}`);
 		}
 	}
 }
 
 type PromiseResolveFn = (a: string) => void;
-const pendingMessageIds: Record<string, PromiseResolveFn> = {};
+const pendingMessageIds: Record<string, { date: number; resolve: PromiseResolveFn }> = {};
 
 /**
  * Send a message and wait for a reply
@@ -187,10 +194,13 @@ export async function sendMessage(
 			);
 		}, options.timeoutMs);
 
-		pendingMessageIds[msg.msgId] = (arg) => {
-			console.log(`Resolving ${msgStr} with arg ${arg}`);
-			clearTimeout(handle);
-			resolve(arg);
+		pendingMessageIds[msg.msgId] = {
+			date: Date.now(),
+			resolve: (arg) => {
+				console.log(`Resolving ${msgStr} with arg ${arg}`);
+				clearTimeout(handle);
+				resolve(arg);
+			}
 		};
 	});
 
@@ -199,40 +209,7 @@ export async function sendMessage(
 	prom.then(() => {
 		console.log('Cleanup ', msg.msgId);
 		delete pendingMessageIds[msg.msgId];
+		console.log('pending messages:', pendingMessageIds);
 	});
 	return prom;
 }
-
-async function setTimeoutPromise(
-	timeoutMs,
-	callback: (res: (value: unknown) => void, rej: (reason?: any) => void) => void
-) {
-	return new Promise((resolve, reject) => {
-		setTimeout(() => {
-			callback(resolve, reject);
-		}, timeoutMs);
-	});
-}
-
-function stringToArrayBuffer(str: string): ArrayBufferLike {
-	const ret = new Uint8Array(str.length);
-	for (let i = 0; i < str.length; i++) {
-		ret[i] = str.charCodeAt(i);
-	}
-	return ret;
-}
-
-//src: https://developers.google.com/web/updates/2012/06/How-to-convert-ArrayBuffer-to-and-from-String
-function arrayBufferToString(buf: ArrayBufferLike): string {
-	return String.fromCharCode.apply(null, new Uint16Array(buf));
-}
-
-// BluetoothSerial.
-
-// export function StartConnectedWatcher(): void {
-//   if (connectionWatchHandle) {
-//     clearInterval(connectionWatchHandle);
-//     connectionWatchHandle = null;
-//   }
-//   connectionWatchHandle =
-// }

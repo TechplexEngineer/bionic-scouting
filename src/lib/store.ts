@@ -1,6 +1,6 @@
 import { writable } from 'svelte/store';
 import { createRxDatabase, addDefaultRxPlugins } from 'rxdb';
-import type RxDatabase from 'rxdb';
+import type RxDatabaseBase from 'rxdb';
 import { addPouchPlugin, getRxStoragePouch } from 'rxdb';
 import * as idb from 'pouchdb-adapter-idb';
 import noteSchema from './schema/note-schema';
@@ -27,7 +27,7 @@ const _create = async () => {
 	return db;
 };
 
-export function getDb(): Promise<RxDatabase> {
+export function getDb(): Promise<typeof createRxDatabase> {
 	return dbPromise ? dbPromise : _create();
 }
 

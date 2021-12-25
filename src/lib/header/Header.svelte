@@ -37,6 +37,22 @@
 			btMessage = `Con(${devices.length})`;
 		}
 	});
+
+	async function removeAllData() {
+		if (!confirm("Are you sure? there is no undo!")) {
+			return
+		}
+		console.log("Removing all databases");
+		const dbs = await indexedDB.databases();
+		dbs.forEach(db => {
+			console.log("Delete", db);
+			indexedDB.deleteDatabase(db.name);
+		});
+
+		localStorage.clear();
+		location.reload();
+
+	}
 </script>
 
 <Navbar dark expand="xs" style="background-color: #0b4833;">
@@ -73,6 +89,10 @@
 					<DropdownItem divider />
 					<ActiveDropdownItem href="/tools/setup">Setup</ActiveDropdownItem>
 					<ActiveDropdownItem href="/tools/super">Super Setup</ActiveDropdownItem>
+					<DropdownItem divider />
+					<ActiveDropdownItem on:click={()=>{location.reload();}}>Reload</ActiveDropdownItem>
+					<ActiveDropdownItem on:click={removeAllData}>Remove All Data</ActiveDropdownItem>
+
 				</DropdownMenu>
 			</Dropdown>
 
