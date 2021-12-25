@@ -101,10 +101,14 @@ async function handleIncomingMessage(info: { bytes: number[]; from: BTDevice }) 
 				.sort({ updatedAt: 'desc' })
 				.limit(msg.params.limit);
 			const results = await query.exec();
-			const reply = await sendMessage(msg.from.macAddress, {
-				action: 'getNotesResponse',
-				data: results
-			});
+			const reply = await sendMessage(
+				msg.from.macAddress,
+				{
+					action: 'getNotesResponse',
+					data: results
+				},
+				{ timeoutMs: -1, responseToMsgId: msg.msgId }
+			);
 			console.log(`Sending getNotesResponse to ${msg.from.macAddress} res: ${reply}`);
 			break;
 		}
@@ -136,14 +140,18 @@ const pendingMessageIds: Record<string, PromiseResolveFn> = {};
  * Send a message and wait for a reply
  * @param macAddr Where to send the message. Must be a paired and connected device(eg. AA:BB:CC:DD:EE:FF)
  * @param data the JSON serializable data to send
- * @param timeoutMs? <optional> defaults to 30 seconds (30*1000), pass negative value to skip waiting for a reply
+ * @param options
  */
 export async function sendMessage(
 	macAddr: string,
 	data: any, // must be stringifiable
 	options?: { timeoutMs?: number; responseToMsgId?: string }
 ): Promise<any> {
+	if (options === undefined) {
+		options = {};
+	}
 	if (!listnerHandle) {
+		console.error('message center is not running.');
 		throw new Error('message center is not running.');
 	}
 	const msg = {

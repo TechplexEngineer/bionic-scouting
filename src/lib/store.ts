@@ -14,13 +14,15 @@ addPouchPlugin(idb);
 
 let dbPromise;
 
+export let notesCollection;
+
 const _create = async () => {
 	const db = await createRxDatabase({
 		name: 'rxdbdemo',
 		storage: getRxStoragePouch('idb'),
 		ignoreDuplicate: true
 	});
-	await db.addCollections({ notes: { schema: noteSchema } });
+	notesCollection = await db.addCollections({ notes: { schema: noteSchema } });
 	dbPromise = db;
 	return db;
 };

@@ -2,6 +2,8 @@
 	import * as bt from "$lib/bluetooth";
 	import Select from "svelte-select";
 	import { BluetoothSerial } from "bionic-bt-serial";
+	import { replicateRxCollection } from "rxdb/src/plugins/replication";
+	import { getDb, notesCollection } from "$lib/store";
 
 	async function click_startMessageCenter() {
 		await bt.startMessageCenter();
@@ -44,6 +46,42 @@
 		}
 	})();
 
+	async function click_syncNotes() {
+		const macAddress = sendMessageToItem.value;
+		// const res = await bt.sendMessage(macAddress, {
+		// 	action: "chat",
+		// 	data: dataToSend
+		// }, { timeoutMs: 5 * 1000 });
+		// console.log(res);
+
+		let db = await getDb();
+		await replicateRxCollection({
+			collection: notesCollection.notes,
+			replicationIdentifier: "my-notes-replication",
+			// retryTime
+			pull: {
+				async handler(latestPullDocument): Promise<{ documents: any, hasMoreDocuments: boolean }> {
+					const limitPerPull = 10;
+					const minTimestamp = latestPullDocument ? latestPullDocument.updatedAt : 0;
+
+					const res = await bt.sendMessage(macAddress, {
+						action: "getNotes",
+						data: "",
+						params: {
+							updatedSince: minTimestamp,
+							limit: limitPerPull
+						}
+					}, { timeoutMs: 5 * 1000 });
+					console.log("getNotes", res);
+					return { documents: res, hasMoreDocuments: false };
+				}
+			},
+			push: undefined,
+			live: false //false=do one time replication, true=continuously sync changes
+		});
+		// console.log("replication state", replicationState);
+	}
+
 
 </script>
 
@@ -71,5 +109,12 @@
 	<div class="card-body">
 		<h5 class="card-title">Message Center: Receive</h5>
 
+	</div>
+</div>
+
+<div class="col col-sm-6 card">
+	<div class="card-body">
+		<h5 class="card-title">Notes Sync</h5>
+		<button class="btn btn-primary" on:click={click_syncNotes}>syncNotes</button>
 	</div>
 </div>
