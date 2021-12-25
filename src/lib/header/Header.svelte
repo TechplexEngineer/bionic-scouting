@@ -40,7 +40,7 @@
 
 	async function removeAllData() {
 		if (!confirm("Are you sure? there is no undo!")) {
-			return
+			return;
 		}
 		console.log("Removing all databases");
 		const dbs = await indexedDB.databases();
@@ -92,18 +92,14 @@
 					<DropdownItem divider />
 					<ActiveDropdownItem on:click={()=>{location.reload();}}>Reload</ActiveDropdownItem>
 					<ActiveDropdownItem on:click={removeAllData}>Remove All Data</ActiveDropdownItem>
-
+					<DropdownItem divider />
+					<ActiveDropdownItem href="/notes">Notes</ActiveDropdownItem>
 				</DropdownMenu>
 			</Dropdown>
 
 			<NavItem>
 				<ActiveNavLink href="/search">Search</ActiveNavLink>
 			</NavItem>
-
-			<NavItem>
-				<ActiveNavLink href="/test">test</ActiveNavLink>
-			</NavItem>
-
 
 		</Nav>
 	</Collapse>

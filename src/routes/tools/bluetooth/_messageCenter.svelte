@@ -3,17 +3,8 @@
 	import Select from "svelte-select";
 	import { BluetoothSerial } from "bionic-bt-serial";
 	import { replicateRxCollection } from "rxdb/src/plugins/replication";
-	import { getDb, notesCollection } from "$lib/store";
-
-	async function click_startMessageCenter() {
-		await bt.startMessageCenter();
-		console.log("Message Center Started");
-	}
-
-	async function click_stopMessageCenter() {
-		await bt.stopMessageCenter();
-		console.log("Message Center Stopped");
-	}
+	import { getDb, collections } from "$lib/store";
+	import { onMount } from "svelte";
 
 	async function click_sendMessage() {
 		if (!bt.isMessageCenterRunning()) {
@@ -32,8 +23,10 @@
 	let connectedDevices: SelectItem[] = [];
 	let sendMessageToItem: SelectItem;
 	let dataToSend = "";
+	let db;
 
-	(async () => {
+	onMount(async () => {
+		db = await getDb();
 		let result = await BluetoothSerial.getConnectedDevices();
 		connectedDevices = result.result.map(d => {
 			return {
@@ -44,7 +37,7 @@
 		if (connectedDevices.length > 0) {
 			sendMessageToItem = connectedDevices[0];
 		}
-	})();
+	});
 
 	async function click_syncNotes() {
 		const macAddress = sendMessageToItem.value;
@@ -54,9 +47,9 @@
 		// }, { timeoutMs: 5 * 1000 });
 		// console.log(res);
 
-		let db = await getDb();
+
 		const replicationState = await replicateRxCollection({
-			collection: notesCollection.notes,
+			collection: collections.notes,
 			replicationIdentifier: "my-notes-replication",
 			// retryTime
 			pull: {
@@ -110,14 +103,6 @@
 
 </script>
 
-
-<div class="col col-sm-6 card">
-	<div class="card-body">
-		<h5 class="card-title">Message Center</h5>
-		<button class="btn btn-primary" on:click={click_startMessageCenter}>startMessageCenter</button>
-		<button class="btn btn-primary" on:click={click_stopMessageCenter}>stopMessageCenter</button>
-	</div>
-</div>
 
 <div class="col col-sm-6 card">
 	<div class="card-body">

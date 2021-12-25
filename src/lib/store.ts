@@ -14,15 +14,15 @@ addPouchPlugin(idb);
 
 let dbPromise;
 
-export let notesCollection;
+export let collections;
 
 const _create = async () => {
 	const db = await createRxDatabase({
-		name: 'rxdbdemo',
+		name: 'tgadb',
 		storage: getRxStoragePouch('idb'),
 		ignoreDuplicate: true
 	});
-	notesCollection = await db.addCollections({ notes: { schema: noteSchema } });
+	collections = await db.addCollections({ notes: { schema: noteSchema } });
 	dbPromise = db;
 	return db;
 };
@@ -30,13 +30,3 @@ const _create = async () => {
 export function getDb(): Promise<typeof createRxDatabase> {
 	return dbPromise ? dbPromise : _create();
 }
-
-/**
- * Svelte Writables ============================================================
- */
-
-export const noteList = writable([]);
-export const name = writable('');
-export const body = writable('');
-
-// export function replicateNotes
