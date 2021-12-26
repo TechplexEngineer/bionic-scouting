@@ -32,20 +32,20 @@ export async function startMessageCenter(): Promise<void> {
 
 	// If hot module reload is enabled, if reloading the layout remove the listener
 	// Since layout keeps track of initialization we use this to prevent duplicate listeners during dev
-	if (import.meta.hot) {
-		import.meta.hot.on('vite:beforeUpdate', (data) => {
-			function reducer(previousValue, currentValue) {
-				return previousValue || currentValue.path == '/src/routes/__layout.svelte';
-			}
-
-			if (data.type == 'update' && data.updates.reduce(reducer, false)) {
-				if (listnerHandle) {
-					console.log('Removing rawData listener');
-					listnerHandle.remove();
-				}
-			}
-		});
-	}
+	// if (import.meta.hot) {
+	// 	import.meta.hot.on('vite:beforeUpdate', (data) => {
+	// 		function reducer(previousValue, currentValue) {
+	// 			return previousValue || currentValue.path == '/src/routes/__layout.svelte';
+	// 		}
+	//
+	// 		if (data.type == 'update' && data.updates.reduce(reducer, false)) {
+	// 			if (listnerHandle) {
+	// 				console.log('Removing rawData listener');
+	// 				listnerHandle.remove();
+	// 			}
+	// 		}
+	// 	});
+	// }
 }
 
 /**

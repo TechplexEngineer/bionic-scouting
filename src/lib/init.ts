@@ -15,5 +15,10 @@ export const init = (): void => {
 
 async function _init(): Promise<void> {
 	console.log('Init');
-	await bt.startMessageCenter();
+
+	// only start the message center if not SSR.
+	// If you try to load rxdb in SSR the indexed db adapter isn't loaded
+	if (!import.meta.env.SSR) {
+		await bt.startMessageCenter();
+	}
 }
