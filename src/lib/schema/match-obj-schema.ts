@@ -6,7 +6,7 @@ const matchObjectiveSchema = {
 	indexes: ['createdAt', 'updatedAt'],
 	primaryKey: {
 		// where should the composed string be stored
-		key: 'matchEventKey',
+		key: 'eventMatchKey',
 		// fields that will be used to create the composed key
 		fields: ['eventKey', 'matchKey'],
 		// separator which is used to concat the fields values.
