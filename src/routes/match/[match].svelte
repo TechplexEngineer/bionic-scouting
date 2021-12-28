@@ -13,7 +13,7 @@
     import {Matches} from "$lib/matches";
 
     import Swal from "sweetalert2";
-    import MatchTable from "$lib/_matchTable.svelte"
+    import MatchTable from "$lib/compontents/_matchTable.svelte"
 
     function getMatch(key: string) {
         for (const m of Matches) {

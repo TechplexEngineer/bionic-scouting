@@ -29,22 +29,35 @@ const matchObjectiveSchema = {
 			type: 'number'
 		},
 		// Pregame
+		preStartingLocation: {
+			type: 'string',
+			metadata: {
+				tab: 'Pre',
+				cardClasses: 'col-12',
+				control: 'buttons'
+			},
+			enum: ['Tower', 'Trench', 'Middle']
+		},
 		preStartingLocationX: {
 			type: 'number',
 			metadata: {
-				tab: 'Pre'
+				tab: 'Pre',
+				hidden: true
 			}
 		},
 		preStartingLocationY: {
 			type: 'number',
 			metadata: {
-				tab: 'Pre'
+				tab: 'Pre',
+				hidden: true
 			}
 		},
 		prePowerCells: {
 			type: 'number',
 			metadata: {
-				tab: 'Pre'
+				label: 'Number of power cells loaded',
+				tab: 'Pre',
+				cardClasses: 'col-12'
 			}
 		},
 		// Auto
@@ -52,7 +65,9 @@ const matchObjectiveSchema = {
 			type: 'number',
 			metadata: {
 				tab: 'Auto'
-			}
+			},
+			minimum: 0,
+			maximum: 3
 		},
 		autoLow: {
 			type: 'number',
