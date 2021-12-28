@@ -1,4 +1,23 @@
-const matchSubjectiveSchema = {
+import type { RxJsonSchema } from 'rxdb';
+
+export type Fact = {
+	name: string;
+	notes: string;
+};
+
+export type MatchSubjReport = {
+	eventMatchKey: string;
+	eventKey: string;
+	matchKey: string;
+	matchForKey: string;
+	createdAt: number;
+	updatedAt: number;
+	teamNumber: number;
+	notes: string;
+	facts: Fact[];
+};
+
+const matchSubjectiveSchema: RxJsonSchema<MatchSubjReport> = {
 	title: 'match-subjective',
 	description: 'Observations about a match',
 	version: 0,
@@ -28,103 +47,31 @@ const matchSubjectiveSchema = {
 			// observations for this match
 		},
 		createdAt: {
-			type: 'number'
+			type: 'number',
+			description: 'When the document was created milliseconds since unix epoch'
 		},
 		updatedAt: {
-			type: 'number'
+			type: 'number',
+			description: 'When the document was last modified milliseconds since unix epoch'
 		},
 		teamNumber: {
 			type: 'number'
 		},
-		// Pregame
-		preStartingLocation: {
-			type: 'string',
-			metadata: {
-				tab: 'Pre',
-				cardClasses: 'col-12',
-				control: 'buttons'
-			},
-			enum: ['Tower', 'Trench', 'Middle']
+		notes: {
+			type: 'string'
 		},
-		preStartingLocationX: {
-			type: 'number',
-			metadata: {
-				tab: 'Pre',
-				hidden: true
-			}
-		},
-		preStartingLocationY: {
-			type: 'number',
-			metadata: {
-				tab: 'Pre',
-				hidden: true
-			}
-		},
-		prePowerCells: {
-			type: 'number',
-			metadata: {
-				label: 'Number of power cells loaded',
-				tab: 'Pre',
-				cardClasses: 'col-12'
-			}
-		},
-		// Auto
-		autoHigh: {
-			type: 'number',
-			metadata: {
-				tab: 'Auto'
-			},
-			minimum: 0,
-			maximum: 3
-		},
-		autoLow: {
-			type: 'number',
-			metadata: {
-				tab: 'Auto'
-			}
-		},
-		autoInitLine: {
-			type: 'boolean',
-			metadata: {
-				tab: 'Auto'
-			}
-		},
-		autoPenalties: {
-			type: 'number',
-			metadata: {
-				tab: 'Auto'
-			}
-		},
-		// Teleop
-		teleopPenalties: {
-			type: 'number',
-			metadata: {
-				tab: 'Teleop'
-			}
-		},
-		teleopHighGoal: {
-			type: 'number',
-			metadata: {
-				tab: 'Teleop'
-			}
-		},
-		teleopLowGoal: {
-			type: 'number',
-			metadata: {
-				tab: 'Teleop'
-			}
-		},
-		teleopClimbLocation: {
-			type: 'string',
-			enum: ['center', 'end'],
-			metadata: {
-				tab: 'Teleop'
-			}
-		},
-		teleopClimbSuccess: {
-			type: 'boolean',
-			metadata: {
-				tab: 'Teleop'
+		facts: {
+			type: 'array',
+			items: {
+				type: 'object',
+				properties: {
+					name: {
+						type: 'string'
+					},
+					notes: {
+						type: 'string'
+					}
+				}
 			}
 		}
 	},

@@ -1,23 +1,27 @@
-const settingsSchema = {
+import type { RxJsonSchema } from 'rxdb';
+
+export type Setting = {
+	createdAt: number;
+	updatedAt: number;
+	key: string;
+	value: string;
+};
+
+const settingsSchema: RxJsonSchema<Setting> = {
 	title: 'settings',
 	description: 'App Wide Configuration',
 	version: 0,
 	type: 'object',
 	indexes: ['createdAt', 'updatedAt', 'key'],
-	primaryKey: {
-		// where should the composed string be stored
-		key: 'eventTeamKey',
-		// fields that will be used to create the composed key
-		fields: ['eventKey', 'teamNumber'],
-		// separator which is used to concat the fields values.
-		separator: '_'
-	},
+	primaryKey: 'key',
 	properties: {
 		createdAt: {
-			type: 'number'
+			type: 'number',
+			description: 'When the document was created milliseconds since unix epoch'
 		},
 		updatedAt: {
-			type: 'number'
+			type: 'number',
+			description: 'When the document was last modified milliseconds since unix epoch'
 		},
 		key: {
 			type: 'string'

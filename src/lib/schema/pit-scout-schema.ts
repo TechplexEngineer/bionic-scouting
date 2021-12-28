@@ -1,4 +1,21 @@
-const pitSchema = {
+import type { RxJsonSchema } from 'rxdb';
+
+export type Fact = {
+	name: string;
+	notes: string;
+};
+
+export type PitReport = {
+	eventTeamKey: string;
+	eventKey: string;
+	createdAt: number;
+	updatedAt: number;
+	teamNumber: number;
+	notes: string;
+	facts: Fact[];
+};
+
+const pitSchema: RxJsonSchema<PitReport> = {
 	title: 'pit-objective',
 	description: 'Notes about a team',
 	version: 0,
@@ -13,19 +30,23 @@ const pitSchema = {
 		separator: '_'
 	},
 	properties: {
+		eventTeamKey: {
+			type: 'string'
+		},
 		eventKey: {
 			type: 'string' // should be in the format <year><eventName> eg: 2020week0
 		},
 		createdAt: {
-			type: 'number'
+			type: 'number',
+			description: 'When the document was created milliseconds since unix epoch'
 		},
 		updatedAt: {
-			type: 'number'
+			type: 'number',
+			description: 'When the document was last modified milliseconds since unix epoch'
 		},
 		teamNumber: {
 			type: 'number'
 		},
-
 		notes: {
 			type: 'string'
 		},

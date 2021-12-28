@@ -73,7 +73,7 @@
 <h2>2. Enter scout names or load list</h2>
 <div class="d-flex">
 	<div>
-		<button class="me-4 btn btn-info" on:click={()=>{fileInput.click();}}>Upload List</button>
+		<button class="me-4 btn btn-outline-primary" on:click={()=>{fileInput.click();}}>Upload List</button>
 		<input type="file" class="form-control d-none" bind:this={fileInput} on:change={processScoutNameFileUpload}>
 	</div>
 	<div class="flex-fill">

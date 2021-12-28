@@ -1,4 +1,29 @@
-const matchObjectiveSchema = {
+import type { RxJsonSchema } from 'rxdb';
+
+export type MatchMetricsReport = {
+	eventMatchKey: string;
+	eventKey: string;
+	matchKey: string;
+	matchForKey: string;
+	createdAt: number;
+	updatedAt: number;
+	teamNumber: number;
+	preStartingLocation: string;
+	preStartingLocationX: number;
+	preStartingLocationY: number;
+	prePowerCells: number;
+	autoHigh: number;
+	autoLow: number;
+	autoInitLine: boolean;
+	autoPenalties: number;
+	teleopPenalties: number;
+	teleopHighGoal: number;
+	teleopLowGoal: number;
+	teleopClimbLocation: string;
+	teleopClimbSuccess: boolean;
+};
+
+const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 	title: 'match-objective',
 	description: 'Metrics about a match',
 	version: 0,
@@ -23,10 +48,12 @@ const matchObjectiveSchema = {
 			type: 'string' // eg: qm4 qf1m1 sf2m1 f1m2
 		},
 		createdAt: {
-			type: 'number'
+			type: 'number',
+			description: 'When the document was created milliseconds since unix epoch'
 		},
 		updatedAt: {
-			type: 'number'
+			type: 'number',
+			description: 'When the document was last modified milliseconds since unix epoch'
 		},
 		teamNumber: {
 			type: 'number'
@@ -125,4 +152,4 @@ const matchObjectiveSchema = {
 	},
 	required: ['eventKey', 'matchKey']
 };
-export default matchObjectiveSchema;
+export default matchMetricsSchema;
