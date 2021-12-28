@@ -6,6 +6,7 @@ import * as idb from 'pouchdb-adapter-idb';
 import noteSchema from './schema/note-schema';
 import matchObjectiveSchema from '$lib/schema/match-obj-schema';
 import matchSubjectiveSchema from '$lib/schema/match-subj-schema';
+import scoutsSchema from '$lib/schema/scouts-schema';
 
 /**
  * RxDB ========================================================================
@@ -28,7 +29,8 @@ const _create = async () => {
 	collections = await db.addCollections({
 		notes: { schema: noteSchema },
 		match_objective: { schema: matchObjectiveSchema },
-		match_subjective: { schema: matchSubjectiveSchema }
+		match_subjective: { schema: matchSubjectiveSchema },
+		scouts: { schema: scoutsSchema }
 	});
 	dbPromise = db;
 	return db;
