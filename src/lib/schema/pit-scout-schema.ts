@@ -1,5 +1,5 @@
 const pitSchema = {
-	title: 'pitObjective',
+	title: 'pit-objective',
 	description: 'Notes about a team',
 	version: 0,
 	type: 'object',

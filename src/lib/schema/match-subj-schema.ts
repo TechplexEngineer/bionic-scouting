@@ -1,6 +1,6 @@
-const matchObjectiveSchema = {
-	title: 'match-objective',
-	description: 'Metrics about a match',
+const matchSubjectiveSchema = {
+	title: 'match-subjective',
+	description: 'Observations about a match',
 	version: 0,
 	type: 'object',
 	indexes: ['createdAt', 'updatedAt'],
@@ -21,6 +21,11 @@ const matchObjectiveSchema = {
 		},
 		matchKey: {
 			type: 'string' // eg: qm4 qf1m1 sf2m1 f1m2
+			// match being observed
+		},
+		matchForKey: {
+			type: 'string' // eg: qm4 qf1m1 sf2m1 f1m2
+			// observations for this match
 		},
 		createdAt: {
 			type: 'number'
@@ -125,4 +130,4 @@ const matchObjectiveSchema = {
 	},
 	required: ['eventKey', 'matchKey']
 };
-export default matchObjectiveSchema;
+export default matchSubjectiveSchema;
