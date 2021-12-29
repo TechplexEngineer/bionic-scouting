@@ -5,6 +5,9 @@
     import type {MyDatabase} from '$lib/store';
     import {onMount} from "svelte";
     import {getDb} from "$lib/store";
+    import {Scout} from '$lib/schema/scouts-schema'
+    import {Button} from "sveltestrap";
+    import type {RxDocument} from "rxdb";
 
     let db: MyDatabase;
 
@@ -21,9 +24,7 @@
 
 
     let scoutName = "";
-    import {Scout} from '$lib/schema/scouts-schema'
-    import {Button} from "sveltestrap";
-    import type {RxDocument} from "rxdb";
+
 
     async function addScout() {
         if (scoutName.length < 2) {
