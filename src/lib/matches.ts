@@ -1,4 +1,6 @@
 //source: https://www.thebluealliance.com/api/v3/event/2020week0/matches
+import type { Match } from '$lib/schema/match-schema';
+
 export const Matches = [
 	{
 		actual_time: 1581796140,
@@ -3066,7 +3068,7 @@ export const compLevels = {
 	f: 6 //finals
 };
 
-export function matchSort(a, b) {
+export function match_sort(a, b) {
 	if (compLevels[a.comp_level] !== compLevels[b.comp_level]) {
 		return compLevels[a.comp_level] - compLevels[b.comp_level];
 	}
@@ -3078,4 +3080,16 @@ export function matchSort(a, b) {
 	}
 }
 
-export const sortedMatches = Matches.sort(matchSort);
+export function matchSort(a: Match, b: Match): number {
+	if (compLevels[a.compLevel] !== compLevels[b.compLevel]) {
+		return compLevels[a.compLevel] - compLevels[b.compLevel];
+	}
+	if (a.setNumber !== b.setNumber) {
+		return a.setNumber - b.setNumber;
+	}
+	if (a.matchNumber !== b.matchNumber) {
+		return a.matchNumber - b.matchNumber;
+	}
+}
+
+export const sortedMatches = Matches.sort(match_sort);

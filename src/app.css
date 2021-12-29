@@ -104,3 +104,8 @@ button:focus:not(:focus-visible) {
         font-size: 2.4rem;
     }
 }
+
+/* Make the svelte-select control the same height as other bootstrap controls */
+.selectContainer {
+    --height: 38px
+}
