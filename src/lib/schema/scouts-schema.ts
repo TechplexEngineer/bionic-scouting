@@ -4,7 +4,7 @@ export type Scout = {
 	createdAt: number;
 	updatedAt: number;
 	name: string;
-	active: boolean;
+	active?: boolean;
 };
 
 export type ScoutCollection = RxCollection<Scout>;

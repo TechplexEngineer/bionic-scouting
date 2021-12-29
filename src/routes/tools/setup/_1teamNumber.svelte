@@ -7,7 +7,6 @@
     export let ourTeamNumber: writable<number | null> = writable(null);
 
     import type {MyDatabase} from '$lib/store';
-    import type {RxQuery} from "rxdb";
 
     let db: MyDatabase;
 
