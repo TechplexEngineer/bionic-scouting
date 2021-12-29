@@ -1,4 +1,4 @@
-import type { RxJsonSchema } from 'rxdb';
+import type { RxJsonSchema, RxCollection } from 'rxdb';
 
 export type Scout = {
 	createdAt: number;
@@ -7,7 +7,7 @@ export type Scout = {
 	active: boolean;
 };
 
-Date.now();
+export type ScoutCollection = RxCollection<Scout>;
 
 const scoutsSchema: RxJsonSchema<Scout> = {
 	title: 'scouts',

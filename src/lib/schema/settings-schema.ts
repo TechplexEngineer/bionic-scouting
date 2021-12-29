@@ -1,4 +1,4 @@
-import type { RxJsonSchema } from 'rxdb';
+import type { RxJsonSchema, RxCollection } from 'rxdb';
 
 export type Setting = {
 	createdAt: number;
@@ -7,12 +7,14 @@ export type Setting = {
 	value: string;
 };
 
+export type SettingsCollection = RxCollection<Setting>;
+
 const settingsSchema: RxJsonSchema<Setting> = {
 	title: 'settings',
 	description: 'App Wide Configuration',
 	version: 0,
 	type: 'object',
-	indexes: ['createdAt', 'updatedAt', 'key'],
+	indexes: ['createdAt', 'updatedAt'],
 	primaryKey: 'key',
 	properties: {
 		createdAt: {

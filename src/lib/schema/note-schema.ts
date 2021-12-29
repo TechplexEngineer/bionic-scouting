@@ -1,4 +1,4 @@
-import type { RxJsonSchema } from 'rxdb';
+import type { RxJsonSchema, RxCollection } from 'rxdb';
 
 export type Note = {
 	name: string;
@@ -6,6 +6,8 @@ export type Note = {
 	createdAt: number;
 	updatedAt: number;
 };
+
+export type NoteCollection = RxCollection<Note>;
 
 const noteSchema: RxJsonSchema<Note> = {
 	title: 'note',

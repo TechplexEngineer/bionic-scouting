@@ -1,4 +1,4 @@
-import type { RxJsonSchema } from 'rxdb';
+import type { RxJsonSchema, RxCollection } from 'rxdb';
 
 export type Fact = {
 	name: string;
@@ -14,6 +14,8 @@ export type PitReport = {
 	notes: string;
 	facts: Fact[];
 };
+
+export type PitReportCollection = RxCollection<PitReport>;
 
 const pitSchema: RxJsonSchema<PitReport> = {
 	title: 'pit-objective',

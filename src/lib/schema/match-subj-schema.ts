@@ -1,4 +1,4 @@
-import type { RxJsonSchema } from 'rxdb';
+import type { RxJsonSchema, RxCollection } from 'rxdb';
 
 export type Fact = {
 	name: string;
@@ -16,6 +16,8 @@ export type MatchSubjReport = {
 	notes: string;
 	facts: Fact[];
 };
+
+export type MatchSubjCollection = RxCollection<MatchSubjReport>;
 
 const matchSubjectiveSchema: RxJsonSchema<MatchSubjReport> = {
 	title: 'match-subjective',

@@ -1,4 +1,4 @@
-import type { RxJsonSchema } from 'rxdb';
+import type { RxJsonSchema, RxCollection } from 'rxdb';
 
 export type MatchMetricsReport = {
 	eventMatchKey: string;
@@ -22,6 +22,8 @@ export type MatchMetricsReport = {
 	teleopClimbLocation: string;
 	teleopClimbSuccess: boolean;
 };
+
+export type MatchMetricsCollection = RxCollection<MatchMetricsReport>;
 
 const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 	title: 'match-objective',
