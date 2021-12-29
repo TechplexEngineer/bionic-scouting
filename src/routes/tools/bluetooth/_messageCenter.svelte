@@ -3,7 +3,7 @@
     import Select from "svelte-select";
     import {BluetoothSerial} from "bionic-bt-serial";
 
-    import {getDb, collections} from "$lib/store";
+    import {getDb} from "$lib/store";
     import {onMount} from "svelte";
 
     async function click_sendMessage() {
@@ -52,7 +52,7 @@
 
 
         const replicationState = await replicateRxCollection({
-            collection: collections.notes,
+            collection: db.notes,
             replicationIdentifier: "my-notes-replication",
             // retryTime
             pull: {
