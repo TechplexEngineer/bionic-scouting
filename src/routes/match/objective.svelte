@@ -14,7 +14,7 @@
         NavLink
     } from "sveltestrap";
 
-    import matchObjectiveSchema from '$lib/schema/match-obj-schema'
+    import matchObjectiveSchema from '$lib/schema/match-metrics-schema'
     import Select from "svelte-select";
 
     let activeTab = 0; // start on first tab
