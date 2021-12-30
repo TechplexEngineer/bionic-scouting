@@ -35,3 +35,8 @@ const settingsSchema: RxJsonSchema<Setting> = {
 	required: ['key', 'value']
 };
 export default settingsSchema;
+
+export enum Settings {
+	CurrentEvent = 'currentEvent',
+	TeamNumber = 'ourTeamNumber'
+}

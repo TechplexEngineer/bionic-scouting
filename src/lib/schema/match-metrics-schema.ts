@@ -1,46 +1,47 @@
 import type { RxJsonSchema, RxCollection } from 'rxdb';
 
 export type MatchMetricsReport = {
-	eventMatchKey: string;
+	eventMatchTeamKey?: string;
 	eventKey: string;
 	matchKey: string;
-	matchForKey: string;
 	createdAt: number;
 	updatedAt: number;
 	teamNumber: number;
-	preStartingLocation: string;
-	preStartingLocationX: number;
-	preStartingLocationY: number;
-	prePowerCells: number;
-	autoHigh: number;
-	autoLow: number;
-	autoInitLine: boolean;
-	autoPenalties: number;
-	teleopPenalties: number;
-	teleopHighGoal: number;
-	teleopLowGoal: number;
-	teleopClimbLocation: string;
-	teleopClimbSuccess: boolean;
+	scoutName: string;
+
+	preStartingLocation?: string;
+	preStartingLocationX?: number;
+	preStartingLocationY?: number;
+	prePowerCells?: number;
+	autoHigh?: number;
+	autoLow?: number;
+	autoInitLine?: boolean;
+	autoPenalties?: number;
+	teleopPenalties?: number;
+	teleopHighGoal?: number;
+	teleopLowGoal?: number;
+	teleopClimbLocation?: string;
+	teleopClimbSuccess?: boolean;
 };
 
 export type MatchMetricsCollection = RxCollection<MatchMetricsReport>;
 
 const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 	title: 'match-objective',
-	description: 'Metrics about a match',
+	description: 'Metrics about a team in a match',
 	version: 0,
 	type: 'object',
 	indexes: ['createdAt', 'updatedAt'],
 	primaryKey: {
 		// where should the composed string be stored
-		key: 'eventMatchKey',
+		key: 'eventMatchTeamKey',
 		// fields that will be used to create the composed key
-		fields: ['eventKey', 'matchKey'],
+		fields: ['eventKey', 'matchKey', 'teamNumber'],
 		// separator which is used to concat the fields values.
 		separator: '_'
 	},
 	properties: {
-		eventMatchKey: {
+		eventMatchTeamKey: {
 			type: 'string'
 		},
 		eventKey: {
@@ -59,6 +60,9 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 		},
 		teamNumber: {
 			type: 'number'
+		},
+		scoutName: {
+			type: 'string'
 		},
 		// Pregame
 		preStartingLocation: {
