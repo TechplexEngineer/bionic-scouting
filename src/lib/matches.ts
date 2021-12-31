@@ -3060,12 +3060,12 @@ export const Matches = [
 
 export const compLevels = {
 	test: 0, // test match
-	pm: 1, //practice match
-	qm: 2, //qualification match
-	ef: 3, //eighth finals
-	qf: 4, //quarter finals
-	sf: 5, //semi finals
-	f: 6 //finals
+	pm: 1, // practice match
+	qm: 2, // qualification match
+	ef: 3, // eighth finals
+	qf: 4, // quarter finals
+	sf: 5, // semi finals
+	f: 6 // finals
 };
 
 export function match_sort(a, b) {

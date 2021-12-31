@@ -8,6 +8,7 @@ export type MatchMetricsReport = {
 	updatedAt: number;
 	teamNumber: number;
 	scoutName: string;
+	submitted: boolean;
 
 	preStartingLocation?: string;
 	preStartingLocationX?: number;
@@ -64,6 +65,12 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 		scoutName: {
 			type: 'string'
 		},
+		submitted: {
+			type: 'boolean',
+			description: 'Match has been played and data recorded',
+			default: false
+		},
+
 		// Pregame
 		preStartingLocation: {
 			type: 'string',

@@ -10,90 +10,100 @@
 
 <script lang="ts">
     import {Column, Table} from "sveltestrap";
-    import {sortedMatches} from "$lib/matches";
 
-    let matchNumber = 1;
-    let match = {};
+    import MatchPicker from './_matchPicker.svelte';
+    import {writable} from "svelte/store";
+    import {onMount} from "svelte";
+    import type {MyDatabase} from "$lib/store";
+    import {getDb} from "$lib/store";
+    import {Settings} from "$lib/schema/settings-schema";
+    import type {RxDocument} from "rxdb";
+    import type {Match} from "$lib/schema/match-schema";
+    import Swal from "sweetalert2";
+    import "sweetalert2/dist/sweetalert2.css";
+    import {goto} from '$app/navigation';
+    import {matchSort} from "$lib/matches";
+    import {capitalizeFirst} from "$lib/util";
 
-    $: match = sortedMatches[matchNumber - 1];
+    let matchNumber: writable<null | number> = writable(null); // starts at null so the set(1) triggers update
+    let match: RxDocument<Match>;
+    let db: MyDatabase;
+    let eventKey: string; //2020week0
+    let matches: RxDocument<Match>[] = [];
+    let ourTeamNumber: number; //eg 4909
+    onMount(async () => {
+        db = await getDb();
+
+        const settingEvent = await db.settings.findOne({selector: {key: Settings.CurrentEvent}}).exec();
+        if (!settingEvent) {
+            let res = await Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                html: `Current event not set. Head over to Setup`,
+                showCloseButton: true,
+                confirmButtonText: 'Go to Setup',
+            });
+            if (res.isConfirmed) {
+                goto("/tools/setup");
+                return;
+            }
+        }
+        eventKey = settingEvent.value;
+        matches = await db.matches.find({
+            selector: {eventKey: eventKey}
+        }).exec();
+
+        const entry = await db.settings.findOne({selector: {key: "ourTeamNumber"}}).exec();
+        if (entry && entry.value) {
+            ourTeamNumber = parseInt(entry.value)
+        }
+
+        matches.sort(matchSort)
+        matchNumber.set(1); //trigger update
+    })
+
+    matchNumber.subscribe(n => {
+        match = matches[n - 1]
+    })
+
 </script>
 
 
 <div class="container-fluid">
-    <!--	<h1>Match Preview: <a href="/match/{match.key.split('_')[1]}">{match.key.split('_')[1]}</a></h1>-->
+    <h1>Match Preview</h1>
 
-    <div class="input-group mb-3 row">
-        <button type="button" class="btn btn-primary col" on:click={()=>{
-		if (matchNumber - 1 > 0) {matchNumber -= 1}
-	}}>&lt; Previous
-        </button>
-        <input type="number" class="form-control col" value={matchNumber} on:change={(e)=>{
-		if (0 <= e.target.value && e.target.value < sortedMatches.length+1) {
-			matchNumber = e.target.value;
-		} else {
-			e.target.value = matchNumber;
-		}
-	}}>
-        <button type="button" class="btn btn-primary col" on:click={()=>{
-		if (matchNumber + 1 < sortedMatches.length+1) {
-			matchNumber += 1
-		}
-	}}>Next &gt;
-        </button>
-    </div>
+    <MatchPicker {matchNumber} numberOfMatches={matches.length} matchKey={match && match.matchKey}/>
 </div>
 
-<!-- Blue -->
-<Table striped>
-    <thead>
-    <tr>
-        <th class="text-primary bluebg">Blue</th>
-        <th>Drivebase</th>
-        <th>Play Def?</th>
-        <th>Score Loc?</th>
-        <th>Handle Def?</th>
-    </tr>
-    </thead>
-    <tbody>
-    {#each match.alliances.blue.team_keys as team}
-        <tr>
-            <th scope="row" class="bluebg">
-                <a href="/team/{team.replace('frc','')}">{team.replace('frc', '')}</a>
-            </th>
-            <td>a</td>
-            <td>b</td>
-            <td>c</td>
-            <td>d</td>
-        </tr>
-    {/each}
-    </tbody>
-</Table>
+{#if match}
+    {#each ['red', 'blue'] as color}
+        <Table striped>
+            <thead>
+            <tr class="{color}bg">
+                <th class="text-{color}">{capitalizeFirst(color)}</th>
+                <th>Drivebase</th>
+                <th>Play Def?</th>
+                <th>Score Loc?</th>
+                <th>Handle Def?</th>
+            </tr>
+            </thead>
+            <tbody>
+            {#each match.alliances[color].teamKeys as team}
+                <tr class="{color}bg">
 
-<!-- Red -->
-<Table striped>
-    <thead>
-    <tr>
-        <th class="text-danger redbg">Red</th>
-        <th>Drivebase</th>
-        <th>Play Def?</th>
-        <th>Score Loc?</th>
-        <th>Handle Def?</th>
-    </tr>
-    </thead>
-    <tbody>
-    {#each match.alliances.red.team_keys as team}
-        <tr>
-            <th scope="row" class="redbg">
-                <a href="/team/{team.replace('frc','')}">{team.replace('frc', '')}</a>
-            </th>
-            <td>a</td>
-            <td>b</td>
-            <td>c</td>
-            <td>d</td>
-        </tr>
+                    <th scope="row" class:our-team={ourTeamNumber==team.replace('frc', '')}>
+                        <a href="/team/{team.replace('frc','')}">{team.replace('frc', '')}</a>
+                    </th>
+                    <td>a</td>
+                    <td>b</td>
+                    <td>c</td>
+                    <td>d</td>
+                </tr>
+            {/each}
+            </tbody>
+        </Table>
     {/each}
-    </tbody>
-</Table>
+{/if}
 
 <style>
     a {
@@ -106,6 +116,34 @@
     }
 
     .redbg a {
-        color: var(--accent-color);
+        color: var(--bs-danger);
+    }
+
+    .redbg .our-team a {
+        color: var(--bs-dark);
+    }
+
+    .text-red {
+        color: var(--bs-danger);
+    }
+
+    .text-blue {
+        color: var(--bs-primary);
+    }
+
+    .bluebg {
+        background-color: rgb(201, 218, 248)
+    }
+
+    .bluebg .our-team {
+        background-color: rgb(109, 158, 235) !important;
+    }
+
+    .redbg {
+        background-color: rgb(244, 204, 204)
+    }
+
+    .redbg .our-team {
+        background-color: rgb(224, 102, 102) !important;
     }
 </style>

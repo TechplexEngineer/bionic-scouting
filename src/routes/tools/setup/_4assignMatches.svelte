@@ -61,10 +61,10 @@
         </tr>
         </thead>
         <tbody>
-        {#each matchesTable as m}
+        {#each matchesTable as m, idx}
             <tr>
                 <td rowspan="2">
-                    {m.matchKey}
+                    {m.matchKey} ({idx + 1})
                 </td>
 
                 {#each ['red'] as color}
