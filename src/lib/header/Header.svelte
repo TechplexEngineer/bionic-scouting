@@ -12,13 +12,11 @@
         NavbarToggler,
         NavbarBrand,
         Nav,
-        NavItem,
-        Dropdown,
-        DropdownToggle,
-        DropdownMenu,
-        DropdownItem, Offcanvas
+        Offcanvas, Dropdown, DropdownToggle, DropdownMenu, DropdownItem
     } from "sveltestrap";
     import {connections} from "$lib/bluetooth";
+    import {goto} from "$app/navigation";
+    import {page} from "$app/stores";
 
     let isOpen = false;
 
@@ -65,6 +63,39 @@
     function forward() {
         history.forward()
     }
+
+    let links = [
+        {name: "Home", href: "/"},
+        {name: "Match Metrics", href: "/match/objective"},
+        {name: "Match Subjective", href: "/match/subjective"},
+        {name: "Pit Scout", href: "/pit"},
+        {name: "Match Preview", href: "/match/preview"},
+        {name: "Match Schedule", href: "/match/schedule"},
+        {
+            name: "Tools",
+            dropdown: [
+                {name: "Settings", href: "/settings"},
+                {name: "Bluetooth", href: "/tools/bluetooth"},
+                {divider: true},
+                {name: "Setup", href: "/tools/setup"},
+                {name: "Super Setup", href: "/tools/super"},
+                {divider: true},
+                {name: "Reload", click: () => location.reload()},
+                {name: "Remove All Data", click: removeAllData},
+                {divider: true},
+                {name: "Notes", href: "/notes"},
+            ]
+        }
+    ];
+
+    function gotoWrapper(href) {
+        return () => {
+            toggle()
+            goto(href)
+        }
+    }
+
+
 </script>
 
 <Navbar dark style="background-color: #0b4833;">
@@ -112,18 +143,53 @@
     </h2>
     <Nav navbar>
 
-        <NavItem>
-            <ActiveNavLink href="/">Home</ActiveNavLink>
-        </NavItem>
+        {#each links as link}
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 w-100">
 
-        <NavItem>Match Scout</NavItem>
-        <NavItem>
-            <ActiveDropdownItem href="/match/objective">Objective</ActiveDropdownItem>
-        </NavItem>
+                {#if !link.dropdown}
+                    <li class="nav-item">
+                        <button
+                                class="btn btn-outline-secondary w-100"
+                                on:click={gotoWrapper(link.href)}
+                                class:active={$page.path === link.href}>
+                            {link.name}
+                        </button>
+                    </li>
+                {:else}
+                    <Dropdown nav inNavbar>
+                        <DropdownToggle caret outline class="w-100">{link.name}</DropdownToggle>
+                        <DropdownMenu end>
+                            {#each link.dropdown as item}
+                                {#if !item.divider}
+                                    <ActiveDropdownItem
+                                            link={item.href}
+                                            on:click={item.click || gotoWrapper(item.href)}>
+                                        {item.name}
+                                    </ActiveDropdownItem>
+                                {:else}
+                                    <DropdownItem divider/>
+                                {/if}
+                            {/each}
+                        </DropdownMenu>
+                    </Dropdown>
+                {/if}
 
-        <NavItem>
-            <ActiveDropdownItem href="/match/subjective">Subjective</ActiveDropdownItem>
-        </NavItem>
+            </ul>
+        {/each}
+
+
+        <!--        <NavItem>-->
+        <!--            <ActiveNavLink href="/">Home</ActiveNavLink>-->
+        <!--        </NavItem>-->
+
+        <!--        <NavItem>Match Scout</NavItem>-->
+        <!--        <NavItem>-->
+        <!--            <ActiveDropdownItem href="/match/objective">Objective</ActiveDropdownItem>-->
+        <!--        </NavItem>-->
+
+        <!--        <NavItem>-->
+        <!--        <ActiveDropdownItem href="/match/subjective">Subjective</ActiveDropdownItem>-->
+        <!--        </NavItem>-->
 
         <!--		<Dropdown nav inNavbar>-->
         <!--			<DropdownToggle nav caret>Match Scout</DropdownToggle>-->
@@ -134,32 +200,32 @@
         <!--			</DropdownMenu>-->
         <!--		</Dropdown>-->
 
-        <NavItem>
-            <ActiveNavLink href="/pit">Pit Scout</ActiveNavLink>
-        </NavItem>
+        <!--        <NavItem>-->
+        <!--            <ActiveNavLink href="/pit">Pit Scout</ActiveNavLink>-->
+        <!--        </NavItem>-->
 
-        <NavItem>
-            <ActiveNavLink href="/match/preview">Match Preview</ActiveNavLink>
-        </NavItem>
-        <NavItem>
-            <ActiveNavLink href="/match/schedule">Match Schedule</ActiveNavLink>
-        </NavItem>
+        <!--        <NavItem>-->
+        <!--            <ActiveNavLink href="/match/preview">Match Preview</ActiveNavLink>-->
+        <!--        </NavItem>-->
+        <!--        <NavItem>-->
+        <!--            <ActiveNavLink href="/match/schedule">Match Schedule</ActiveNavLink>-->
+        <!--        </NavItem>-->
 
-        <Dropdown nav inNavbar>
-            <DropdownToggle nav caret>Tools</DropdownToggle>
-            <DropdownMenu end>
-                <ActiveDropdownItem href="/settings">Settings</ActiveDropdownItem>
-                <ActiveDropdownItem href="/tools/bluetooth">Bluetooth</ActiveDropdownItem>
-                <DropdownItem divider/>
-                <ActiveDropdownItem href="/tools/setup">Setup</ActiveDropdownItem>
-                <ActiveDropdownItem href="/tools/super">Super Setup</ActiveDropdownItem>
-                <DropdownItem divider/>
-                <ActiveDropdownItem on:click={()=>{location.reload();}}>Reload</ActiveDropdownItem>
-                <ActiveDropdownItem on:click={removeAllData}>Remove All Data</ActiveDropdownItem>
-                <DropdownItem divider/>
-                <ActiveDropdownItem href="/notes">Notes</ActiveDropdownItem>
-            </DropdownMenu>
-        </Dropdown>
+        <!--        <Dropdown nav inNavbar>-->
+        <!--            <DropdownToggle nav caret>Tools</DropdownToggle>-->
+        <!--            <DropdownMenu end>-->
+        <!--                <ActiveDropdownItem href="/settings">Settings</ActiveDropdownItem>-->
+        <!--                <ActiveDropdownItem href="/tools/bluetooth">Bluetooth</ActiveDropdownItem>-->
+        <!--                <DropdownItem divider/>-->
+        <!--                <ActiveDropdownItem href="/tools/setup">Setup</ActiveDropdownItem>-->
+        <!--                <ActiveDropdownItem href="/tools/super">Super Setup</ActiveDropdownItem>-->
+        <!--                <DropdownItem divider/>-->
+        <!--                <ActiveDropdownItem on:click={()=>{location.reload();}}>Reload</ActiveDropdownItem>-->
+        <!--                <ActiveDropdownItem on:click={removeAllData}>Remove All Data</ActiveDropdownItem>-->
+        <!--                <DropdownItem divider/>-->
+        <!--                <ActiveDropdownItem href="/notes">Notes</ActiveDropdownItem>-->
+        <!--            </DropdownMenu>-->
+        <!--        </Dropdown>-->
 
         <!--			<NavItem>-->
         <!--				<ActiveNavLink href="/search">Search</ActiveNavLink>-->

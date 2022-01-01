@@ -1,57 +1,58 @@
 <script>
-  import { page } from '$app/stores';
+    import {page} from '$app/stores';
 
-  import { getContext } from 'svelte';
-  import { classnames } from "./utils";
+    import {getContext} from 'svelte';
+    import {classnames} from "./utils";
 
-  const context = getContext('dropdownContext');
+    const context = getContext('dropdownContext');
 
-  let className = '';
-  export { className as class };
+    let className = '';
+    export {className as class};
 
-  let active = false;
-  export let disabled = false;
-  export let divider = false;
-  export let header = false;
-  export let toggle = true;
-  export let href = '';
+    let active = false;
+    export let disabled = false;
+    export let divider = false;
+    export let header = false;
+    export let toggle = true;
+    export let href = '';
+    export let link = '';
 
-  $: active = ($page.path === href)
+    $: active = ($page.path === href || $page.path === link)
 
-  $: classes = classnames(className, {
-    disabled,
-    'dropdown-item': !divider && !header,
-    active: active,
-    'dropdown-header': header,
-    'dropdown-divider': divider
-  });
+    $: classes = classnames(className, {
+        disabled,
+        'dropdown-item': !divider && !header,
+        active: active,
+        'dropdown-header': header,
+        'dropdown-divider': divider
+    });
 
-  function handleItemClick(e) {
-    if (disabled || header || divider) {
-      e.preventDefault();
-      return;
+    function handleItemClick(e) {
+        if (disabled || header || divider) {
+            e.preventDefault();
+            return;
+        }
+
+        if (toggle) {
+            $context.toggle(e);
+        }
     }
-
-    if (toggle) {
-      $context.toggle(e);
-    }
-  }
 </script>
 
 {#if header}
-  <h6 {...$$restProps} on:click on:click={handleItemClick} class={classes}>
-    <slot />
-  </h6>
+    <h6 {...$$restProps} on:click on:click={handleItemClick} class={classes}>
+        <slot/>
+    </h6>
 {:else if divider}
-  <div {...$$restProps} on:click on:click={handleItemClick} class={classes}>
-    <slot />
-  </div>
+    <div {...$$restProps} on:click on:click={handleItemClick} class={classes}>
+        <slot/>
+    </div>
 {:else if href}
-  <a {...$$restProps} click on:click={handleItemClick} {href} class={classes}>
-    <slot />
-  </a>
+    <a {...$$restProps} click on:click={handleItemClick} {href} class={classes}>
+        <slot/>
+    </a>
 {:else}
-  <button type="button" {...$$restProps} on:click on:click={handleItemClick} class={classes}>
-    <slot />
-  </button>
+    <button type="button" {...$$restProps} on:click on:click={handleItemClick} class={classes}>
+        <slot/>
+    </button>
 {/if}
