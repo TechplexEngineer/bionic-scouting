@@ -16,6 +16,17 @@ export const connections = readable([], (set) => {
 	return () => clearInterval(handle);
 });
 
+export const adapterName = readable('', (set) => {
+	(async () => {
+		set((await BluetoothSerial.getName()).result);
+	})();
+	const handle = setInterval(async () => {
+		set((await BluetoothSerial.getName()).result);
+	}, 5 * 1000);
+
+	return () => clearInterval(handle);
+});
+
 let listnerHandle;
 let db;
 
