@@ -14,7 +14,7 @@
         NavLink
     } from "sveltestrap";
 
-    import matchObjectiveSchema from '$lib/schema/match-metrics-schema'
+    import matchObjectiveSchema, {MatchMetricsReport} from '$lib/schema/match-metrics-schema'
     import Select from "svelte-select";
     import Counter from "$lib/compontents/Counter.svelte";
     import BtnGroup from "$lib/compontents/BtnGroup.svelte";
@@ -22,8 +22,7 @@
 
     let activeTab = 0; // start on first tab
     let currentScout = "John Q.";// @todo
-    let currentMatch = "QM0";
-    let currentPos = "Red1";
+
 
     const tabs: Record<string, { key: string }[]> = {};
     const props = matchObjectiveSchema.properties;
@@ -48,7 +47,7 @@
 
     function makeNiceName(tabName: string, propKey: string) {
         let name = propKey;
-        // remove tab name prefix if it exists
+        // remove tab name(eg. 'pre' or 'auto') prefix if it exists
         if (name.toLowerCase().startsWith(tabName.toLowerCase())) {
             name = name.substring(tabName.length)
         }
@@ -61,6 +60,76 @@
         return !d.metadata.hidden
     }
 
+    import MatchPicker from './_matchPicker.svelte';
+    import {writable} from "svelte/store";
+    import {onMount} from "svelte";
+    import {getDb, MyDatabase} from "$lib/store";
+    import Swal from "sweetalert2";
+    import "sweetalert2/dist/sweetalert2.css";
+    import {Settings} from "$lib/schema/settings-schema";
+    import {goto} from "$app/navigation";
+    import type {RxDocument} from "rxdb";
+    import type {Match} from "$lib/schema/match-schema";
+    import {matchSort} from "$lib/matches";
+    import {adapterName} from "$lib/bluetooth";
+
+    let matchNumber: writable<number | null> = writable(null);
+
+    let eventKey: string; //2020week0
+    let matches: RxDocument<Match>[] = [];
+    let db: MyDatabase;
+    onMount(async () => {
+        db = await getDb();
+
+        const settingEvent = await db.settings.findOne({selector: {key: Settings.CurrentEvent}}).exec();
+        if (!settingEvent) {
+            let res = await Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                html: `Current event not set. Head over to Setup`,
+                showCloseButton: true,
+                confirmButtonText: 'Go to Setup',
+            });
+            if (res.isConfirmed) {
+                await goto("/tools/setup");
+                return;
+            }
+        }
+        eventKey = settingEvent.value;
+        matches = await db.matches.find({
+            selector: {eventKey: eventKey}
+        }).exec();
+        matches.sort(matchSort)
+        matchNumber.set(1); //trigger update
+    })
+
+    let match: RxDocument<Match>;
+    let matchMetrics: RxDocument<MatchMetricsReport>;
+    let teamNumber;
+    matchNumber.subscribe(async (n) => {
+        if (n == null) {
+            return; //nothing to do
+        }
+        match = matches[n - 1]
+        // let color = 'red';
+
+        let [color, number] = $adapterName.split('-')
+        color = color.toLowerCase()
+        console.log("color number", color, number);
+
+        // console.log("here", , $adapterName);
+        teamNumber = match.alliances[color].teamKeys[number - 1].replace('frc', '')
+
+        // matchMetrics = await db.match_metrics.findOne({
+        //     selector: {
+        //         eventKey: eventKey,
+        //         matchKey: match.matchKey,
+        //         teamNumber: match.alliances[color].team
+        //     }
+        // }).exec();
+
+    })
+
 </script>
 
 
@@ -70,12 +139,14 @@
             <h3 class="fs-5 text-muted">S: {currentScout}</h3>
         </div>
         <div class="col">
-            <h3 class="fs-5 text-muted text-center">{currentPos}</h3>
+            <h3 class="fs-5 text-muted text-center">{$adapterName} &mdash; {teamNumber}</h3>
         </div>
         <div class="col">
-            <h3 class="fs-5 text-muted text-end">M: {currentMatch}</h3>
+            <h3 class="fs-5 text-muted text-end">M: {match && match.matchKey}</h3>
         </div>
     </div>
+
+    <MatchPicker {matchNumber} numberOfMatches={matches.length} matchKey={match && match.matchKey}/>
 
 
     <Nav tabs class="mb-2">

@@ -53,7 +53,7 @@
             selector: {eventKey: eventKey}
         }).exec();
 
-        const entry = await db.settings.findOne({selector: {key: "ourTeamNumber"}}).exec();
+        const entry = await db.settings.findOne({selector: {key: Settings.TeamNumber}}).exec();
         if (entry && entry.value) {
             ourTeamNumber = parseInt(entry.value)
         }
