@@ -6,6 +6,8 @@
     import {getDb} from "$lib/store";
     import {onMount} from "svelte";
 
+    export let colClass: string;
+
     async function click_sendMessage() {
         if (!bt.isMessageCenterRunning()) {
             alert("Message center must be running.");
@@ -112,7 +114,7 @@
 </script>
 
 
-<div class="col col-sm-6 card">
+<div class="col {colClass} card">
     <div class="card-body">
         <h5 class="card-title">Message Center: Send</h5>
         <Select items={connectedDevices} bind:value={sendMessageToItem}/>
@@ -123,14 +125,14 @@
     </div>
 </div>
 
-<div class="col col-sm-6 card">
+<div class="col {colClass} card">
     <div class="card-body">
         <h5 class="card-title">Message Center: Receive</h5>
 
     </div>
 </div>
 
-<div class="col col-sm-6 card">
+<div class="col {colClass} card">
     <div class="card-body">
 
         <h5 class="card-title">Notes Sync</h5>
