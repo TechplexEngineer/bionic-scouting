@@ -126,7 +126,7 @@ const matchSchema: RxJsonSchema<Match> = {
 		},
 		winningAlliance: {
 			type: 'string',
-			enum: ['red', 'blue'],
+			enum: ['red', 'blue', ''],
 			description:
 				'The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.'
 		},

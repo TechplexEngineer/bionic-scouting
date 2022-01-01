@@ -56,7 +56,7 @@
 
     let fileInput; //Bound to the file input
     async function processScoutNameFileUpload(e) {
-        console.log(e.target.value);
+        // console.log("File Name", e.target.value);
         const papa = await import("papaparse");
         let file = e.target.files[0];
 

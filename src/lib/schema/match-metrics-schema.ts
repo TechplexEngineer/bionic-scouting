@@ -83,6 +83,7 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 		},
 		preStartingLocationX: {
 			type: 'number',
+			minimum: 0,
 			metadata: {
 				tab: 'Pre',
 				hidden: true
@@ -90,6 +91,7 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 		},
 		preStartingLocationY: {
 			type: 'number',
+			minimum: 0,
 			metadata: {
 				tab: 'Pre',
 				hidden: true
@@ -97,8 +99,10 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 		},
 		prePowerCells: {
 			type: 'number',
+			minimum: 0,
+			maximum: 3,
 			metadata: {
-				label: 'Number of power cells loaded',
+				label: 'Number of Power Cells loaded',
 				tab: 'Pre',
 				cardClasses: 'col-12'
 			}
@@ -109,51 +113,51 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 			metadata: {
 				tab: 'Auto'
 			},
-			minimum: 0,
-			maximum: 3
+			minimum: 0
 		},
 		autoLow: {
 			type: 'number',
 			metadata: {
 				tab: 'Auto'
-			}
+			},
+			minimum: 0
 		},
 		autoInitLine: {
 			type: 'boolean',
 			metadata: {
-				tab: 'Auto'
+				tab: 'Auto',
+				labelNotSelected: 'Not Crossed',
+				labelSelected: 'Crossed'
 			}
 		},
 		autoPenalties: {
 			type: 'number',
 			metadata: {
 				tab: 'Auto'
-			}
+			},
+			minimum: 0
 		},
 		// Teleop
-		teleopPenalties: {
-			type: 'number',
-			metadata: {
-				tab: 'Teleop'
-			}
-		},
 		teleopHighGoal: {
 			type: 'number',
 			metadata: {
 				tab: 'Teleop'
-			}
+			},
+			minimum: 0
 		},
 		teleopLowGoal: {
 			type: 'number',
 			metadata: {
 				tab: 'Teleop'
-			}
+			},
+			minimum: 0
 		},
 		teleopClimbLocation: {
 			type: 'string',
-			enum: ['center', 'end'],
+			enum: ['Center', 'End'],
 			metadata: {
-				tab: 'Teleop'
+				tab: 'Teleop',
+				control: 'buttons'
 			}
 		},
 		teleopClimbSuccess: {
@@ -161,6 +165,13 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 			metadata: {
 				tab: 'Teleop'
 			}
+		},
+		teleopPenalties: {
+			type: 'number',
+			metadata: {
+				tab: 'Teleop'
+			},
+			minimum: 0
 		}
 	},
 	required: ['eventKey', 'matchKey']

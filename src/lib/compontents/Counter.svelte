@@ -6,7 +6,11 @@
      * The value of the counter
      */
     export let value = writable(0);
+    export let min: number | null = null; //inclusive
+    export let max: number | null = null; //inclusive
 
+
+    // Start Magic to make it look cool as the number changes
     const displayed_count = spring();
     value.subscribe(v => {
         displayed_count.set(v);
@@ -18,10 +22,36 @@
         // handle negative numbers
         return ((n % m) + m) % m;
     }
+
+    // End Magic to make it look cool as the number changes
+
+    function increment() {
+        value.update(v => {
+            if (max != null) {
+                if (v + 1 <= max) {
+                    return v + 1;
+                }
+                return v;
+            }
+            return v + 1;
+        })
+    }
+
+    function decrement() {
+        value.update(v => {
+            if (min != null) {
+                if (v - 1 >= min) {
+                    return v - 1;
+                }
+                return v;
+            }
+            return v - 1;
+        })
+    }
 </script>
 
 <div class="counter">
-    <button on:click={() => {value.set($value-1)}} aria-label="Decrease the counter by one">
+    <button on:click={decrement} aria-label="Decrease the counter by one">
         <svg aria-hidden="true" viewBox="0 0 1 1">
             <path d="M0,0.5 L1,0.5"/>
         </svg>
@@ -34,7 +64,7 @@
         </div>
     </div>
 
-    <button on:click={() => {value.set($value+1)}} aria-label="Increase the counter by one">
+    <button on:click={increment} aria-label="Increase the counter by one">
         <svg aria-hidden="true" viewBox="0 0 1 1">
             <path d="M0,0.5 L1,0.5 M0.5,0 L0.5,1"/>
         </svg>
