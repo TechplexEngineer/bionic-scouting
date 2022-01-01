@@ -147,8 +147,7 @@
     </div>
 
     <MatchPicker {matchNumber} numberOfMatches={matches.length} matchKey={match && match.matchKey}/>
-
-
+    
     <Nav tabs class="mb-2">
         {#each Object.keys(tabs) as tabName, index}
             <NavItem class="flex-grow-1 px-1">

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="description" content="Svelte demo app" />
-		<link rel="icon" href="/favicon.png" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<script>
-			window.process = window.process || {env: {NODE_DEBUG:undefined, DEBUG:undefined}};
-			window.global = window;
-		</script>
-		%svelte.head%
-	</head>
-	<body>
-		<div id="svelte">%svelte.body%</div>
-	</body>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="description" content="Bionic Scouting for the FIRST Robotics Competition by FRC Team 4909"/>
+    <link rel="icon" href="/favicon.png"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <script>
+        window.process = window.process || {env: {NODE_DEBUG: undefined, DEBUG: undefined}};
+        window.global = window;
+    </script>
+    %svelte.head%
+</head>
+<body>
+<div id="svelte">%svelte.body%</div>
+</body>
 </html>
