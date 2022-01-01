@@ -1,5 +1,21 @@
 import type { RxJsonSchema, RxCollection } from 'rxdb';
-import type { Mat319ch as TBAMatch, Match_alliance } from 'tba-api-v3client-ts';
+import type { Match as TBAMatch } from 'tba-api-v3client-ts';
+
+export declare type Match_alliance = {
+	/**
+	 * Score for this alliance. Will be null or -1 for an unplayed match.
+	 */
+	score: number;
+	teamKeys: Array<string>;
+	/**
+	 * TBA team keys (eg `frc254`) of any teams playing as a surrogate.
+	 */
+	surrogateTeamKeys?: Array<string>;
+	/**
+	 * TBA team keys (eg `frc254`) of any disqualified teams.
+	 */
+	dqTeamKeys?: Array<string>;
+};
 
 export type Match = {
 	/**
