@@ -51,6 +51,12 @@
     {:catch error}
         {error.message}
     {/await}
+    <div class="d-block d-sm-none">xs</div>
+    <div class="d-none d-sm-block d-md-none">sm</div>
+    <div class="d-none d-md-block d-lg-none">md</div>
+    <div class="d-none d-lg-block d-xl-none">lg</div>
+    <div class="d-none d-xl-block d-xxl-none">xl</div>
+    <div class="d-none d-xxl-block">xxl</div>
 </footer>
 
 <style>
