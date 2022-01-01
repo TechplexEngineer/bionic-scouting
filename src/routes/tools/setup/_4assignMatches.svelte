@@ -78,7 +78,7 @@
                 {/each}
 
             </tr>
-            <tr>
+            <tr style="border-bottom: 2px solid black">
                 {#each ['blue'] as color}
                     {#each m.alliances[color].teamKeys as t, idx}
                         <td class="{color}bg" class:our-team={t.replace('frc','') == ourTeamNumber}>
