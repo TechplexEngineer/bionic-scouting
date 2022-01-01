@@ -6,7 +6,7 @@
     import "../app.css";
     import {App} from "@capacitor/app";
 
-    // not sure how else to do this so we only get do init work once
+    // not sure how else to do this, so we only get do init work once
     import {init} from "$lib/init";
 
     init();

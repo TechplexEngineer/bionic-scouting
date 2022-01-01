@@ -1,112 +1,172 @@
 <script context="module">
-	// Disable server side rendering for this page
-	export const ssr = false;
+    // Disable server side rendering for this page
+    export const ssr = false;
 </script>
 
 <script lang="ts">
-	import ActiveNavLink from "$lib/header/ActiveNavLink.svelte";
-	import ActiveDropdownItem from "$lib/header/ActiveDropdownItem.svelte";
+    import ActiveNavLink from "$lib/header/ActiveNavLink.svelte";
+    import ActiveDropdownItem from "$lib/header/ActiveDropdownItem.svelte";
 
-	import {
-		Collapse,
-		Navbar,
-		NavbarToggler,
-		NavbarBrand,
-		Nav,
-		NavItem,
-		Dropdown,
-		DropdownToggle,
-		DropdownMenu,
-		DropdownItem
-	} from "sveltestrap";
-	import { connections } from "$lib/bluetooth";
+    import {
+        Navbar,
+        NavbarToggler,
+        NavbarBrand,
+        Nav,
+        NavItem,
+        Dropdown,
+        DropdownToggle,
+        DropdownMenu,
+        DropdownItem, Offcanvas
+    } from "sveltestrap";
+    import {connections} from "$lib/bluetooth";
 
-	let isOpen = false;
+    let isOpen = false;
 
-	function handleUpdate(event) {
-		isOpen = event.detail.isOpen;
-	}
+    // function handleUpdate(event) {
+    //     isOpen = event.detail.isOpen;
+    // }
 
-	let btMessage = "...";
-	connections.subscribe(devices => {
-		if (devices.length == 0) {
-			btMessage = "NC";
-		} else if (devices.length == 1) {
-			btMessage = "Con";
-		} else {
-			btMessage = `Con(${devices.length})`;
-		}
-	});
+    function toggle() {
+        isOpen = !isOpen;
+    }
 
-	async function removeAllData() {
-		if (!confirm("Are you sure? there is no undo!")) {
-			return;
-		}
-		console.log("Removing all databases");
-		const dbs = await indexedDB.databases();
-		dbs.forEach(db => {
-			console.log("Delete", db);
-			indexedDB.deleteDatabase(db.name);
-		});
+    let btMessage = "...";
+    connections.subscribe(devices => {
+        if (devices.length == 0) {
+            btMessage = "NC";
+        } else if (devices.length == 1) {
+            btMessage = "Con";
+        } else {
+            btMessage = `Con(${devices.length})`;
+        }
+    });
 
-		localStorage.clear();
-		location.reload();
+    async function removeAllData() {
+        if (!confirm("Are you sure? there is no undo!")) {
+            return;
+        }
+        console.log("Removing all databases");
+        const dbs = await indexedDB.databases();
+        dbs.forEach(db => {
+            console.log("Delete", db);
+            indexedDB.deleteDatabase(db.name);
+        });
 
-	}
+        localStorage.clear();
+        location.reload();
+    }
+
+    let expand = "lg";
+
+    function back() {
+        history.back()
+    }
+
+    function forward() {
+        history.forward()
+    }
 </script>
 
-<Navbar dark expand="xs" style="background-color: #0b4833;">
-	<NavbarBrand on:click={history.back}>TGA</NavbarBrand>
-	<NavbarToggler on:click={() => (isOpen = !isOpen)} />
-	<Collapse {isOpen} navbar expand="xs" on:update={handleUpdate}>
-		<Nav navbar>
+<Navbar dark style="background-color: #0b4833;">
 
-			<NavItem>
-				<ActiveNavLink href="/">Home</ActiveNavLink>
-			</NavItem>
+    <div class="d-flex justify-content-center">
 
-			<Dropdown nav inNavbar>
-				<DropdownToggle nav caret>Match Scout</DropdownToggle>
-				<DropdownMenu end>
-					<ActiveDropdownItem href="/match/objective">Objective</ActiveDropdownItem>
-					<DropdownItem divider />
-					<ActiveDropdownItem href="/match/subjective">Subjective</ActiveDropdownItem>
-				</DropdownMenu>
-			</Dropdown>
+        <div class="flex-1">
+            <NavbarBrand href="/">TGA</NavbarBrand>
+            <button class="btn btn-outline-secondary px-2 py-0" on:click={back}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                     class="bi bi-arrow-left-short" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                          d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
+                </svg>
+            </button>
+            <button class="btn btn-outline-secondary px-2 py-0" on:click={forward}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                     class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                          d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
+                </svg>
+            </button>
+        </div>
 
-			<NavItem>
-				<ActiveNavLink href="/pit">Pit Scout</ActiveNavLink>
-			</NavItem>
 
-			<Dropdown nav inNavbar>
-				<DropdownToggle nav caret>Tools</DropdownToggle>
-				<DropdownMenu end>
-					<ActiveDropdownItem href="/match/preview">Match Preview</ActiveDropdownItem>
-					<ActiveDropdownItem href="/match/schedule">Match Schedule</ActiveDropdownItem>
-					<DropdownItem divider />
-					<ActiveDropdownItem href="/settings">Settings</ActiveDropdownItem>
-					<ActiveDropdownItem href="/tools/bluetooth">Bluetooth</ActiveDropdownItem>
-					<DropdownItem divider />
-					<ActiveDropdownItem href="/tools/setup">Setup</ActiveDropdownItem>
-					<ActiveDropdownItem href="/tools/super">Super Setup</ActiveDropdownItem>
-					<DropdownItem divider />
-					<ActiveDropdownItem on:click={()=>{location.reload();}}>Reload</ActiveDropdownItem>
-					<ActiveDropdownItem on:click={removeAllData}>Remove All Data</ActiveDropdownItem>
-					<DropdownItem divider />
-					<ActiveDropdownItem href="/notes">Notes</ActiveDropdownItem>
-				</DropdownMenu>
-			</Dropdown>
+    </div>
+    <div class="navbar-text flex-1 justify-content-center text-center">
+        BT: {btMessage}
+    </div>
+    <div class="flex-1 justify-content-end text-end">
+        <NavbarToggler on:click={() => (isOpen = !isOpen)}/>
 
-			<!--			<NavItem>-->
-			<!--				<ActiveNavLink href="/search">Search</ActiveNavLink>-->
-			<!--			</NavItem>-->
+    </div>
 
-		</Nav>
-	</Collapse>
-	<span class="navbar-text">
-    BT: {btMessage}
-  </span>
 </Navbar>
+
+<Offcanvas isOpen={isOpen} toggle={toggle} placement="start">
+
+    <h1 slot="header">
+        The Green Alliance
+    </h1>
+
+    <h2 class="text-muted" style="margin-top: -20px">
+        Menu
+    </h2>
+    <Nav navbar>
+
+        <NavItem>
+            <ActiveNavLink href="/">Home</ActiveNavLink>
+        </NavItem>
+
+        <NavItem>Match Scout</NavItem>
+        <NavItem>
+            <ActiveDropdownItem href="/match/objective">Objective</ActiveDropdownItem>
+        </NavItem>
+
+        <NavItem>
+            <ActiveDropdownItem href="/match/subjective">Subjective</ActiveDropdownItem>
+        </NavItem>
+
+        <!--		<Dropdown nav inNavbar>-->
+        <!--			<DropdownToggle nav caret>Match Scout</DropdownToggle>-->
+        <!--			<DropdownMenu end>-->
+        <!--				<ActiveDropdownItem href="/match/objective">Objective</ActiveDropdownItem>-->
+        <!--				<DropdownItem divider/>-->
+        <!--				<ActiveDropdownItem href="/match/subjective">Subjective</ActiveDropdownItem>-->
+        <!--			</DropdownMenu>-->
+        <!--		</Dropdown>-->
+
+        <NavItem>
+            <ActiveNavLink href="/pit">Pit Scout</ActiveNavLink>
+        </NavItem>
+
+        <NavItem>
+            <ActiveNavLink href="/match/preview">Match Preview</ActiveNavLink>
+        </NavItem>
+        <NavItem>
+            <ActiveNavLink href="/match/schedule">Match Schedule</ActiveNavLink>
+        </NavItem>
+
+        <Dropdown nav inNavbar>
+            <DropdownToggle nav caret>Tools</DropdownToggle>
+            <DropdownMenu end>
+                <ActiveDropdownItem href="/settings">Settings</ActiveDropdownItem>
+                <ActiveDropdownItem href="/tools/bluetooth">Bluetooth</ActiveDropdownItem>
+                <DropdownItem divider/>
+                <ActiveDropdownItem href="/tools/setup">Setup</ActiveDropdownItem>
+                <ActiveDropdownItem href="/tools/super">Super Setup</ActiveDropdownItem>
+                <DropdownItem divider/>
+                <ActiveDropdownItem on:click={()=>{location.reload();}}>Reload</ActiveDropdownItem>
+                <ActiveDropdownItem on:click={removeAllData}>Remove All Data</ActiveDropdownItem>
+                <DropdownItem divider/>
+                <ActiveDropdownItem href="/notes">Notes</ActiveDropdownItem>
+            </DropdownMenu>
+        </Dropdown>
+
+        <!--			<NavItem>-->
+        <!--				<ActiveNavLink href="/search">Search</ActiveNavLink>-->
+        <!--			</NavItem>-->
+
+    </Nav>
+</Offcanvas>
 
 <!--<header>-->
 <!--	<Navbar dark expand="md" style="background-color: #0b4833;">-->
@@ -166,5 +226,7 @@
 <!--</header>-->
 
 <style>
-
+    .flex-1 {
+        flex: 1;
+    }
 </style>
