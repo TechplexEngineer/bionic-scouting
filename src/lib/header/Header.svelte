@@ -14,9 +14,11 @@
         Nav,
         Offcanvas, Dropdown, DropdownToggle, DropdownMenu, DropdownItem
     } from "sveltestrap";
-    import {connections} from "$lib/bluetooth";
+    import {adapterName, connections} from "$lib/bluetooth";
     import {goto} from "$app/navigation";
     import {page} from "$app/stores";
+    import {onMount} from "svelte";
+    import {BluetoothSerial} from "bionic-bt-serial";
 
     let isOpen = false;
 
@@ -54,7 +56,6 @@
         location.reload();
     }
 
-    let expand = "lg";
 
     function back() {
         history.back()
@@ -63,6 +64,7 @@
     function forward() {
         history.forward()
     }
+
 
     let links = [
         {name: "Home", href: "/"},
@@ -98,36 +100,32 @@
 
 </script>
 
-<Navbar dark style="background-color: #0b4833;">
+<Navbar dark style="background-color: #0b4833;" class="d-flex">
 
-    <div class="d-flex justify-content-center">
-
-        <div class="flex-1">
-            <NavbarBrand href="/">TGA</NavbarBrand>
-            <button class="btn btn-outline-secondary px-2 py-0" on:click={back}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                     class="bi bi-arrow-left-short" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd"
-                          d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
-                </svg>
-            </button>
-            <button class="btn btn-outline-secondary px-2 py-0" on:click={forward}>
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
-                     class="bi bi-arrow-right-short" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd"
-                          d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
-                </svg>
-            </button>
-        </div>
-
-
+    <div class="flex-1 justify-content-center">
+        <NavbarBrand href="/">TGA</NavbarBrand>
+        <button class="btn btn-outline-secondary px-2 py-0" on:click={back}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                 class="bi bi-arrow-left-short" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                      d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
+            </svg>
+        </button>
+        <button class="btn btn-outline-secondary px-2 py-0" on:click={forward}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                 class="bi bi-arrow-right-short" viewBox="0 0 16 16">
+                <path fill-rule="evenodd"
+                      d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
+            </svg>
+        </button>
     </div>
-    <div class="navbar-text flex-1 justify-content-center text-center">
-        BT: {btMessage} | Red 1
+
+    <div class="flex-1 justify-content-center navbar-text text-center">
+        {$adapterName} | BT: {btMessage}
     </div>
+
     <div class="flex-1 justify-content-end text-end">
         <NavbarToggler on:click={() => (isOpen = !isOpen)}/>
-
     </div>
 
 </Navbar>
