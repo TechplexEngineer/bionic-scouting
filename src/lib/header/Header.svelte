@@ -123,7 +123,7 @@
 
     </div>
     <div class="navbar-text flex-1 justify-content-center text-center">
-        BT: {btMessage}
+        BT: {btMessage} | Red 1
     </div>
     <div class="flex-1 justify-content-end text-end">
         <NavbarToggler on:click={() => (isOpen = !isOpen)}/>
@@ -177,56 +177,6 @@
             </ul>
         {/each}
 
-
-        <!--        <NavItem>-->
-        <!--            <ActiveNavLink href="/">Home</ActiveNavLink>-->
-        <!--        </NavItem>-->
-
-        <!--        <NavItem>Match Scout</NavItem>-->
-        <!--        <NavItem>-->
-        <!--            <ActiveDropdownItem href="/match/objective">Objective</ActiveDropdownItem>-->
-        <!--        </NavItem>-->
-
-        <!--        <NavItem>-->
-        <!--        <ActiveDropdownItem href="/match/subjective">Subjective</ActiveDropdownItem>-->
-        <!--        </NavItem>-->
-
-        <!--		<Dropdown nav inNavbar>-->
-        <!--			<DropdownToggle nav caret>Match Scout</DropdownToggle>-->
-        <!--			<DropdownMenu end>-->
-        <!--				<ActiveDropdownItem href="/match/objective">Objective</ActiveDropdownItem>-->
-        <!--				<DropdownItem divider/>-->
-        <!--				<ActiveDropdownItem href="/match/subjective">Subjective</ActiveDropdownItem>-->
-        <!--			</DropdownMenu>-->
-        <!--		</Dropdown>-->
-
-        <!--        <NavItem>-->
-        <!--            <ActiveNavLink href="/pit">Pit Scout</ActiveNavLink>-->
-        <!--        </NavItem>-->
-
-        <!--        <NavItem>-->
-        <!--            <ActiveNavLink href="/match/preview">Match Preview</ActiveNavLink>-->
-        <!--        </NavItem>-->
-        <!--        <NavItem>-->
-        <!--            <ActiveNavLink href="/match/schedule">Match Schedule</ActiveNavLink>-->
-        <!--        </NavItem>-->
-
-        <!--        <Dropdown nav inNavbar>-->
-        <!--            <DropdownToggle nav caret>Tools</DropdownToggle>-->
-        <!--            <DropdownMenu end>-->
-        <!--                <ActiveDropdownItem href="/settings">Settings</ActiveDropdownItem>-->
-        <!--                <ActiveDropdownItem href="/tools/bluetooth">Bluetooth</ActiveDropdownItem>-->
-        <!--                <DropdownItem divider/>-->
-        <!--                <ActiveDropdownItem href="/tools/setup">Setup</ActiveDropdownItem>-->
-        <!--                <ActiveDropdownItem href="/tools/super">Super Setup</ActiveDropdownItem>-->
-        <!--                <DropdownItem divider/>-->
-        <!--                <ActiveDropdownItem on:click={()=>{location.reload();}}>Reload</ActiveDropdownItem>-->
-        <!--                <ActiveDropdownItem on:click={removeAllData}>Remove All Data</ActiveDropdownItem>-->
-        <!--                <DropdownItem divider/>-->
-        <!--                <ActiveDropdownItem href="/notes">Notes</ActiveDropdownItem>-->
-        <!--            </DropdownMenu>-->
-        <!--        </Dropdown>-->
-
         <!--			<NavItem>-->
         <!--				<ActiveNavLink href="/search">Search</ActiveNavLink>-->
         <!--			</NavItem>-->
@@ -234,62 +184,6 @@
     </Nav>
 </Offcanvas>
 
-<!--<header>-->
-<!--	<Navbar dark expand="md" style="background-color: #0b4833;">-->
-<!--		<div class="container-fluid">-->
-<!--&lt;!&ndash;			<NavbarBrand href="/">TGA</NavbarBrand>&ndash;&gt;-->
-<!--			<a class="navbar-brand" href="/">TGA</a>-->
-
-
-<!--			<Collapse {isOpen} navbar expand="md" on:update={handleUpdate}>-->
-<!--				<ul class="navbar-nav me-auto mb-2 mb-lg-0">-->
-<!--					<li class="nav-item">-->
-<!--						<a class="nav-link" href="/" class:active={$page.path === '/'}>Home</a>-->
-<!--					</li>-->
-
-<!--					<li class="nav-item dropdown">-->
-<!--						<a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--							Match-->
-<!--						</a>-->
-<!--						<ul class="dropdown-menu">-->
-<!--							<li><a class="dropdown-item" href="/match/objective" class:active={$page.path === '/match/objective'}>Objective</a></li>-->
-<!--							<li><a class="dropdown-item" href="/match/subjective" class:active={$page.path === '/match/subjective'}>Subjective</a></li>-->
-<!--						</ul>-->
-<!--					</li>-->
-
-<!--					<li class="nav-item dropdown">-->
-<!--						<a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--							Pit-->
-<!--						</a>-->
-<!--						<ul class="dropdown-menu">-->
-<!--							<li><a class="dropdown-item" href="/pit/objective" class:active={$page.path === '/pit/objective'}>Objective</a></li>-->
-<!--							<li><a class="dropdown-item" href="/pit/subjective" class:active={$page.path === '/pit/subjective'}>Subjective</a></li>-->
-<!--						</ul>-->
-<!--					</li>-->
-
-<!--					<li class="nav-item dropdown">-->
-<!--						<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">-->
-<!--							Tools-->
-<!--						</a>-->
-<!--						<ul class="dropdown-menu" aria-labelledby="navbarDropdown">-->
-<!--							<li><a class="dropdown-item" href="/preview" class:active={$page.path === '/preview'}>Match Preview</a></li>-->
-<!--							<li><a class="dropdown-item" href="/match/schedule" class:active={$page.path === '/match/schedule'}>Match Schedule</a></li>-->
-<!--							<li><hr class="dropdown-divider"></li>-->
-<!--							<li><a class="dropdown-item" href="/bluetooth" class:active={$page.path === '/bluetooth'}>Bluetooth</a></li>-->
-<!--							<li><a class="dropdown-item" href="/settings" class:active={$page.path === '/settings'}>Settings</a></li>-->
-<!--							<li><hr class="dropdown-divider"></li>-->
-<!--							<li><a class="dropdown-item" href="/setup" class:active={$page.path === '/setup'}>Setup</a></li>-->
-<!--						</ul>-->
-<!--					</li>-->
-<!--				</ul>-->
-<!--
-<!--			</Collapse>-->
-
-
-<!--		</div>-->
-<!--	</Navbar>-->
-
-<!--</header>-->
 
 <style>
     .flex-1 {
