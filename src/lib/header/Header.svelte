@@ -120,7 +120,7 @@
         </button>
     </div>
 
-    <div class="flex-1 justify-content-center navbar-text text-center">
+    <div class="flex-1 justify-content-center navbar-text text-center text-nowrap">
         {$adapterName} | BT: {btMessage}
     </div>
 
