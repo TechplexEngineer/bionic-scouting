@@ -15,10 +15,6 @@
     } from "sveltestrap";
 
     import matchObjectiveSchema, {MatchMetricsReport} from '$lib/schema/match-metrics-schema'
-    import Select from "svelte-select";
-    import Counter from "$lib/compontents/Counter.svelte";
-    import BtnGroup from "$lib/compontents/BtnGroup.svelte";
-    import Boolean from "$lib/compontents/Boolean.svelte";
 
     let activeTab = 0; // start on first tab
 
