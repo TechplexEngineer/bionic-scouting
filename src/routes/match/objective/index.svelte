@@ -21,7 +21,6 @@
     import Boolean from "$lib/compontents/Boolean.svelte";
 
     let activeTab = 0; // start on first tab
-    let currentScout = "John Q.";// @todo
 
 
     const tabs: Record<string, { key: string }[]> = {};
@@ -60,7 +59,7 @@
         return !d.metadata.hidden
     }
 
-    import MatchPicker from './_matchPicker.svelte';
+    import MatchPicker from '../_matchPicker.svelte';
     import {writable} from "svelte/store";
     import {onMount} from "svelte";
     import {getDb, MyDatabase} from "$lib/store";
@@ -111,24 +110,25 @@
             return; //nothing to do
         }
         match = matches[n - 1]
-        // let color = 'red';
 
         let [color, number] = $adapterName.split('-')
         color = color.toLowerCase()
-        console.log("color number", color, number);
+        // console.log("color number", color, number);
 
-        // console.log("here", , $adapterName);
         teamNumber = match.alliances[color].teamKeys[number - 1].replace('frc', '')
 
-        // matchMetrics = await db.match_metrics.findOne({
-        //     selector: {
-        //         eventKey: eventKey,
-        //         matchKey: match.matchKey,
-        //         teamNumber: match.alliances[color].team
-        //     }
-        // }).exec();
+        matchMetrics = await db.match_metrics.findOne({
+            selector: {
+                eventKey: eventKey,
+                matchKey: match.matchKey,
+                teamNumber: parseInt(teamNumber),
+            }
+        }).exec();
+        // console.log("matchMetrics", eventKey, match.matchKey, teamNumber, matchMetrics);
 
-    })
+    });
+
+    import InputControl from './_inputControl.svelte';
 
 </script>
 
@@ -136,7 +136,7 @@
 <div class="content">
     <div class="row">
         <div class="col">
-            <h3 class="fs-5 text-muted">S: {currentScout}</h3>
+            <h3 class="fs-5 text-muted">S: {matchMetrics && matchMetrics.scoutName || "Unassigned"}</h3>
         </div>
         <div class="col">
             <h3 class="fs-5 text-muted text-center">{$adapterName} &mdash; {teamNumber}</h3>
@@ -147,7 +147,7 @@
     </div>
 
     <MatchPicker {matchNumber} numberOfMatches={matches.length} matchKey={match && match.matchKey}/>
-    
+
     <Nav tabs class="mb-2">
         {#each Object.keys(tabs) as tabName, index}
             <NavItem class="flex-grow-1 px-1">
@@ -167,26 +167,13 @@
                             <div class="card-body">
                                 <!--{JSON.stringify(d)}-->
                                 <h5 class="card-title">{d.metadata.label || makeNiceName(tabName, d.key)}</h5>
-                                {#if d.enum && d.type === 'string'}
-                                    {#if d.metadata.control === 'buttons'}
-                                        <BtnGroup name="first" options={d.enum.map(i=>({label:i}))}/>
-                                    {:else}
-                                        <Select items={d.enum.map((i)=>({label:i, value:i}))}/>
-                                    {/if}
-                                {:else if d.type === 'boolean'}
-                                    {#if d.metadata.control === 'checkbox'}
-                                        <input type="checkbox" class="form-check-input form-control"
-                                               placeholder="{d.metadata.placeholder}">
-                                    {:else}
-                                        <Boolean label={d.metadata.labelNotSelected || 'False'}
-                                                 labelSelected={d.metadata.labelSelected || 'True'}/>
-                                    {/if}
-                                {:else if d.type === 'number'}
-                                    <Counter min={d.minimum} max={d.maximum}/>
-                                {:else}
-                                    <input type={(d.type === 'number')?'number':'text'} class="form-control"
-                                           placeholder="{d.metadata.placeholder}">
-                                {/if}
+                                <InputControl
+                                        {eventKey}
+                                        matchKey={match && match.matchKey}
+                                        teamNumber={teamNumber}
+                                        propertyName={d.key}
+                                        def={d}
+                                />
 
                             </div>
                         </div>
