@@ -3,7 +3,7 @@
 </svelte:head>
 
 <script lang="ts">
-    let deviceName = "Red1";
+    
 </script>
 
 <div class="container-fluid">

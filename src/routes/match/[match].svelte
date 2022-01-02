@@ -10,13 +10,15 @@
 
 <script lang="ts">
     import {page} from "$app/stores";
-    import {Matches} from "$lib/matches";
+
 
     import Swal from "sweetalert2";
     import MatchTable from "$lib/compontents/_matchTable.svelte"
 
+    let matches = [];
+
     function getMatch(key: string) {
-        for (const m of Matches) {
+        for (const m of matches) {
             if (m.key.split("_")[1] == key) {
                 return m;
             }
@@ -33,10 +35,11 @@
 
     let ourTeamNumber = 4909;
 
+
 </script>
 
 <div class="container-fluid">
-    <a class="btn btn-info float-start" href="schedule">&lt; Schedule</a>
+    <a class="btn btn-info float-start" href="/match/myschedule">&lt; Schedule</a>
     <h1>Match {$page.params.match.toUpperCase()}</h1>
 </div>
 

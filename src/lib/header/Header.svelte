@@ -45,10 +45,10 @@
         if (!confirm("Are you sure? there is no undo!")) {
             return;
         }
-        console.log("Removing all databases");
+        // console.log("Removing all databases");
         const dbs = await indexedDB.databases();
         dbs.forEach(db => {
-            console.log("Delete", db);
+            // console.log("Delete", db);
             indexedDB.deleteDatabase(db.name);
         });
 

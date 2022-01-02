@@ -3,9 +3,11 @@
 </svelte:head>
 
 <script lang="ts">
-    import {sortedMatches} from "$lib/matches";
+    // import {sortedMatches} from "$lib/matches";
     import {Modal, ModalBody, ModalHeader, Table} from "sveltestrap";
     import "sweetalert2/dist/sweetalert2.css";
+
+    let sortedMatches = [];
 
     let ourTeamNumber = 4909; //@todo
 
