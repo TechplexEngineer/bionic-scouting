@@ -38,7 +38,16 @@
     let selectedEvent: writable<{ label: string, value: string } | null> = writable(null);
 
     onMount(async () => {
-        eventsToSelect = await getEventList();
+        try {
+            eventsToSelect = await getEventList();
+        } catch (e) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                html: `Unable to get events from TBA. <br>Error: ${e.message}`
+            });
+        }
+
         db = await getDb();
         let currentEventSetting = await db.settings.findOne({selector: {key: Settings.CurrentEvent}}).exec();
 
@@ -71,18 +80,26 @@
             return;
         }
         let selectedEventKey = $selectedEvent.value;
-        const tbaMatches = await tba.getMatches(selectedEventKey);
-        if (tbaMatches.length == 0) {
+        try {
+            const tbaMatches = await tba.getMatches(selectedEventKey);
+            if (tbaMatches.length == 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: `TBA Has no matches for ${selectedEventKey}`
+                });
+                return;
+            }
+            for (const match of tbaMatches) {
+                const m = TBAMatchToMatch(match);
+                await db.matches.insert(m);
+            }
+        } catch (e) {
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                text: `TBA Has no matches for ${selectedEventKey}`
+                text: `Unable to get matches from TBA. Error: ${e.message}`
             });
-            return;
-        }
-        for (const match of tbaMatches) {
-            const m = TBAMatchToMatch(match);
-            await db.matches.insert(m);
         }
     }
 
@@ -105,7 +122,11 @@
                class="form-control me-2" style="width: 100px">
     </div>
     <div style="max-width: 52.125vw" class="flex-grow-1">
-        <Select items={eventsToSelect} bind:value={$selectedEvent} containerClasses="" containerStyles="width:100%"/>
+        <Select
+                items={eventsToSelect}
+                bind:value={$selectedEvent}
+                isCreatable={true}
+                containerStyles="width:100%"/>
     </div>
     <div style="min-width: 250px">
         <button class="btn btn-primary ms-2" type="button" on:click={pullMatches}>Pull Matches</button>
