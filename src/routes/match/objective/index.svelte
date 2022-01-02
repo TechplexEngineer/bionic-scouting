@@ -13,6 +13,8 @@
         NavItem,
         NavLink
     } from "sveltestrap";
+    import Swal from "sweetalert2";
+    import "sweetalert2/dist/sweetalert2.css";
 
     import matchObjectiveSchema, {MatchMetricsReport} from '$lib/schema/match-metrics-schema'
 
@@ -109,6 +111,20 @@
 
         let [color, number] = $adapterName.split('-')
         color = color.toLowerCase()
+        if (!['red', 'blue'].includes(color)) {
+            let res = await Swal.fire({
+                icon: "error",
+                title: "Bluetooth Adapter Misconfiguration",
+                html: `Expected Color-Number (eg. 'Red-1' or 'Blue-3')`,
+                showCloseButton: true,
+                confirmButtonText: 'Go to Bluetooth Settings',
+            });
+            if (res.isConfirmed) {
+                goto("/tools/bluetooth");
+                return;
+            }
+        }
+
         // console.log("color number", color, number);
 
         teamNumber = match.alliances[color].teamKeys[number - 1].replace('frc', '')
@@ -120,6 +136,19 @@
                 teamNumber: parseInt(teamNumber),
             }
         }).exec();
+        if (matchMetrics == null) {
+            let res = await Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                html: `Scout is not assigned for this match`,
+                showCloseButton: true,
+                confirmButtonText: 'Go to Setup',
+            });
+            if (res.isConfirmed) {
+                goto("/tools/setup");
+                return;
+            }
+        }
         // console.log("matchMetrics", eventKey, match.matchKey, teamNumber, matchMetrics);
 
     });

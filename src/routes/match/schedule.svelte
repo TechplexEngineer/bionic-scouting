@@ -44,7 +44,6 @@
         ourTeamNumber = teamSetting.value;
 
         db.matches.find({selector: {eventKey: eventKey}}).$.subscribe(m => {
-            console.log("matches", m);
             m.sort(matchSort)
             matches = m;
         })
