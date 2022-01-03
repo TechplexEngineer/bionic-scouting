@@ -1,40 +1,52 @@
 <script lang="ts">
-    import {writable} from 'svelte/store';
+	import { writable } from "svelte/store";
+	import { createEventDispatcher, onMount } from "svelte";
+	import { v4 as uuidv4 } from "uuid";
 
-    /**
-     * The name of the input group
-     */
-    export let name: string;
+	let id = uuidv4();
 
-    /**
-     * Button options
-     */
-    export let options: { label: string }[] = [];
 
-    /**
-     * The currently active button
-     */
-    export let activeIdx = writable(-1);
+	/**
+	 * one event: change
+	 */
+	const dispatch = createEventDispatcher();
 
-    export let allowDeselect = true;
+	/**
+	 * Button options
+	 * Labels must be unique
+	 */
+	export let options: { label: string }[] = [];
 
-    function onClick(newIdx) {
-        return () => {
-            activeIdx.update(prev => {
-                if (allowDeselect && prev == newIdx) {
-                    return -1 //deselect
-                }
-                return newIdx
-            })
-        }
-    }
+	/**
+	 * The currently active button
+	 */
+	export let selected = null;
+	console.log("Selected:", selected);
+
+	export let allowDeselect = true;
+
+	function onClick(newSelectedOption) {
+		return () => {
+			if (selected.label == newSelectedOption.label && allowDeselect) {
+				selected = null;
+				dispatch("change", selected);
+				return;
+			}
+			selected = newSelectedOption;
+			dispatch("change", selected);
+		};
+	}
 
 </script>
 
 <div class="btn-group" role="group">
-    {#each options as option, idx}
-        <input type="radio" class="btn-check" name={name} id="{name}{idx}" autocomplete="off"
-               checked={$activeIdx === idx} on:click={onClick(idx)}>
-        <label class="btn btn-outline-primary p-3" for="{name}{idx}">{option.label}</label>
-    {/each}
+	{#each options as option, idx}
+		<input id="{id}-{idx}" type="radio" class="btn-check" autocomplete="off"
+			   checked={selected && selected.label == option.label}
+			   on:click={onClick(option)}>
+		<label class="btn btn-outline-primary p-3" for="{id}-{idx}">
+			{option.label}
+		</label>
+
+	{/each}
 </div>

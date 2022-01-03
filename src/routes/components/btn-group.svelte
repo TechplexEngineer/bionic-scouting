@@ -15,6 +15,8 @@
 		{ label: "Three" }
 	];
 
+
+	let selected;
 	let activeIdx = writable(-1);
 
 	let activeIdx2 = writable(0);
@@ -24,9 +26,9 @@
 <hr>
 <label>Three Options</label>
 <div class="mb-2">
-	<BtnGroup name="first" {options} activeIdx={activeIdx} />
+	<BtnGroup name="first" {options} bind:selected={selected} activeIdx={activeIdx} />
 </div>
-Selected: {options[$activeIdx] && options[$activeIdx].label}
+Selected: {selected && selected.label}
 <hr>
 <label>Number of power cells</label>
 <div>
