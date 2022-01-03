@@ -109,6 +109,8 @@
 		if (n == null) {
 			return; //nothing to do
 		}
+		// Force the inputs to reload
+		onMountComplete = false;
 		match = matches[n - 1];
 
 		let [color, number] = $adapterName.split("-");
@@ -152,7 +154,7 @@
 			}
 		}
 		// console.log("matchMetrics", eventKey, match.matchKey, teamNumber, matchMetrics);
-
+		onMountComplete = true;
 	});
 
 	import InputControl from "./_inputControl.svelte";
