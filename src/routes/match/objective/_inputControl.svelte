@@ -71,7 +71,7 @@
 		});
 	}
 
-	function counterChange(event) {
+	function onChange(event) {
 		if (!canProceed()) {
 			return;
 		}
@@ -106,13 +106,15 @@
 				placeholder="{def.metadata.placeholder}">
 		{:else}
 			<Boolean label={def.metadata.labelNotSelected || 'False'}
-					 labelSelected={def.metadata.labelSelected || 'True'} />
+					 labelSelected={def.metadata.labelSelected || 'True'}
+					 value={propertyValue}
+					 on:change={onChange} />
 		{/if}
 	{:else if def.type === 'number'}
 		<Counter
 			min={def.minimum}
 			max={def.maximum}
-			on:change={counterChange}
+			on:change={onChange}
 			value={propertyValue}
 		/>
 	{:else}

@@ -3,10 +3,7 @@
 	import { writable } from "svelte/store";
 	import Select from "svelte-select";
 
-	const value = writable(false);
-	value.subscribe(v => {
-		console.log("value", v);
-	});
+	let value = false;
 	const items = [
 		{ label: "Blue (btn-outline-primary)", value: "btn-outline-primary" },
 		{ label: "Gray (btn-outline-secondary)", value: "btn-outline-secondary" },
@@ -30,8 +27,8 @@
 <h3>Config</h3>
 <label>Color</label>
 <Select isCreatable="true" items={items} value="{startingValue}" on:select={handleSelect}
-				placeholder="Color..." />
+		placeholder="Color..." />
 <hr>
-<Boolean label="Toggle" value={value} classes={classes} />
+<Boolean label="Toggle" bind:value={value} classes={classes} />
 <hr>
-<h2>Value is: {$value}</h2>
+<h2>Value is: {value}</h2>

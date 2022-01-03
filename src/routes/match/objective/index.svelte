@@ -191,8 +191,8 @@
 
 				<div class="row">
 					{#each tabs[tabName].filter(notHidden) as d}
-						<div class="col col-6 mb-2">
-							<div class="card {d.metadata.cardClasses}">
+						<div class="col col-6 col-md-6 mb-2">
+							<div class="card {d.metadata.cardClasses} h-100">
 								<div class="card-body">
 									<!--{JSON.stringify(d)}-->
 									<h5 class="card-title">{d.metadata.label || makeNiceName(tabName, d.key)}</h5>
