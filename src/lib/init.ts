@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import * as bt from '$lib/bluetooth';
+import { browser } from '$app/env';
 
 const initCount = writable(0); // used to make sure init() is only called once
 
@@ -18,7 +19,7 @@ async function _init(): Promise<void> {
 
 	// only start the message center if not SSR.
 	// If you try to load rxdb in SSR the indexed db adapter isn't loaded
-	if (!import.meta.env.SSR) {
+	if (browser) {
 		await bt.startMessageCenter();
 	}
 }
