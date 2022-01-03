@@ -1,46 +1,106 @@
-# create-svelte
+# Bionic Scouting
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
+Bionic Scouting is an app primarily for Android that FIRST robotics Team 4909 is developing for use at competitions.
+The app aids in collecting data about other teams to inform match strategy and alliance selection.
 
-## Creating a project
+The system is designed with the thought that there are 6 objective scouts each collecting metrics about 1 of 6 robots during a match.
 
-If you're seeing this, you've probably already done this step. Congrats!
+The system also supports having additional "super" scouts collecting subjective observations.
 
-```bash
-# create a new project in the current directory
-npm init svelte@next
+Goals:
+- Support completely offline operation. Many events do not have WiFi, and some steel buildings do a great job blocking cellular signals.
+  - Default to syncing with database in the cloud
+  - Fallback to Bluetooth
+  - Fallback to QR Codes for data sync
+- Pull Match schedule and teams from The Blue Alliance
+- Provide a quick view for the drive coach to use for match preparation
+- Objective match metrics are easily configurable as they change season to season
+- Super scouts collect observations in preparations for upcoming matches
+- Robot specific pit scouting 
+- Easy data export to excel
+- Make all data collected viewable in the app
 
-# create a new project in my-app
-npm init svelte@next my-app
-```
+Hardware:
+- Six 8" tablets for scouts in the stands (Red 1,2,3 and Blue 1,2,3)
+- One lead scout using a tablet 10"
+- Three super scouts using 8" tablets
+- One lead super scout using an 8" tablet
 
-> Note: the `@next` is temporary
+We plan to have our Super scouts pit scout on the first day of the event collecting overall observations, drivetrain information and photos of each robot.
+
+The data collected by the system can be exported to CSV for analysis in Excel.
+
+
+
+## Software Architecture
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## Developing
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
 ```bash
-npm run dev
+# install dependencies
+npm ci
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+# Run a development server
+npm run dev
+```
+
+### Testing on a connected android device
+
+When developing and testing it can be useful to test on a usb connected android device.
+We can do this by running a webserver with our latest code on our development computer and instructing the app
+to connect to the dev server.
+
+NOTE: Device must be connected to the same network as the host computer
+```bash
+npm run dev -- --host
+npx cap sync
+HOST=<dev computer ip> npx cap run android
 ```
 
 ## Building
 
-Before creating a production version of your app, install an [adapter](https://kit.svelte.dev/docs#adapters) for your target environment. Then:
-
+To build the frontend of the app run: 
 ```bash
 npm run build
 ```
+To view a preview of the "production" build:
+```bash
+npm run preview
+```
 
-> You can preview the built app with `npm run preview`, regardless of whether you installed an adapter. This should _not_ be used to serve your app in production.
+Once the frontend is built we can build the andorid app:
+```bash
+./gradlew bundleRelease \
+            -PversionName="1.0.0" \
+            -PversionNumber=$(date '+%s')
+```
+The aab will be stored in `android/app/build/outputs/`
 
+### Our build and release process
 
-## Capacitor
-
-NOTE: Device mus be connected to the same network as the host computer
-npm run dev -- --host
-npx cap sync
-HOST=10.42.0.5 npx cap run android
+We use GitHub Actions to build an android app on each push to the main branch.
