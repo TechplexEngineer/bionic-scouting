@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { writable } from "svelte/store";
-	import { createEventDispatcher, onMount } from "svelte";
+	import { createEventDispatcher } from "svelte";
 	import { v4 as uuidv4 } from "uuid";
 
 	let id = uuidv4();

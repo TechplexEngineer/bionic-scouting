@@ -1,13 +1,10 @@
 <script>
-    import Counter from '$lib/compontents/Counter.svelte'
-    import {writable} from 'svelte/store';
+	import Counter from "$lib/compontents/Counter.svelte";
+	import { writable } from "svelte/store";
 
-    const value = writable(1);
-    value.subscribe(i => {
-        console.log(i);
-    })
+	let value = 0;
 </script>
 
-<h1>Count is: {$value}</h1>
+<h1>Count is: {value}</h1>
 
-<Counter {value}/>
+<Counter bind:value={value} />

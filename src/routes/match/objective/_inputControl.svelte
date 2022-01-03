@@ -42,16 +42,24 @@
 		});
 	});
 
-	function btnChange(event) {
+	function canProceed(): boolean {
 		if (!document) {
 			console.log("Cant update null document");
-			return;
+			return false;
 		}
 		if (!propertyName) {
 			console.log("Cant update null propertyName");
+			return false;
+		}
+		return true;
+	}
+
+	function btnChange(event) {
+		if (!canProceed()) {
 			return;
 		}
-		console.log(event.detail);
+
+		// console.log(event.detail);
 		document.atomicUpdate(data => {
 			if (event.detail == null) {
 				data[propertyName] = undefined;
@@ -59,6 +67,20 @@
 				data[propertyName] = event.detail.label;
 			}
 
+			return data;
+		});
+	}
+
+	function counterChange(event) {
+		if (!canProceed()) {
+			return;
+		}
+		document.atomicUpdate(data => {
+			if (event.detail == null) {
+				data[propertyName] = undefined;
+			} else {
+				data[propertyName] = event.detail;
+			}
 			return data;
 		});
 	}
@@ -89,7 +111,10 @@
 	{:else if def.type === 'number'}
 		<Counter
 			min={def.minimum}
-			max={def.maximum} />
+			max={def.maximum}
+			on:change={counterChange}
+			value={propertyValue}
+		/>
 	{:else}
 		<input
 			type={(def.type === 'number')?'number':'text'}
