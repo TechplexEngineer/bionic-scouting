@@ -20,7 +20,6 @@
 	 * The currently active button
 	 */
 	export let selected = null;
-	console.log("Selected:", selected);
 
 	export let allowDeselect = true;
 
