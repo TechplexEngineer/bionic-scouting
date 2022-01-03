@@ -1,86 +1,149 @@
 <svelte:head>
-    <title>Pit</title>
+	<title>Pit</title>
 </svelte:head>
 
 <script lang="ts">
-    import {sortedTeams} from "$lib/teams";
-    import Select from "svelte-select";
+	import Select from "svelte-select";
+	import { onMount } from "svelte";
+	import { getDb } from "$lib/store";
+	import { Settings } from "$lib/schema/settings-schema";
+	import Swal from "sweetalert2";
+	import "sweetalert2/dist/sweetalert2.css";
+	import { goto } from "$app/navigation";
+	import type { RxDocument } from "rxdb";
+	import type { PitReport } from "$lib/schema/pit-scout-schema";
+	import { page } from "$app/stores";
+	import { Camera, CameraResultType } from "@capacitor/camera";
 
-    let items = sortedTeams.map(t => {
-        return {
-            value: t.team_number,
-            label: `${t.team_number}  ${"&nbsp; ".repeat(6 - t.team_number.toString().length)} ${t.nickname}`
-        };
-    });
 
-    let value = null;
+	let eventKey: string; //eg. 2020week0
+	let teams: RxDocument<PitReport>[] = [];
+	let teamsToChoose: { label: string, value: string }[] = [];
+	let currentSelectedTeamItem = null;
 
-    function handleSelect(event) {
-        console.log("selected item", event.detail.value);
-        // .. do something here 🙂
-        console.log("value", value);
-    }
+	onMount(async () => {
+		const db = await getDb();
 
-    let factNames = ["climber", "drivetrain"];
-    let facts: { name: string, value: string }[] = [
-        {name: "", value: ""} // need to start with at least one to show the form
-    ];
+
+		const eventSetting = await db.settings.findOne().where({ key: Settings.CurrentEvent }).exec();
+		if (!eventSetting) {
+			let res = await Swal.fire({
+				icon: "error",
+				title: "Oops...",
+				html: `Current event not set. Head over to Setup`,
+				showCloseButton: true,
+				confirmButtonText: "Go to Setup"
+			});
+			if (res.isConfirmed) {
+				await goto("/tools/setup");
+				return;
+			}
+			return;
+		}
+		eventKey = eventSetting.value;
+
+		teams = await db.pit_scouting.find().where({ eventKey }).sort({ teamNumber: "asc" }).exec();
+		teamsToChoose = teams.map(t => {
+			return {
+				value: `${t.teamNumber}`,
+				label: `${t.teamNumber}  ${"&nbsp; ".repeat(6 - t.teamNumber.toString().length)} ${t.nickname}`
+			};
+		});
+
+		const queryTeam = $page.query.get("team");
+		if (queryTeam) {
+			currentSelectedTeamItem = teamsToChoose.find(i => i.value == queryTeam);
+		}
+	});
+
+	let robotPhotoUrl = null;
+
+	const takePicture = async () => {
+		const image = await Camera.getPhoto({
+			quality: 90,
+			allowEditing: true,
+			resultType: CameraResultType.Uri
+		});
+
+		// image.webPath will contain a path that can be set as an image src.
+		// You can access the original file using image.path, which can be
+		// passed to the Filesystem API to read the raw data of the image,
+		// if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
+		// var imageUrl = image.webPath;
+
+		// Can be set to the src of an image now
+		// imageElement.src = imageUrl;
+		robotPhotoUrl = image.webPath;
+	};
+
+
+	function handleSelect(event) {
+
+		console.log("selected item", event.detail.value);
+		// .. do something here 🙂
+		console.log("value", currentSelectedTeamItem);
+	}
+
+	let factNames = ["climber", "drivetrain"];
+	let facts: { name: string, value: string }[] = [
+		{ name: "", value: "" } // need to start with at least one to show the form
+	];
 </script>
 
 <div class="content">
-    <h1>Pit Scout</h1>
+	<h1>Pit Scout</h1>
 
-    <label for="team">Team Number:</label>
-    <Select id="team" items={items} bind:value={value} on:select={handleSelect}/>
+	<label for="team">Team Number:</label>
+	<Select id="team" items={teamsToChoose} bind:value={currentSelectedTeamItem} on:select={handleSelect} />
 
 
-    <!--	Robot Photo-->
-    <div class="d-flex mb-2 mt-4">
-        <h3 class="flex-fill">Robot Image</h3>
-        <button class="btn btn-info align-self-end">Take Photo</button>
-    </div>
+	<!--	Robot Photo-->
+	<div class="d-flex mb-2 mt-4">
+		<h3 class="flex-fill">Robot Image</h3>
+		<button class="btn btn-info align-self-end" on:click={takePicture}>Take Photo</button>
+	</div>
 
-    <div class="d-flex" style="height: 250px; background-color: #868e96">
-        <div class="w-auto h-auto"></div>
-    </div>
+	<div class="d-flex" style="height: 250px; background-color: #868e96">
+		<img class="w-auto h-auto mx-auto" src={robotPhotoUrl} alt="Robot Photo">
+	</div>
 
-    <!-- Notes -->
-    <div class="form-floating mt-4">
-        <textarea id="notes" class="form-control" placeholder=" " style="height: 150px"></textarea>
-        <label for="notes">Notes</label>
-    </div>
+	<!-- Notes -->
+	<div class="form-floating mt-4">
+		<textarea id="notes" class="form-control" placeholder=" " style="height: 150px"></textarea>
+		<label for="notes">Notes</label>
+	</div>
 
-    <!--	Facts-->
-    <div class="d-flex mb-2 mt-4">
-        <h3 class="flex-fill">Facts</h3>
-        <button on:click={()=>{facts = [{name:"", value:""}, ...facts]}} class="btn btn-success align-self-end">+ Add
-            Fact
-        </button>
-    </div>
+	<!--	Facts-->
+	<div class="d-flex mb-2 mt-4">
+		<h3 class="flex-fill">Facts</h3>
+		<button on:click={()=>{facts = [{name:"", value:""}, ...facts]}} class="btn btn-success align-self-end">+ Add
+			Fact
+		</button>
+	</div>
 
-    {#each facts as fact, idx}
-        <div class="d-flex">
-            <div class="flex-grow-1 pe-1">
-                <Select items={factNames} bind:value={fact.value} isCreatable="true" on:select={handleSelect}/>
-            </div>
-            <button class="btn btn-warning" on:click={()=>{
+	{#each facts as fact, idx}
+		<div class="d-flex">
+			<div class="flex-grow-1 pe-1">
+				<Select items={factNames} bind:value={fact.value} isCreatable="true" on:select={handleSelect} />
+			</div>
+			<button class="btn btn-warning" on:click={()=>{
 				if (confirm("Are you sure?")) {
 					facts = facts.filter((f, idx) => f !== fact)
 				}
 			}}>Remove
-            </button>
-        </div>
+			</button>
+		</div>
 
-        <div class="form-floating mt-1 mb-2">
-            <textarea id="fact" class="form-control" placeholder="Leave a comment here" style="height: 75px"></textarea>
-            <label for="fact">Notes</label>
-        </div>
-    {/each}
+		<div class="form-floating mt-1 mb-2">
+			<textarea id="fact" class="form-control" placeholder="Leave a comment here" style="height: 75px"></textarea>
+			<label for="fact">Notes</label>
+		</div>
+	{/each}
 
 
-    <div class="d-flex justify-content-end mt-2">
-        <button class="btn btn-success">Save</button>
-    </div>
+	<div class="d-flex justify-content-end mt-2">
+		<button class="btn btn-success">Save</button>
+	</div>
 
 
 </div>
