@@ -71,6 +71,7 @@
         {name: "Match Metrics", href: "/match/objective"},
         {name: "Match Subjective", href: "/match/subjective"},
         {name: "Pit Scout", href: "/pit"},
+        {name: "Teams", href: "/team"},
         {name: "Match Preview", href: "/match/preview"},
         {name: "Match Schedule", href: "/match/schedule"},
         {

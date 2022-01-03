@@ -1,5 +1,6 @@
 import type { RxJsonSchema, RxCollection } from 'rxdb';
 import type { Match as TBAMatch } from 'tba-api-v3client-ts';
+import { keysToCamel } from '$lib/util';
 
 export declare type Match_alliance = {
 	/**
@@ -165,39 +166,6 @@ const matchSchema: RxJsonSchema<Match> = {
 };
 export default matchSchema;
 
-export const toCamel = (s) => {
-	return s.replace(/([-_][a-z])/gi, ($1) => {
-		return $1.toUpperCase().replace('-', '').replace('_', '');
-	});
-};
-
-const isArray = function (a) {
-	return Array.isArray(a);
-};
-
-const isObject = function (o) {
-	return o === Object(o) && !isArray(o) && typeof o !== 'function';
-};
-
-// src https://matthiashager.com/converting-snake-case-to-camel-case-object-keys-with-javascript
-const keysToCamel = function (o) {
-	if (isObject(o)) {
-		const n = {};
-
-		Object.keys(o).forEach((k) => {
-			n[toCamel(k)] = keysToCamel(o[k]);
-		});
-
-		return n;
-	} else if (isArray(o)) {
-		return o.map((i) => {
-			return keysToCamel(i);
-		});
-	}
-
-	return o;
-};
-
 export function TBAMatchToMatch(tbaMatch: TBAMatch): Match {
 	const match = keysToCamel(tbaMatch);
 
@@ -206,6 +174,9 @@ export function TBAMatchToMatch(tbaMatch: TBAMatch): Match {
 
 	match.scheduledTime = match.time;
 	delete match.time;
+
+	match.createdAt = new Date().getTime();
+	match.updatedAt = new Date().getTime();
 
 	// delete match.scoreBreakdown;
 	delete match.videos;

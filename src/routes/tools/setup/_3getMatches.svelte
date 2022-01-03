@@ -10,6 +10,7 @@
     import {debounce} from "$lib/debounce";
     import {TBAMatchToMatch} from "$lib/schema/match-schema";
     import {Settings} from "$lib/schema/settings-schema";
+    import {TBATeamToPitReport} from "$lib/schema/pit-scout-schema";
 
     // List of events to choose from
     type SelectOption = { label: string, value: string };
@@ -86,7 +87,7 @@
                 Swal.fire({
                     icon: "error",
                     title: "Oops...",
-                    text: `TBA Has no matches for ${selectedEventKey}`
+                    text: `TBA has no matches for ${selectedEventKey}`
                 });
                 return;
             }
@@ -94,11 +95,27 @@
                 const m = TBAMatchToMatch(match);
                 await db.matches.insert(m);
             }
+            //@todo load teams too?
+
+            const tbaTeams = await tba.getTeams(selectedEventKey);
+            if (tbaTeams.length == 0) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: `TBA has no teams for ${selectedEventKey}`
+                });
+                return;
+            }
+            for (const team of tbaTeams) {
+                const t = TBATeamToPitReport(team, selectedEventKey);
+                await db.pit_scouting.insert(t);
+            }
+
         } catch (e) {
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                text: `Unable to get matches from TBA. Error: ${e.message}`
+                text: `Unable to get data from TBA. Error: ${e.message}`
             });
         }
     }

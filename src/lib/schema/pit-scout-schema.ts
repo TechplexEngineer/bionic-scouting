@@ -5,14 +5,23 @@ export type Fact = {
 	notes: string;
 };
 
+// analogous for team list
 export type PitReport = {
-	eventTeamKey: string;
+	eventTeamKey?: string;
 	eventKey: string;
 	createdAt: number;
 	updatedAt: number;
 	teamNumber: number;
 	notes: string;
 	facts: Fact[];
+
+	city?: string;
+	country?: string;
+	name?: string;
+	nickname?: string;
+	rookieYear?: number;
+	schoolName?: string;
+	stateProv?: string;
 };
 
 export type PitReportCollection = RxCollection<PitReport>;
@@ -65,8 +74,56 @@ const pitSchema: RxJsonSchema<PitReport> = {
 					}
 				}
 			}
+		},
+		city: {
+			type: 'string'
+		},
+		country: {
+			type: 'string'
+		},
+		name: {
+			type: 'string'
+		},
+		nickname: {
+			type: 'string'
+		},
+		rookieYear: {
+			type: 'number'
+		},
+		schoolName: {
+			type: 'string'
+		},
+		stateProv: {
+			type: 'string'
 		}
 	},
 	required: ['eventKey', 'teamNumber']
 };
 export default pitSchema;
+import type { Team } from 'tba-api-v3client-ts';
+import { keysToCamel } from '$lib/util';
+
+const fieldWhitelist = Object.keys(pitSchema.properties);
+
+export function TBATeamToPitReport(tbaTeam: Team, eventKey: string): PitReport {
+	const team = keysToCamel(tbaTeam);
+	console.log('Converted Team', team, 'raw', tbaTeam);
+
+	//@todo this is a blacklist... really should be a whitelist if tba changes their api
+
+	for (const key in team) {
+		if (!fieldWhitelist.includes(key)) {
+			delete team[key];
+		}
+	}
+
+	team.createdAt = new Date().getTime();
+	team.updatedAt = new Date().getTime();
+	team.eventKey = eventKey;
+
+	// delete team.key;
+	// delete team.postal_code;
+	// delete team.website;
+
+	return team;
+}

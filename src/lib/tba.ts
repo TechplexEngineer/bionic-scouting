@@ -1,6 +1,6 @@
 const TBA_KEY = `QehLoNZFqjsoiGRwzhbna8k5MEoj1C40i9gQNLBPM0KUw8AsVCm4hFTYxVQzZql6`;
 
-import type { Team_Simple, Match } from 'tba-api-v3client-ts';
+import type { Team, Match } from 'tba-api-v3client-ts';
 import { EventService, OpenAPI } from 'tba-api-v3client-ts';
 
 // Pull TBA key from environment variable and set as header value
@@ -21,6 +21,6 @@ export async function getMatches(eventKey: string): Promise<Array<Match>> {
 	return await EventService.getEventMatches(eventKey);
 }
 
-export async function getTeams(eventKey: string): Promise<Array<Team_Simple>> {
-	return await EventService.getEventTeamsSimple(eventKey);
+export async function getTeams(eventKey: string): Promise<Array<Team>> {
+	return await EventService.getEventTeams(eventKey);
 }
