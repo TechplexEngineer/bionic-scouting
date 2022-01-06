@@ -16,7 +16,7 @@
     let ourTeamNumber = 0;
 
 
-    let eventKey = ""; //writable("");
+    let eventKey = "";
 
     onMount(async () => {
         db = await getDb();
@@ -31,11 +31,6 @@
                 ourTeamNumber = parseInt(d.value, 10);
             }
         });
-        // let res = await db.settings.findOne({selector: {key: Settings.CurrentEvent}}).exec();
-        // if (res && res.value) {
-        //     console.log("Event is: ", res.value);
-        //     eventKey.set = res.value;
-        // }
 
         db.settings.findOne({selector: {key: Settings.CurrentEvent}}).$.subscribe(d => {
             if (d && d.value) {
@@ -43,6 +38,48 @@
             }
         });
     });
+
+    function copyFromTo(fromIdx, toIdx) {
+        return async () => {
+            // console.log(matchesTable[fromIdx].matchKey, matchesTable[toIdx].matchKey)
+
+            let dstTeams = matchesTable[toIdx].alliances.red.teamKeys.concat(matchesTable[toIdx].alliances.blue.teamKeys);
+            let srcTeams = matchesTable[fromIdx].alliances.red.teamKeys.concat(matchesTable[fromIdx].alliances.blue.teamKeys);
+
+            dstTeams = dstTeams.map(t=>parseInt(t.replace('frc','')));
+            srcTeams = srcTeams.map(t=>parseInt(t.replace('frc','')));//order is red1,2,3 then Blue,1,2,3
+
+            for (let i=0; i<srcTeams.length; i++) {
+                const srcQuery = {
+                    eventKey: matchesTable[fromIdx].eventKey,
+                    matchKey: matchesTable[fromIdx].matchKey,
+                    teamNumber: srcTeams[i]
+                };
+                const matchReportSrc = await db.match_metrics.findOne().where(srcQuery).exec();
+
+                const dstQuery = {
+                    eventKey:matchesTable[fromIdx].eventKey,
+                    matchKey: matchesTable[fromIdx].matchKey,
+                    // teamNumber: dstTeams[i]
+                };
+                const matchReportDst = await db.match_metrics.findOne().where(dstQuery).exec();
+                console.log(matchReportDst)
+
+                if (!matchReportSrc) {
+                    console.log("unable to find src match report for: ", srcQuery)
+                    continue;
+                }
+                if (!matchReportDst) {
+                    console.log("unable to find dst match report for: ", dstQuery)
+                    continue;
+                }
+                // await matchReportDst.atomicUpdate(data=>{
+                //     data.scoutName = matchReportSrc.scoutName;
+                //     return data
+                // })
+            }
+        }
+    }
 
 
 </script>
@@ -65,6 +102,9 @@
             <tr>
                 <td rowspan="2">
                     {m.matchKey} ({idx + 1})
+                    {#if idx > 0}
+                        <button class="btn btn-outline-primary btn-sm mt-3" on:click={copyFromTo(idx-1, idx)}>Copy Above</button>
+                    {/if}
                 </td>
 
                 {#each ['red'] as color}

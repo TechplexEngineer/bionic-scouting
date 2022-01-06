@@ -220,6 +220,8 @@
 					{/if}
 					{#if activeTab < Object.keys(tabs).length - 1}
 						<button class="btn btn-primary ms-auto" on:click={()=>{activeTab += 1}}>Next &gt;</button>
+						{:else}
+						<button class="btn btn-warning ms-auto" on:click={()=>{$matchNumber+=1; activeTab=0}}>Next &gt;</button>
 					{/if}
 				</div>
 

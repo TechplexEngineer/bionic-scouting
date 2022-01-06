@@ -97,7 +97,7 @@
 	<Select id="team" items={teamsToChoose} bind:value={currentSelectedTeamItem} on:select={handleSelect} />
 
 
-	<!--	Robot Photo-->
+	<!-- Robot Photo -->
 	<div class="d-flex mb-2 mt-4">
 		<h3 class="flex-fill">Robot Image</h3>
 		<button class="btn btn-info align-self-end" on:click={takePicture}>Take Photo</button>
@@ -113,7 +113,7 @@
 		<label for="notes">Notes</label>
 	</div>
 
-	<!--	Facts-->
+	<!-- Facts-->
 	<div class="d-flex mb-2 mt-4">
 		<h3 class="flex-fill">Facts</h3>
 		<button on:click={()=>{facts = [{name:"", value:""}, ...facts]}} class="btn btn-success align-self-end">+ Add
