@@ -18,7 +18,8 @@
         "btn-group",
         "boolean",
         "field",
-        "select"
+        "select",
+        "spinbutton"
     ];
 
     function capitalizeFirst(str) {

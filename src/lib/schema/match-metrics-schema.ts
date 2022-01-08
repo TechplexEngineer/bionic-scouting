@@ -8,7 +8,7 @@ export type MatchMetricsReport = {
 	updatedAt: number;
 	teamNumber: number;
 	scoutName: string;
-	submitted: boolean;
+	submitted?: boolean;
 
 	preStartingLocation?: string;
 	preStartingLocationX?: number;

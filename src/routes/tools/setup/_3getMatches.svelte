@@ -11,6 +11,7 @@
     import {TBAMatchToMatch} from "$lib/schema/match-schema";
     import {Settings} from "$lib/schema/settings-schema";
     import {TBATeamToPitReport} from "$lib/schema/pit-scout-schema";
+    import SpinButton from "$lib/compontents/SpinButton.svelte";
 
     // List of events to choose from
     type SelectOption = { label: string, value: string };
@@ -146,7 +147,7 @@
                 containerStyles="width:100%"/>
     </div>
     <div style="min-width: 250px">
-        <button class="btn btn-primary ms-2" type="button" on:click={pullMatches}>Pull Matches</button>
+        <SpinButton class="btn-primary ms-2" onClick={pullMatches}>Pull Matches</SpinButton>
         <button class="btn btn-outline-primary ms-2" type="button" on:click={uploadMatches}>Upload List</button>
     </div>
 </div>
