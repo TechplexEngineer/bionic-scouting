@@ -101,7 +101,7 @@
 
 </script>
 
-<Navbar dark style="background-color: #0b4833;" class="d-flex">
+<Navbar dark style="background-color: #0b4833;" class="d-flex fixed-top">
 
     <div class="flex-1 justify-content-center">
         <NavbarBrand href="/">TGA</NavbarBrand>

@@ -12,6 +12,9 @@
     import {Settings} from "$lib/schema/settings-schema";
     import {TBATeamToPitReport} from "$lib/schema/pit-scout-schema";
     import SpinButton from "$lib/compontents/SpinButton.svelte";
+    import {matchSort, tbaMatchSort} from "$lib/matches";
+    import {Match as TBAMatch} from 'tba-api-v3client-ts';
+    import comp_level = TBAMatch.comp_level;
 
     // List of events to choose from
     type SelectOption = { label: string, value: string };
@@ -92,11 +95,14 @@
                 });
                 return;
             }
-            for (const match of tbaMatches) {
-                const m = TBAMatchToMatch(match);
-                await db.matches.insert(m);
+            const sortedTbaMatches = tbaMatches.sort(tbaMatchSort);
+            for (let i = 0; i < sortedTbaMatches.length; i++) {
+                const m = TBAMatchToMatch(sortedTbaMatches[i]);
+                m.order = i;
+                if (m.compLevel == comp_level.QM) {
+                    await db.matches.insert(m);
+                }
             }
-            //@todo load teams too?
 
             const tbaTeams = await tba.getTeams(selectedEventKey);
             if (tbaTeams.length == 0) {
@@ -131,8 +137,10 @@
 
 </script>
 
-
-<h2>3. Pull matches from TBA or load csv</h2>
+<div class="d-flex my-2">
+    <h2 class="flex-fill">3. Pull matches from TBA or load csv</h2>
+    <button class="btn btn-outline-primary ms-2 btn-sm" type="button" on:click={uploadMatches}>Upload List</button>
+</div>
 
 <div class="mb-3 d-flex">
     <div>
@@ -148,6 +156,5 @@
     </div>
     <div style="min-width: 250px">
         <SpinButton class="btn-primary ms-2" onClick={pullMatches}>Pull Matches</SpinButton>
-        <button class="btn btn-outline-primary ms-2" type="button" on:click={uploadMatches}>Upload List</button>
     </div>
 </div>

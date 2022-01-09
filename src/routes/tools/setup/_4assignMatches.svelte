@@ -73,15 +73,15 @@
                         // continue;
                         return;
                     }
-                    console.log(`copy from: ${matchReportSrc.teamNumber} ${matchReportSrc.scoutName} to ${dstTeams[i]}`);
+                    // console.log(`copy from: ${matchReportSrc.teamNumber} ${matchReportSrc.scoutName} to ${dstTeams[i]}`);
                     if (matchReportDst) {
-                        console.log("Update");
+                        // console.log("Update");
                         matchReportDst.atomicUpdate(data => {
                             data.scoutName = matchReportSrc.scoutName;
                             return data
                         });
                     } else {
-                        console.log("Create");
+                        // console.log("Create");
                         db.match_metrics.insert({
                             eventKey: matchesTable[toIdx].eventKey,
                             matchKey: matchesTable[toIdx].matchKey,
@@ -91,7 +91,7 @@
                             updatedAt: new Date().getTime()
                         });
                     }
-                    console.log("----\n");
+                    // console.log("----\n");
                 })());
             }
             return Promise.all(copyPromises)
@@ -101,7 +101,7 @@
 
 </script>
 
-<h2>4. Assign students to matches</h2>
+<h2>4. [Manual] Assign students to matches</h2>
 
 <!-- this if statement is annoying.. shouldn't be needed-->
 {#if eventKey && eventKey.length}

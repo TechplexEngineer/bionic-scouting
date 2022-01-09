@@ -25,6 +25,7 @@ export type Match = {
 	eventMatchKey: string;
 	eventKey: string;
 	matchKey: string;
+	order: number;
 
 	/**
 	 * A list of alliances, the teams on the alliances, and their score.
@@ -102,7 +103,7 @@ const matchSchema: RxJsonSchema<Match> = {
 	description: 'Metrics about a match',
 	version: 0,
 	type: 'object',
-	indexes: ['createdAt', 'updatedAt'],
+	indexes: ['createdAt', 'updatedAt', 'order'],
 	primaryKey: {
 		// where should the composed string be stored
 		key: 'eventMatchKey',
@@ -120,6 +121,10 @@ const matchSchema: RxJsonSchema<Match> = {
 		},
 		matchKey: {
 			type: 'string' // eg: qm4 qf1m1 sf2m1 f1m2
+		},
+		order: {
+			type: 'number',
+			description: 'The order the match will be played'
 		},
 		alliances: {
 			type: 'object',

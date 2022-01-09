@@ -1,5 +1,6 @@
 //source: https://www.thebluealliance.com/api/v3/event/2020week0/matches
 import type { Match } from '$lib/schema/match-schema';
+import type { Match as TBAMatch } from 'tba-api-v3client-ts';
 
 export const compLevels = {
 	test: 0, // test match
@@ -21,4 +22,18 @@ export function matchSort(a: Match, b: Match): number {
 	if (a.matchNumber !== b.matchNumber) {
 		return a.matchNumber - b.matchNumber;
 	}
+	return 0;
+}
+
+export function tbaMatchSort(a: TBAMatch, b: TBAMatch): number {
+	if (compLevels[a.comp_level] !== compLevels[b.comp_level]) {
+		return compLevels[a.comp_level] - compLevels[b.comp_level];
+	}
+	if (a.set_number !== b.set_number) {
+		return a.set_number - b.set_number;
+	}
+	if (a.match_number !== b.match_number) {
+		return a.match_number - b.match_number;
+	}
+	return 0;
 }

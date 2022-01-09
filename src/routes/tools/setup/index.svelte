@@ -14,19 +14,23 @@
 	import GetMatches from "./_3getMatches.svelte";
 	import AssignMatches from "./_4assignMatches.svelte";
 
+	import MatchAssigner from "./_5matchAssiginer.svelte";
+
 
 </script>
 
 <div class="content">
 	<h1>Setup</h1>
 
-	<TeamNumber />
+	<TeamNumber/>
 
-	<Scouts />
+	<Scouts/>
 
-	<GetMatches />
+	<GetMatches/>
 
-	<AssignMatches />
+	<AssignMatches/>
+
+	<MatchAssigner/>
 
 </div>
 
