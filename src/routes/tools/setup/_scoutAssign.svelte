@@ -77,6 +77,7 @@
             } else {
                 // insert
                 let a: MatchMetricsReport = {
+                    order: match.order,
                     createdAt: new Date().getTime(),
                     updatedAt: new Date().getTime(),
                     eventKey: eventKey,

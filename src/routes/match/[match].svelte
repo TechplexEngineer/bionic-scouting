@@ -10,28 +10,39 @@
 
 <script lang="ts">
     import {page} from "$app/stores";
-
-
+    import "sweetalert2/dist/sweetalert2.css";
     import Swal from "sweetalert2";
-    import MatchTable from "$lib/compontents/_matchTable.svelte"
+    import MatchTable from "$lib/compontents/_matchTable.svelte";
+    import {onMount} from "svelte";
+    import {getDb} from "$lib/store";
+    import {Settings} from "$lib/schema/settings-schema";
+    import {goto} from "$app/navigation";
+    import type {RxDocument} from "rxdb";
+    import type {Match} from "$lib/schema/match-schema";
 
-    let matches = [];
+    let match: RxDocument<Match>;
 
-    function getMatch(key: string) {
-        for (const m of matches) {
-            if (m.key.split("_")[1] == key) {
-                return m;
+    onMount(async () => {
+        const db = await getDb();
+
+        const settingEvent = await db.settings.findOne({selector: {key: Settings.CurrentEvent}}).exec();
+        if (!settingEvent) {
+            let res = await Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                html: `Current event not set. Head over to Setup`,
+                showCloseButton: true,
+                confirmButtonText: 'Go to Setup',
+            });
+            if (res.isConfirmed) {
+                goto("/tools/setup");
+                return;
             }
         }
-        Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "Invalid match" + key
-        });
-    }
+        let eventKey = settingEvent.value;
 
-    let match = {};
-    $: match = getMatch($page.params.match);
+        match = await db.matches.findOne().where({eventKey, matchKey: $page.params.match}).exec();
+    });
 
     let ourTeamNumber = 4909;
 
@@ -40,7 +51,9 @@
 
 <div class="container-fluid">
     <a class="btn btn-info float-start" href="/match/myschedule">&lt; Schedule</a>
+    <a class="btn btn-warning float-end" href="/match/objective?match={match && match.matchKey}">Re-Scout Match</a>
     <h1>Match {$page.params.match.toUpperCase()}</h1>
+
 </div>
 
 
@@ -49,11 +62,11 @@
 
     <pre>
 	BLUE
-        {JSON.stringify(match.score_breakdown.blue, null, "    ")}
+        {JSON.stringify(match.scoreBreakdown.blue, null, "    ")}
     </pre>
     <pre>
       RED
-        {JSON.stringify(match.score_breakdown.red, null, "    ")}
+        {JSON.stringify(match.scoreBreakdown.red, null, "    ")}
     </pre>
 {/if}
 

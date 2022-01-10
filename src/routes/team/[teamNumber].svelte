@@ -10,10 +10,15 @@
     import {Settings} from "$lib/schema/settings-schema";
     import Swal from "sweetalert2";
     import {goto} from "$app/navigation";
+    import type {RxDocument} from "rxdb";
+    import type {PitReport} from "$lib/schema/pit-scout-schema";
+    import type {MatchMetricsReport} from "$lib/schema/match-metrics-schema";
 
-    let team;
+    let team: RxDocument<PitReport>;
     let teamNumber = $page.params.teamNumber;
-    console.log("TeamNumber", teamNumber);
+    // console.log("TeamNumber", teamNumber);
+
+    let scoutedMatches: RxDocument<MatchMetricsReport>[];
 
     onMount(async () => {
         const db = await getDb();
@@ -33,13 +38,20 @@
             }
         }
 
-        console.log("TeamNumber----", teamNumber);
         db.pit_scouting.findOne().where({
             eventKey: settingEvent.value,
             teamNumber: parseInt(teamNumber)
         }).$.subscribe(t => {
             team = t;
         });
+
+        db.match_metrics.find().where({
+            eventKey: settingEvent.value,
+            teamNumber: parseInt(teamNumber),
+            submitted: true
+        }).$.subscribe(mm => {
+            scoutedMatches = mm;
+        })
     });
 
 </script>
@@ -47,14 +59,25 @@
 {#if team}
     <div class="container-fluid">
         <h1>Team {teamNumber} - {team.nickname}</h1>
-        <div class="row">
-            <div class="col"><h2><b>From:</b> {team.city}, {team.stateProv}, {team.country}</h2></div>
-            <div class="col text-end"><h2><b>Rookie Year:</b> {team.rookieYear}</h2></div>
+        <a href="/pit/?team={teamNumber}" class="btn btn-primary">Scout</a>
+
+        <div class="d-flex">
+            <span class="fs-5"><b>From:</b> {team.city}, {team.stateProv}, {team.country}</span>
+            <span class="fs-5"><b>Rookie Year:</b> {team.rookieYear}</span>
         </div>
 
         <h1>@todo Robot Photo</h1>
 
         <h1 class="mt-5">@todo metrics</h1>
 
+        <h2>Pit Scouting</h2>
+        <pre>
+        {JSON.stringify(team.toJSON(), null, 4)}
+        </pre>
+
+        <h2>Scouted Matches</h2>
+        <pre>
+            {JSON.stringify(scoutedMatches, null, 4)}
+        </pre>
     </div>
 {/if}

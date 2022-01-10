@@ -99,6 +99,7 @@
             let scoutCounter = 1;
             for (const t of redTeams) {
                 bulkInsertMatches.push({
+                    order: m.order,
                     eventKey: m.eventKey,
                     matchKey: m.matchKey,
                     teamNumber: t,
@@ -112,6 +113,7 @@
             scoutCounter = 1;
             for (const t of blueTeams) {
                 bulkInsertMatches.push({
+                    order: m.order,
                     eventKey: m.eventKey,
                     matchKey: m.matchKey,
                     teamNumber: t,
@@ -124,7 +126,7 @@
             matchCounter += 1;
             if (matchCounter % matchesPerShift == 0) {
                 groupCounter += 1;
-                console.log(`matchCounter${matchCounter} % matchesPerShift${matchesPerShift} == 0`);
+                // console.log(`matchCounter${matchCounter} % matchesPerShift${matchesPerShift} == 0`);
             }
         }
         await db.match_metrics.bulkInsert(bulkInsertMatches)

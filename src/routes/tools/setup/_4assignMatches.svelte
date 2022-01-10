@@ -83,6 +83,7 @@
                     } else {
                         // console.log("Create");
                         db.match_metrics.insert({
+                            order: matchesTable[toIdx].order,
                             eventKey: matchesTable[toIdx].eventKey,
                             matchKey: matchesTable[toIdx].matchKey,
                             teamNumber: dstTeams[i],

@@ -24,6 +24,8 @@
     import type {Match} from "$lib/schema/match-schema";
     import {matchSort} from "$lib/matches";
     import {adapterName} from "$lib/bluetooth";
+    import InputControl from "./_inputControl.svelte";
+    import {page} from "$app/stores";
 
     import matchObjectiveSchema, {MatchMetricsReport} from "$lib/schema/match-metrics-schema";
 
@@ -91,17 +93,30 @@
             }
         }
         eventKey = settingEvent.value;
-        matches = await db.matches.find({
-            selector: {eventKey: eventKey}
-        }).exec();
+        matches = await db.matches.find().where({eventKey: eventKey}).exec();
         matches.sort(matchSort);
 
-        // find first unsubmitted match
-        for (const m of matches) {
-            m.su
+        if ($page.query.get("match")) {
+            for (const m of matches) {
+                if (m.matchKey == $page.query.get("match")) {
+                    matchNumber.set(m.order + 1);
+                    break
+                }
+            }
+            // it is possible we got here and didn't find a match
+        } else {
+
+            // find first un-submitted match
+            const lastSubmitted = await db.match_metrics.findOne().where({submitted: true}).sort({order: "desc"}).exec()
+            if (lastSubmitted == null) {
+                // no matches submitted yet, go to first match
+                matchNumber.set(1); //trigger update
+            } else {
+                //+2 since order is 0 indexed
+                matchNumber.set(lastSubmitted.order + 2);
+            }
         }
 
-        matchNumber.set(5); //trigger update
         onMountComplete = true;
     });
 
@@ -132,7 +147,6 @@
             }
         }
 
-
         teamNumber = match.alliances[color].teamKeys[number - 1].replace("frc", "");
 
         matchMetrics = await db.match_metrics.findOne({
@@ -159,7 +173,22 @@
         onMountComplete = true;
     });
 
-    import InputControl from "./_inputControl.svelte";
+
+    async function nextMatch() {
+        if (!confirm("Move to next match?")) {
+            return
+        }
+        console.time('setSubmitted')
+        // Mark this match as completed
+        await matchMetrics.atomicUpdate(doc => {
+            doc.submitted = true;
+            return doc;
+        });
+        console.timeEnd('setSubmitted')
+
+        $matchNumber += 1;
+        activeTab = 0; //reset view to first tab
+    }
 
 </script>
 
@@ -223,8 +252,7 @@
                     {#if activeTab < Object.keys(tabs).length - 1}
                         <button class="btn btn-primary ms-auto" on:click={()=>{activeTab += 1}}>Next &gt;</button>
                     {:else}
-                        <button class="btn btn-warning ms-auto" on:click={()=>{$matchNumber+=1; activeTab=0}}>Next
-                            &gt;
+                        <button class="btn btn-warning ms-auto" on:click={nextMatch}>Next &gt;
                         </button>
                     {/if}
                 </div>

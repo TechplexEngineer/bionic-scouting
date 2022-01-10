@@ -9,20 +9,18 @@ export type MatchMetricsReport = {
 	teamNumber: number;
 	scoutName: string;
 	submitted?: boolean;
+	order: number;
 
 	preStartingLocation?: string;
-	preStartingLocationX?: number;
-	preStartingLocationY?: number;
-	prePowerCells?: number;
+	preCargoLoaded?: number;
 	autoHigh?: number;
 	autoLow?: number;
-	autoInitLine?: boolean;
+	autoTaxi?: boolean;
 	autoPenalties?: number;
 	teleopPenalties?: number;
 	teleopHighGoal?: number;
 	teleopLowGoal?: number;
-	teleopClimbLocation?: string;
-	teleopClimbSuccess?: boolean;
+	teleopClimb?: string;
 };
 
 export type MatchMetricsCollection = RxCollection<MatchMetricsReport>;
@@ -32,7 +30,7 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 	description: 'Metrics about a team in a match',
 	version: 0,
 	type: 'object',
-	indexes: ['createdAt', 'updatedAt'],
+	indexes: ['createdAt', 'updatedAt', 'order'],
 	primaryKey: {
 		// where should the composed string be stored
 		key: 'eventMatchTeamKey',
@@ -70,6 +68,9 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 			description: 'Match has been played and data recorded',
 			default: false
 		},
+		order: {
+			type: 'number'
+		},
 
 		// Pregame
 		preStartingLocation: {
@@ -79,34 +80,19 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 				cardClasses: 'col-12',
 				control: 'buttons'
 			},
-			enum: ['Tower', 'Trench', 'Middle']
+			enum: ['Near Hangar', 'Away From Hangar']
 		},
-		preStartingLocationX: {
+		preCargoLoaded: {
 			type: 'number',
 			minimum: 0,
+			maximum: 1,
 			metadata: {
-				tab: 'Pre',
-				hidden: true
-			}
-		},
-		preStartingLocationY: {
-			type: 'number',
-			minimum: 0,
-			metadata: {
-				tab: 'Pre',
-				hidden: true
-			}
-		},
-		prePowerCells: {
-			type: 'number',
-			minimum: 0,
-			maximum: 3,
-			metadata: {
-				label: 'Number of Power Cells loaded',
+				label: 'Number of Cargo loaded',
 				tab: 'Pre',
 				cardClasses: 'col-12'
 			}
 		},
+
 		// Auto
 		autoHigh: {
 			type: 'number',
@@ -122,7 +108,7 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 			},
 			minimum: 0
 		},
-		autoInitLine: {
+		autoTaxi: {
 			type: 'boolean',
 			metadata: {
 				tab: 'Auto',
@@ -137,6 +123,7 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 			},
 			minimum: 0
 		},
+
 		// Teleop
 		teleopHighGoal: {
 			type: 'number',
@@ -152,18 +139,12 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 			},
 			minimum: 0
 		},
-		teleopClimbLocation: {
+		teleopClimb: {
 			type: 'string',
-			enum: ['Center', 'End'],
+			enum: ['None', 'L1', 'L2', 'L3', 'L4'],
 			metadata: {
 				tab: 'Teleop',
 				control: 'buttons'
-			}
-		},
-		teleopClimbSuccess: {
-			type: 'boolean',
-			metadata: {
-				tab: 'Teleop'
 			}
 		},
 		teleopPenalties: {
@@ -174,6 +155,6 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 			minimum: 0
 		}
 	},
-	required: ['eventKey', 'matchKey']
+	required: ['eventKey', 'matchKey', 'order']
 };
 export default matchMetricsSchema;

@@ -31,7 +31,7 @@
         }
 
         db.pit_scouting.find().where({eventKey: settingEvent.value}).sort('teamNumber').$.subscribe(t => {
-            console.log("teams", t);
+            // console.log("teams", t);
             teams = t;
         });
     });
