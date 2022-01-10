@@ -8,6 +8,13 @@
     <script>
         window.process = window.process || {env: {NODE_DEBUG: undefined, DEBUG: undefined}};
         window.global = window;
+
+        // Capture any unhandled errors so we can fix them
+        // src: https://stackoverflow.com/a/37724538/429544
+        window.addEventListener("error", function (e) {
+            alert("Error occurred: " + e.error.message);
+            return false;
+        });
     </script>
     %svelte.head%
 </head>
