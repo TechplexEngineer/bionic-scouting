@@ -185,7 +185,5 @@
 
 
 <style>
-    .flex-1 {
-        flex: 1;
-    }
+
 </style>

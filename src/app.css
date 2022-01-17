@@ -109,3 +109,7 @@ button:focus:not(:focus-visible) {
 .selectContainer {
     --height: 38px
 }
+
+.flex-1 {
+    flex: 1;
+}
