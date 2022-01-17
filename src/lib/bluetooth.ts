@@ -27,18 +27,18 @@ export const adapterName = readable('', (set) => {
 	return () => clearInterval(handle);
 });
 
-let listnerHandle;
+let listenerHandle;
 let db;
 
 /**
  * Start listening for messages from bluetooth connections
  */
 export async function startMessageCenter(): Promise<void> {
-	if (listnerHandle) {
-		listnerHandle.remove();
-		listnerHandle = null;
+	if (listenerHandle) {
+		listenerHandle.remove();
+		listenerHandle = null;
 	}
-	listnerHandle = await BluetoothSerial.addListener('rawData', handleIncomingMessage); //@todo needs to include sender mac address
+	listenerHandle = await BluetoothSerial.addListener('rawData', handleIncomingMessage); //@todo needs to include sender mac address
 	db = await getDb();
 
 	// If hot module reload is enabled, if reloading the layout remove the listener
@@ -50,9 +50,9 @@ export async function startMessageCenter(): Promise<void> {
 			}
 
 			if (data.type == 'update' && data.updates.reduce(reducer, false)) {
-				if (listnerHandle) {
+				if (listenerHandle) {
 					console.log('Removing rawData listener');
-					listnerHandle.remove();
+					listenerHandle.remove();
 				}
 			}
 		});
@@ -64,14 +64,14 @@ export async function startMessageCenter(): Promise<void> {
  * @todo should we purge the pending queue
  */
 export async function stopMessageCenter(): Promise<void> {
-	if (listnerHandle) {
-		listnerHandle.remove();
-		listnerHandle = null;
+	if (listenerHandle) {
+		listenerHandle.remove();
+		listenerHandle = null;
 	}
 }
 
 export function isMessageCenterRunning(): boolean {
-	return !!listnerHandle;
+	return !!listenerHandle;
 }
 
 type Message = { msgId: string; action: string; data; params; from: BTDevice };
@@ -168,7 +168,7 @@ export async function sendMessage(
 	if (options === undefined) {
 		options = {};
 	}
-	if (!listnerHandle) {
+	if (!listenerHandle) {
 		console.error('message center is not running.');
 		throw new Error('message center is not running.');
 	}
