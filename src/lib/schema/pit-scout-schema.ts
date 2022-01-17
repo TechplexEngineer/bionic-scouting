@@ -12,6 +12,7 @@ export type PitReport = {
 	createdAt: number;
 	updatedAt: number;
 	teamNumber: number;
+	imageUrl: string;
 	notes: string;
 	facts: Fact[];
 
@@ -57,6 +58,9 @@ const pitSchema: RxJsonSchema<PitReport> = {
 		},
 		teamNumber: {
 			type: 'number'
+		},
+		imageUrl: {
+			type: 'string'
 		},
 		notes: {
 			type: 'string'
