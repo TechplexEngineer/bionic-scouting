@@ -78,6 +78,7 @@
                         // console.log("Update");
                         matchReportDst.atomicUpdate(data => {
                             data.scoutName = matchReportSrc.scoutName;
+                            data.updatedAt = new Date().getTime();
                             return data
                         });
                     } else {

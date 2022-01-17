@@ -182,6 +182,7 @@
         // Mark this match as completed
         await matchMetrics.atomicUpdate(doc => {
             doc.submitted = true;
+            doc.updatedAt = new Date().getTime();
             return doc;
         });
         console.timeEnd('setSubmitted')

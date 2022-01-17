@@ -75,6 +75,7 @@
                     data[propertyName] = event.detail.label;
                 }
             }
+            data.updatedAt = new Date().getTime();
 
             return data;
         });
@@ -90,6 +91,7 @@
             } else {
                 data[propertyName] = event.detail;
             }
+            data.updatedAt = new Date().getTime();
             return data;
         });
     }
