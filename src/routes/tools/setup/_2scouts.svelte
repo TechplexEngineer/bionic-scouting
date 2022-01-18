@@ -9,13 +9,15 @@
     import {Button} from "sveltestrap";
     import type {RxDocument} from "rxdb";
 
+    export let dbTable: string; //eg. scouts or super_scouts
+
     let db: MyDatabase;
 
     let scouts = [];
 
     onMount(async () => {
         db = await getDb();
-        await db.scouts.find()
+        await db[dbTable].find()
             .sort({name: "asc"})
             .$.subscribe((s) => {
                 scouts = s;
@@ -23,7 +25,6 @@
     });
 
     let scoutName = "";
-
 
     async function addScout() {
         if (scoutName.length < 2) {
@@ -35,7 +36,7 @@
             updatedAt: new Date().getTime()
         };
 
-        if (await db.scouts.findOne({selector: {name: scoutName}}).exec() != null) {
+        if (await db[dbTable].findOne({selector: {name: scoutName}}).exec() != null) {
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
@@ -44,7 +45,7 @@
             return;
         }
 
-        await db.scouts.insert(s);
+        await db[dbTable].insert(s);
         scoutName = ""; //clear form for next name
     }
 
@@ -107,7 +108,7 @@
             confirmButtonColor: "#dd6b55"
         });
         if (result.isConfirmed) {
-            await db.scouts.find().remove();
+            await db[dbTable].find().remove();
         }
     }
 
@@ -115,7 +116,7 @@
 
     function makeInactive(scout: RxDocument<Scout>) {
         return async () => {
-            console.log("makeInactive", scout);
+            // console.log("makeInactive", scout);
             await scout.update({
                 $set: {active: false}
             });
@@ -124,7 +125,7 @@
 
     function makeActive(scout: RxDocument<Scout>) {
         return async () => {
-            console.log("makeActive", scout);
+            // console.log("makeActive", scout);
             await scout.update({
                 $set: {active: true}
             });
@@ -133,7 +134,6 @@
 
 </script>
 
-<h2>2. Enter scout names or load list</h2>
 <div class="d-flex">
     <div>
         <button class="me-4 btn btn-outline-primary" on:click={()=>{fileInput.click();}}>Upload List</button>
