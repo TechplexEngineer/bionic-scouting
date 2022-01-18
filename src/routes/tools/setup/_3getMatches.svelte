@@ -72,7 +72,7 @@
         if (v == null) {
             return;
         }
-        db.settings.upsert({key: Settings.CurrentEvent, value: v.value});
+        db.settings.atomicUpsert({key: Settings.CurrentEvent, value: v.value});
     }));
 
     async function pullMatches() {
