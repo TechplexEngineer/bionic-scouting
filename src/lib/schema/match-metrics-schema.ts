@@ -90,7 +90,8 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 				label: 'Number of Cargo loaded',
 				tab: 'Pre',
 				cardClasses: 'col-12'
-			}
+			},
+			default: 0
 		},
 
 		// Auto
@@ -99,14 +100,16 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 			metadata: {
 				tab: 'Auto'
 			},
-			minimum: 0
+			minimum: 0,
+			default: 0
 		},
 		autoLow: {
 			type: 'number',
 			metadata: {
 				tab: 'Auto'
 			},
-			minimum: 0
+			minimum: 0,
+			default: 0
 		},
 		autoTaxi: {
 			type: 'boolean',
@@ -114,14 +117,16 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 				tab: 'Auto',
 				labelNotSelected: 'Not Crossed',
 				labelSelected: 'Crossed'
-			}
+			},
+			default: false
 		},
 		autoPenalties: {
 			type: 'number',
 			metadata: {
 				tab: 'Auto'
 			},
-			minimum: 0
+			minimum: 0,
+			default: 0
 		},
 
 		// Teleop
@@ -130,14 +135,16 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 			metadata: {
 				tab: 'Teleop'
 			},
-			minimum: 0
+			minimum: 0,
+			default: 0
 		},
 		teleopLowGoal: {
 			type: 'number',
 			metadata: {
 				tab: 'Teleop'
 			},
-			minimum: 0
+			minimum: 0,
+			default: 0
 		},
 		teleopClimb: {
 			type: 'string',
@@ -145,14 +152,16 @@ const matchMetricsSchema: RxJsonSchema<MatchMetricsReport> = {
 			metadata: {
 				tab: 'Teleop',
 				control: 'buttons'
-			}
+			},
+			default: 'None'
 		},
 		teleopPenalties: {
 			type: 'number',
 			metadata: {
 				tab: 'Teleop'
 			},
-			minimum: 0
+			minimum: 0,
+			default: 0
 		}
 	},
 	required: ['eventKey', 'matchKey', 'order']
