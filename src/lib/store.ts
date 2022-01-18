@@ -8,6 +8,7 @@ import noteSchema from './schema/note-schema';
 import pitSchema from '$lib/schema/pit-scout-schema';
 import scoutsSchema from '$lib/schema/scouts-schema';
 import settingsSchema from '$lib/schema/settings-schema';
+import SuperScoutSchema from '$lib/schema/super-scout-schema';
 
 import type { MatchMetricsCollection } from '$lib/schema/match-metrics-schema';
 import type { MatchCollection } from '$lib/schema/match-schema';
@@ -17,6 +18,7 @@ import type { PitReportCollection } from '$lib/schema/pit-scout-schema';
 import type { ScoutCollection } from '$lib/schema/scouts-schema';
 import type { SettingsCollection } from '$lib/schema/settings-schema';
 import type { RxDatabase } from 'rxdb';
+import type { SuperScoutCollection } from '$lib/schema/super-scout-schema';
 
 addDefaultRxPlugins();
 addPouchPlugin(idb);
@@ -31,6 +33,7 @@ type MyDatabaseCollections = {
 	pit_scouting: PitReportCollection;
 	scouts: ScoutCollection;
 	settings: SettingsCollection;
+	super_scouts: SuperScoutCollection;
 };
 
 export type MyDatabase = RxDatabase<MyDatabaseCollections>;
@@ -49,7 +52,8 @@ const _create = async () => {
 		notes: { schema: noteSchema },
 		pit_scouting: { schema: pitSchema },
 		scouts: { schema: scoutsSchema },
-		settings: { schema: settingsSchema }
+		settings: { schema: settingsSchema },
+		super_scouts: { schema: SuperScoutSchema }
 	});
 	dbPromise = db;
 	return db;

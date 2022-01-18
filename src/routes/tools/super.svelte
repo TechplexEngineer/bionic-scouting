@@ -3,117 +3,157 @@
 </svelte:head>
 
 <script lang="ts">
-    // import {sortedMatches} from "$lib/matches";
     import {Modal, ModalBody, ModalHeader, Table} from "sveltestrap";
     import "sweetalert2/dist/sweetalert2.css";
+    import {onMount} from "svelte";
+    import {getDb, MyDatabase} from "$lib/store";
+    import {Settings} from "$lib/schema/settings-schema";
+    import {goto} from "$app/navigation";
+    import Swal from "sweetalert2";
+    import "sweetalert2/dist/sweetalert2.css";
+    import type {RxDocument} from "rxdb";
+    import type {SuperScout} from "$lib/schema/super-scout-schema";
+    import type {Match} from "$lib/schema/match-schema";
+    import Scouts from "./setup/_2scouts.svelte";
+    import Select from "svelte-select";
 
-    let sortedMatches = [];
 
-    let ourTeamNumber = 4909; //@todo
+    let db: MyDatabase;
+    let eventKey: string; //eg. 2020week0 (current event)
+    let matches: RxDocument<Match>[] = [];
+    let ourTeamNumber; //eg. 4909
+    let ourMatches: RxDocument<Match>[] = [];
+    let scoutsSelectList = [];
 
-    let ourMatches = sortedMatches.filter(m => {
-        return m.alliances.red.team_keys.includes(`frc${ourTeamNumber}`) ||
-            m.alliances.blue.team_keys.includes(`frc${ourTeamNumber}`);
+    onMount(async () => {
+        db = await getDb();
+
+        const eventSetting = await db.settings.findOne().where({key: Settings.CurrentEvent}).exec();
+        if (!eventSetting) {
+            let res = await Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                html: `Current event not set. Head over to Setup`,
+                showCloseButton: true,
+                confirmButtonText: "Go to Setup"
+            });
+            if (res.isConfirmed) {
+                await goto("/tools/setup");
+                return;
+            }
+            return;
+        }
+        eventKey = eventSetting.value;
+
+        const entry = await db.settings.findOne({selector: {key: Settings.TeamNumber}}).exec();
+        if (entry && entry.value) {
+            ourTeamNumber = parseInt(entry.value)
+        } else {
+            let res = await Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                html: `Team number not set. Head over to Setup`,
+                showCloseButton: true,
+                confirmButtonText: "Go to Setup"
+            });
+            if (res.isConfirmed) {
+                await goto("/tools/setup");
+                return;
+            }
+            return;
+        }
+
+        matches = await db.matches.find().where({eventKey}).sort({order: "asc"}).exec();
+
+        // Find our matches
+        for (let match of matches) {
+            const teamKeys = match.alliances.red.teamKeys.concat(match.alliances.blue.teamKeys)
+            const matchTeams = teamKeys.map(t => parseInt(t.replace('frc', '')));
+            if (matchTeams.includes(ourTeamNumber)) {
+                ourMatches.push(match)
+            }
+        }
     });
 
-    let pairedDevices = [ //@todo
-        {name: "Red1", super: false, assignedMatches: []},
-        {name: "Red2", super: false, assignedMatches: []},
-        {name: "Red3", super: false, assignedMatches: []},
-        {name: "Blue1", super: false, assignedMatches: []},
-        {name: "Blue2", super: false, assignedMatches: []},
-        {name: "Blue3", super: false, assignedMatches: []},
-        {name: "Super1", super: false, assignedMatches: []},
-        {name: "Super2", super: false, assignedMatches: []},
-        {name: "Super3", super: false, assignedMatches: []},
-    ];
+    let modalOpen = false;
+    let currentMatch; // match that was selected when button selected
 
-    function refreshDevices() {
-        console.log("@todo? maybe not needed");
+    function toggleModal() {
+        modalOpen = !modalOpen;
     }
 
-    let open = false;
-    let currentMatch;
-    let currentTeam;
-
-    function toggle(match, team: number) {
+    function openModal(match: RxDocument<Match>) {
         return () => {
             currentMatch = match;
-            currentTeam = team;
-            open = !open;
+            modalOpen = true;
         }
+
     }
 
-    let superDevices = [];
-    $: superDevices = pairedDevices.filter(v => v.super)
+    //
+    // let superDevices = [];
+    // $: superDevices = pairedDevices.filter(v => v.super)
+    //
+    // function toggleAssignDevToMatch(dev, match, team: number) {
+    //     return () => {
+    //         let eventMatchTeam = `${match.key}_${team}`;
+    //         if (dev.assignedMatches.includes(eventMatchTeam)) {
+    //             dev.assignedMatches = dev.assignedMatches.filter(v => (v == eventMatchTeam))
+    //         } else {
+    //             dev.assignedMatches = [...dev.assignedMatches, eventMatchTeam];
+    //         }
+    //         pairedDevices = pairedDevices; // trigger update of devices table
+    //         ourMatches = ourMatches; //trigger update of assigned buttons
+    //         toggle(null, null)() // close the modal
+    //     }
+    // }
 
-    function toggleAssignDevToMatch(dev, match, team: number) {
-        return () => {
-            let eventMatchTeam = `${match.key}_${team}`;
-            if (dev.assignedMatches.includes(eventMatchTeam)) {
-                dev.assignedMatches = dev.assignedMatches.filter(v => (v == eventMatchTeam))
-            } else {
-                dev.assignedMatches = [...dev.assignedMatches, eventMatchTeam];
+    // function isAssigned(match, team: number) {
+    //     let eventMatchTeam = `${match.key}_${team}`;
+    //     return pairedDevices.map(d => d.assignedMatches).flat().includes(eventMatchTeam)
+    // }
+
+    function formatDate(d) {
+        const date1 = new Date(d * 1000); //unix timestamp to javascript millis
+
+        const dateTimeFormat3 = new Intl.DateTimeFormat('en-US', {
+            weekday: 'short',
+            month: 'numeric',
+            day: 'numeric',
+        });
+        return dateTimeFormat3.format(date1); //Fri, m/dd
+    }
+
+    function getMatches(team, currentOrder) {
+        let teamMatches = [];
+        for (let match of ourMatches) {
+            const teamKeys = match.alliances.red.teamKeys.concat(match.alliances.blue.teamKeys)
+            const matchTeams = teamKeys.map(t => parseInt(t.replace('frc', '')));
+            if (matchTeams.includes(team) && match.order < currentOrder) {
+                teamMatches.push(match.matchKey)
             }
-            pairedDevices = pairedDevices; // trigger update of devices table
-            ourMatches = ourMatches; //trigger update of assigned buttons
-            toggle(null, null)() // close the modal
         }
+        return teamMatches.join(',')
     }
 
-    function isAssigned(match, team: number) {
-        let eventMatchTeam = `${match.key}_${team}`;
-        return pairedDevices.map(d => d.assignedMatches).flat().includes(eventMatchTeam)
+    function matchContainsOurTeam(match: RxDocument<Match>) {
+        const teamKeys = match.alliances.red.teamKeys.concat(match.alliances.blue.teamKeys)
+        const matchTeams = teamKeys.map(t => parseInt(t.replace('frc', '')));
+
+        return matchTeams.includes(ourTeamNumber)
     }
+
 
 </script>
 
 <div class="container-fluid">
     <h1>Super Scout Setup</h1>
 
-    <div class="d-flex justify-content-between">
-        <h2>Paired Devices</h2>
-        <div>
-            <button class="btn btn-info btn-sm" on:click={refreshDevices}>Refresh</button>
-        </div>
-    </div>
-    <small class="text-muted fw-light fs-5">1. Select devices to be super scouts</small>
+    <h2>1. Scouts <small class="text-muted fw-light fs-5">Enter scouts</small></h2>
+    <Scouts dbTable="super_scouts"/>
 
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>Device</th>
-            <th></th>
-            <th>Teams</th>
-        </tr>
-        </thead>
-        <tbody>
-        {#each pairedDevices as d}
-            <tr>
-                <td>{d.name}</td>
-                <td>
-                    <button class:btn-warning={d.super} on:click={()=>{d.super = !d.super}}
-                            class="btn btn-primary btn-sm">
-                        {#if d.super}
-                            Mark as Objective
-                        {:else}
-                            Mark as Super
-                        {/if}
-                    </button>
-                </td>
-                <td>
-                    <ul>
-                        {#each d.assignedMatches as t}
-                            <li>{t}</li>
-                        {/each}
-                    </ul>
-                </td>
-            </tr>
-        {/each}
-        </tbody>
-    </table>
 
-    <h2>Our Matches <small class="text-muted fw-light fs-5">2. Assign super scouts to teams</small></h2>
+    <h2>2. Our Matches <small class="text-muted fw-light fs-5">Assign super scouts to teams</small></h2>
     <Table striped>
         <thead>
         <tr>
@@ -123,34 +163,39 @@
         </tr>
         </thead>
         <tbody>
-        {#each ourMatches as m}
+        {#each matches as m}
             <tr>
                 <td rowspan="2">
-                    <a href="/match/{m.key.split('_')[1]}">{m.key.split('_')[1].toUpperCase()}</a>
+                    <a href="/match/{m.matchKey}">{m.matchKey.toUpperCase()}</a><br>
+                    {formatDate(m.scheduledTime)}
+                    {#if matchContainsOurTeam(m)}
+                        <button class="btn btn-outline-primary" on:click={openModal(m)}>Assign</button>
+                    {/if}
                 </td>
 
                 {#each ['red', 'blue'] as color}
-                    {#each m.alliances[color].team_keys as t}
+                    {#each m.alliances[color].teamKeys as t}
                         <td class="{color}bg" class:ourTeam={t.replace('frc','') == ourTeamNumber}>
                             <a href="/team/{t.replace('frc','')}">{t.replace('frc', '')}</a>
                         </td>
                     {/each}
                 {/each}
             </tr>
-            <tr>
+            <tr style="border-bottom: 2px solid black">
                 {#each ['red', 'blue'] as color}
-                    {#each m.alliances[color].team_keys as t}
+                    {#each m.alliances[color].teamKeys as t}
                         <td class="{color}bg">
                             {#if t !== `frc${ourTeamNumber}`}
-                                {#if isAssigned(m, t)}
-                                    <button on:click={toggle(m, t)} class="btn btn-success btn-sm">
-                                        Unassign
-                                    </button>
-                                {:else}
-                                    <button on:click={toggle(m, t)} class="btn btn-secondary btn-sm">
-                                        Assign
-                                    </button>
-                                {/if}
+                                {getMatches(parseInt(t.replace('frc', '')), m.order)}
+                                <!--{#if isAssigned(m, t)}-->
+                                <!--    <button on:click={toggle(m, t)} class="btn btn-success btn-sm">-->
+                                <!--        Unassign-->
+                                <!--    </button>-->
+                                <!--{:else}-->
+                                <!--    <button on:click={toggle(m, t)} class="btn btn-secondary btn-sm">-->
+                                <!--        Assign-->
+                                <!--    </button>-->
+                                <!--{/if}-->
                             {/if}
                         </td>
                     {/each}
@@ -161,16 +206,12 @@
     </Table>
 </div>
 
-<Modal isOpen={open} toggle={toggle()}>
-    <ModalHeader toggle={toggle()}>Assign <b>{currentMatch.key.split('_')[1].toUpperCase()}</b> to...</ModalHeader>
+<Modal isOpen={modalOpen} toggle={toggleModal}>
+    <ModalHeader toggle={toggleModal}>Assign <b>{currentMatch.matchKey.toUpperCase()}</b> to...</ModalHeader>
     <ModalBody>
-        {#each superDevices as dev}
-            <button on:click={toggleAssignDevToMatch(dev, currentMatch, currentTeam)}
-                    class="btn btn-success me-1">{dev.name}</button>
 
-        {:else}
-            <p>No scouts designated as super scouts</p>
-        {/each}
+        <Select items={scoutsSelectList}/>
+
     </ModalBody>
 </Modal>
 
