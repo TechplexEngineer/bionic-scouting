@@ -33,7 +33,7 @@
 
 <div class="content">
 
-    <a class="btn btn-info float-start" href="/match/myschedule">&lt; My Schedule</a>
+    <a class="btn btn-info float-start" href="/">&lt; My Schedule</a>
     <h1>Match Subjective</h1>
 
     <label for="team">Team Number:</label>

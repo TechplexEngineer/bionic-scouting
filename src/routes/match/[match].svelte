@@ -50,7 +50,7 @@
 </script>
 
 <div class="container-fluid">
-    <a class="btn btn-info float-start" href="/match/myschedule">&lt; Schedule</a>
+    <a class="btn btn-info float-start" href="/">&lt; Schedule</a>
     <a class="btn btn-warning float-end" href="/match/objective?match={match && match.matchKey}">Re-Scout Match</a>
     <h1>Match {$page.params.match.toUpperCase()}</h1>
 

@@ -8,15 +8,11 @@
 </svelte:head>
 
 <script lang="ts">
-
     import TeamNumber from "./_1teamNumber.svelte";
     import Scouts from "./_2scouts.svelte";
     import GetMatches from "./_3getMatches.svelte";
     import AssignMatches from "./_4assignMatches.svelte";
-
     import MatchAssigner from "./_5matchAssiginer.svelte";
-
-
 </script>
 
 <div class="content">
@@ -32,7 +28,6 @@
     <AssignMatches/>
 
     <MatchAssigner/>
-
 </div>
 
 

@@ -34,3 +34,27 @@ export const keysToCamel = function (o) {
 
 	return o;
 };
+
+export const formatDate = function (d) {
+	const date1 = new Date(d * 1000); //unix timestamp to javascript millis
+
+	const dateTimeFormat3 = new Intl.DateTimeFormat('en-US', {
+		weekday: 'short',
+		month: 'numeric',
+		day: 'numeric'
+	});
+	return dateTimeFormat3.format(date1); //Fri, m/dd
+};
+
+export const formatDateTime = function (d) {
+	const date1 = new Date(d * 1000); //unix timestamp to javascript millis
+
+	const dateTimeFormat3 = new Intl.DateTimeFormat('en-US', {
+		weekday: 'short',
+		month: 'numeric',
+		day: 'numeric',
+		hour: 'numeric',
+		minute: 'numeric'
+	});
+	return dateTimeFormat3.format(date1); //Fri, m/dd
+};

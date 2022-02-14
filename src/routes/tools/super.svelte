@@ -16,6 +16,7 @@
     import type {Match} from "$lib/schema/match-schema";
     import Scouts from "./setup/_2scouts.svelte";
     import Select from "svelte-select";
+    import {formatDate} from "$lib/util"
 
 
     let db: MyDatabase;
@@ -30,8 +31,6 @@
 
     onMount(async () => {
         db = await getDb();
-
-        window.db = db
 
         const eventSetting = await db.settings.findOne().where({key: Settings.CurrentEvent}).exec();
         if (!eventSetting) {
@@ -137,16 +136,6 @@
         currentMatch = null;
     }
 
-    function formatDate(d) {
-        const date1 = new Date(d * 1000); //unix timestamp to javascript millis
-
-        const dateTimeFormat3 = new Intl.DateTimeFormat("en-US", {
-            weekday: "short",
-            month: "numeric",
-            day: "numeric"
-        });
-        return dateTimeFormat3.format(date1); //Fri, m/dd
-    }
 
     function getMatches(team, currentOrder) {
         let teamMatches = [];

@@ -35,6 +35,7 @@
     let debugResponsive = localStorage.getItem('debugResponsive') || false;
 
     onMount(() => {
+        // Expose errors.... Hopefully we don't have too many
         window.onunhandledrejection = (e) => {
             Swal.fire({
                 icon: "error",

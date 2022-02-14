@@ -34,6 +34,8 @@
     onMount(async () => {
         db = await getDb();
 
+        window.db = db
+
         const settingEvent = await db.settings.findOne({selector: {key: Settings.CurrentEvent}}).exec();
         if (!settingEvent) {
             let res = await Swal.fire({
@@ -59,12 +61,32 @@
         }
 
         matches.sort(matchSort)
-        matchNumber.set(1); //trigger update
-    })
+        // feels like we should be able to query for just the matches we are in but it isn't working
+        // await db.matches.find().where({
+        //     "alliances.red.teamKeys": "frc4909"
+        // }).exec()
+
+        // filter to our matches
+        matches = matches.filter(m => {
+            return m.alliances.red.teamKeys.includes(`frc${ourTeamNumber}`) || m.alliances.blue.teamKeys.includes(`frc${ourTeamNumber}`)
+        })
+        let num = localStorage.getItem("matchPreview_curNum");
+        num = parseInt(num)
+        if (typeof num !== "number") {
+            num = 1;
+        }
+        matchNumber.set(num); //trigger update
+    });
 
     matchNumber.subscribe(n => {
+        if (!n) {
+            return
+        }
         match = matches[n - 1]
-    })
+        if (n && n != 1) {
+            localStorage.setItem("matchPreview_curNum", n)
+        }
+    });
 
 </script>
 
