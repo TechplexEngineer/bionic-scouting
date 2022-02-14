@@ -11,6 +11,7 @@
 
     init();
 
+
     async function getVersion() {
         try {
             const info = await App.getInfo();
@@ -27,8 +28,22 @@
 
 <script lang="ts">
     import Header from "$lib/header/Header.svelte";
+    import Swal from "sweetalert2";
+    import "sweetalert2/dist/sweetalert2.css";
+    import {onMount} from "svelte";
 
     let debugResponsive = localStorage.getItem('debugResponsive') || false;
+
+    onMount(() => {
+        window.onunhandledrejection = (e) => {
+            Swal.fire({
+                icon: "error",
+                title: "App Crashed.",
+                html: `Error: ${event.reason}`,
+                showConfirmButton: false
+            });
+        }
+    })
 </script>
 
 <Header/>
