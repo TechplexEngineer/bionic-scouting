@@ -5,8 +5,22 @@ export type SuperScout = {
 	updatedAt: number;
 	name: string;
 	active?: boolean;
-	assignedMatches: string[]; //matchKeys
+	assignedMatches: {
+		assignedMatch: string;
+		teamMatches: { team: number; match: string }[];
+	}[];
 };
+
+// let a = {
+//   assignedMatches: [
+//     {
+//       assignedMatch: "qm5",
+//       teamMatches: [
+//         {team: 319, match: "qm2"}
+//       ]
+//     }
+//   ]
+// }
 
 export type SuperScoutCollection = RxCollection<SuperScout>;
 
@@ -39,7 +53,26 @@ const scoutsSchema: RxJsonSchema<SuperScout> = {
 			type: 'array',
 			default: [],
 			items: {
-				type: 'string'
+				type: 'object',
+				properties: {
+					assignedMatch: {
+						type: 'string'
+					},
+					teamMatches: {
+						type: 'array',
+						items: {
+							type: 'object',
+							properties: {
+								team: {
+									type: 'number'
+								},
+								match: {
+									type: 'string'
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	},
