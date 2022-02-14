@@ -5,6 +5,7 @@ export type SuperScout = {
 	updatedAt: number;
 	name: string;
 	active?: boolean;
+	assignedMatches: string[]; //matchKeys
 };
 
 export type SuperScoutCollection = RxCollection<SuperScout>;
@@ -33,6 +34,13 @@ const scoutsSchema: RxJsonSchema<SuperScout> = {
 			type: 'boolean',
 			default: true,
 			description: 'If the scheduler should include this scout'
+		},
+		assignedMatches: {
+			type: 'array',
+			default: [],
+			items: {
+				type: 'string'
+			}
 		}
 	},
 	required: ['name']
