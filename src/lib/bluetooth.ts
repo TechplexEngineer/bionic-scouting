@@ -103,9 +103,9 @@ async function handleIncomingMessage(info: { bytes: number[]; from: BTDevice }) 
 	// 	return;
 	// }
 	switch (msg.action) {
-		case 'getNotes': {
+		case 'get': {
 			// @todo check if all params are set and proper types
-			const query = db.notes
+			const query = db[msg.params.collection] //@todo error handling for missing collection
 				.find()
 				.where('updatedAt')
 				.gt(msg.params.updatedSince)
@@ -115,21 +115,21 @@ async function handleIncomingMessage(info: { bytes: number[]; from: BTDevice }) 
 			const reply = await sendMessage(
 				msg.from.macAddress,
 				{
-					action: 'getNotesResponse',
+					action: 'getResponse',
 					data: results
 				},
 				{ timeoutMs: -1, responseToMsgId: msg.msgId }
 			);
 			break;
 		}
-		case 'putNotes':
+		case 'put':
 			for (const doc of msg.data) {
-				await db.notes.upsert(doc);
+				await db[msg.params.collection].upsert(doc);
 			}
 			await sendMessage(
 				msg.from.macAddress,
 				{
-					action: 'putNotesResponse',
+					action: 'putResponse',
 					data: ''
 				},
 				{ timeoutMs: -1, responseToMsgId: msg.msgId }
