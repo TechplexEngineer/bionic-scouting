@@ -2,7 +2,7 @@ import type { MyDatabase } from '$lib/store';
 import * as bt from '$lib/bluetooth';
 import type { RxReplicationState } from 'rxdb/dist/types/types';
 
-export const doNotesReplication = async (
+export const doReplication = async (
 	db: MyDatabase,
 	macAddress: string,
 	collection: string
