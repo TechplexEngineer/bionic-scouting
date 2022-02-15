@@ -86,7 +86,9 @@
 				{ name: "Reload", click: () => location.reload() },
 				{ name: "Remove All Data", click: removeAllData },
 				{ divider: true },
-				{ name: "Notes", href: "/notes" }
+				{ name: "Notes", href: "/notes" },
+				{ divider: true },
+				{ name: "Export", href: "/export" }
 			]
 		}
 	];
