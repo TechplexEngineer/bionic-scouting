@@ -12,6 +12,7 @@
 	import type { RxDocument } from "rxdb";
 	import type { Match } from "$lib/schema/match-schema";
 	import type { SuperScout } from "$lib/schema/super-scout-schema";
+	import { adapterName } from "$lib/bluetooth";
 
 	let deviceName = "...";
 	let eventName = "...";
@@ -80,47 +81,48 @@
 	<h1>Current Event <b>{eventName}</b></h1>
 
 
-	<!--	Only show if this device is a super scout -->
-	<h2 class="mt-3">My Schedule: <small class="text-muted">{scout && scout.name} (Super Scout)</small></h2>
-	<table class="table table-striped">
-		<thead>
-		<tr>
-			<th>Match</th>
-			<th>Date</th>
-			<th colspan="3">Red Alliance</th>
-			<th colspan="3">Blue Alliance</th>
-		</tr>
-		</thead>
-		<tbody>
-		{#each scoutMatches as m}
+	{#if $adapterName.startsWith("SS")}
+		<h2 class="mt-3">My Schedule: <small class="text-muted">{scout && scout.name} (Super Scout)</small></h2>
+		<table class="table table-striped">
+			<thead>
 			<tr>
-				<td>
-					<a href="/match/{m.matchKey}">{m.matchKey.toUpperCase()}</a>
-				</td>
-				<td>
-					{formatDateTime(m.scheduledTime)}
-				</td>
-
-				{#each ['red', 'blue'] as color}
-					{#each m.alliances[color].teamKeys as t}
-						<td class="{color}bg"
-							class:ourTeam={t.replace('frc','') == ourTeamNumber}
-							class:toWatch={toWatch(m.matchKey, parseInt(t.replace('frc','')))}>
-							{t.replace('frc', '')}
-							{#if toWatch(m.matchKey, parseInt(t.replace('frc', '')))}
-								<button class="btn btn-success">Scout</button>
-								<br>
-								For: {getPrepFor(m.matchKey, parseInt(t.replace('frc', '')))}
-							{/if}
-						</td>
-					{/each}
-				{/each}
-
-
+				<th>Match</th>
+				<th>Date</th>
+				<th colspan="3">Red Alliance</th>
+				<th colspan="3">Blue Alliance</th>
 			</tr>
-		{/each}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+			{#each scoutMatches as m}
+				<tr>
+					<td>
+						<a href="/match/{m.matchKey}">{m.matchKey.toUpperCase()}</a>
+					</td>
+					<td>
+						{formatDateTime(m.scheduledTime)}
+					</td>
+
+					{#each ['red', 'blue'] as color}
+						{#each m.alliances[color].teamKeys as t}
+							<td class="{color}bg"
+								class:ourTeam={t.replace('frc','') == ourTeamNumber}
+								class:toWatch={toWatch(m.matchKey, parseInt(t.replace('frc','')))}>
+								{t.replace('frc', '')}
+								{#if toWatch(m.matchKey, parseInt(t.replace('frc', '')))}
+									<button class="btn btn-success">Scout</button>
+									<br>
+									For: {getPrepFor(m.matchKey, parseInt(t.replace('frc', '')))}
+								{/if}
+							</td>
+						{/each}
+					{/each}
+
+
+				</tr>
+			{/each}
+			</tbody>
+		</table>
+	{/if}
 </div>
 
 <style>
