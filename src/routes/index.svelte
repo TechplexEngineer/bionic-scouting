@@ -41,9 +41,12 @@
 			ourTeamNumber = parseInt(entry.value);
 		}
 
+		//@todo get the correct SS given tablet name
 		scout = await db.super_scouts.findOne().where({ active: true }).exec();
+		if (!scout) {
+			return;
+		}
 
-		console.log(scout.assignedMatches);
 
 		myTeamMatchesToScout = scout.assignedMatches.map(am => am.teamMatches).flat();
 
@@ -77,6 +80,7 @@
 	<h1>Current Event <b>{eventName}</b></h1>
 
 
+	<!--	Only show if this device is a super scout -->
 	<h2 class="mt-3">My Schedule: <small class="text-muted">{scout && scout.name} (Super Scout)</small></h2>
 	<table class="table table-striped">
 		<thead>
