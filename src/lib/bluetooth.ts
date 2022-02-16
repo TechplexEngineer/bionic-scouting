@@ -4,8 +4,28 @@ import { readable } from 'svelte/store';
 // import * as timersPromises from 'timers/promises';
 import { v4 as uuidv4 } from 'uuid';
 import { getDb } from '$lib/store';
+import type { MyDatabase } from '$lib/store';
+import type { RxReplicationState } from 'rxdb/dist/types/types';
+import { doReplication } from '$lib/sync/replication';
+import { debounce } from '$lib/util';
 
 export const connections = readable([], (set) => {
+	//attempt to be better about changes in connection state
+	BluetoothSerial.addListener('connected', async (result: BTDevice) => {
+		console.log('Connected Event');
+		set((await BluetoothSerial.getConnectedDevices()).result);
+	});
+
+	BluetoothSerial.addListener('connectionLost', async (result: BTDevice) => {
+		console.log('Connection Lost Event');
+		set((await BluetoothSerial.getConnectedDevices()).result);
+	});
+
+	BluetoothSerial.addListener('connectionFailed', async (result: BTDevice) => {
+		console.log('Connection Lost Event');
+		set((await BluetoothSerial.getConnectedDevices()).result);
+	});
+
 	(async () => {
 		set((await BluetoothSerial.getConnectedDevices()).result);
 	})();
@@ -28,7 +48,8 @@ export const adapterName = readable('', (set) => {
 });
 
 let listenerHandle;
-let db;
+let db: MyDatabase;
+let syncStatus: RxReplicationState<any>[] = [];
 
 /**
  * Start listening for messages from bluetooth connections
@@ -38,7 +59,7 @@ export async function startMessageCenter(): Promise<void> {
 		listenerHandle.remove();
 		listenerHandle = null;
 	}
-	listenerHandle = await BluetoothSerial.addListener('rawData', handleIncomingMessage); //@todo needs to include sender mac address
+	listenerHandle = await BluetoothSerial.addListener('rawData', handleIncomingMessage);
 	db = await getDb();
 
 	// If hot module reload is enabled, if reloading the layout remove the listener
@@ -57,6 +78,24 @@ export async function startMessageCenter(): Promise<void> {
 			}
 		});
 	}
+
+	connections.subscribe(
+		debounce(async (connTo: BTDevice[]) => {
+			// cancel any in progress replication
+			for (const sync of syncStatus) {
+				sync.cancel();
+			}
+			// clear the array
+			syncStatus = [];
+
+			// replicate to every connected device all collections
+			for (const dev of connTo) {
+				for (const collection_name of Object.keys(db.collections)) {
+					syncStatus.push(await doReplication(db, dev.macAddress, collection_name, true));
+				}
+			}
+		}, 500)
+	);
 }
 
 /**

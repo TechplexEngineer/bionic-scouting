@@ -5,7 +5,8 @@ import type { RxReplicationState } from 'rxdb/dist/types/types';
 export const doReplication = async (
 	db: MyDatabase,
 	macAddress: string,
-	collection: string
+	collection: string,
+	live = false
 ): Promise<RxReplicationState<any>> => {
 	// Use dynamic import to solve "Error [ERR_UNSUPPORTED_DIR_IMPORT]: Directory import"
 	const { replicateRxCollection } = await import('rxdb/src/plugins/replication');
@@ -62,7 +63,7 @@ export const doReplication = async (
 				return;
 			}
 		},
-		live: false //false=do one time replication, true=continuously sync changes
+		live: live //false=do one time replication, true=continuously sync changes
 	});
 	replicationState.cancel();
 	console.log('replication state', replicationState);
