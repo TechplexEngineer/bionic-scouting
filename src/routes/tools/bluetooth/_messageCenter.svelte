@@ -5,7 +5,7 @@
 
 	import { getDb } from "$lib/store";
 	import { onMount } from "svelte";
-	import { doReplication } from "$lib/sync/notes";
+	import { doReplication } from "$lib/sync/replication";
 
 	export let colClass: string;
 
@@ -50,7 +50,7 @@
 		// }, { timeoutMs: 5 * 1000 });
 		// console.log(res);
 
-		const state = await doReplication(db, macAddress, "notes")
+		const state = await doReplication(db, macAddress, "notes");
 		console.log(state);
 
 
