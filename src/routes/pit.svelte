@@ -60,7 +60,10 @@
 		}
 	});
 
+	// Bound Variables
 	let robotPhotoUrl = null;
+	let notes = "";
+	let saveStatusMessage = "Waiting for changes...";
 
 	const takePicture = async () => {
 		const image = await Camera.getPhoto({
@@ -97,6 +100,7 @@
 		};
 		teamData = await db.pit_scouting.findOne().where(query).exec();
 		robotPhotoUrl = teamData.imageUrl;
+		notes = teamData.notes;
 	}
 
 	let factNames = ["climber", "drivetrain", "shooter"];
@@ -104,12 +108,28 @@
 		{ name: "", value: "" } // need to start with at least one to show the form
 	];
 
-	function notesChange(evt) {
-		teamData.atomicUpdate(data => {
-			data.notes = evt.target.value;
+	let debouncedSaveNotes = debounce(notesChange);
+	const notesDirty = (n) => {
+		if (!n) {
+			return;
+		}
+		saveStatusMessage = "waiting...";
+	};
+
+	$: debouncedSaveNotes(notes); // any time notes changes save after 500ms
+	$: notesDirty(notes);
+
+	async function notesChange(notes) {
+		if (!teamData) {
+			return;
+		}
+		saveStatusMessage = "Saving...";
+		await teamData.atomicUpdate(data => {
+			data.notes = notes;
 			data.updatedAt = new Date().getTime();
 			return data;
 		});
+		saveStatusMessage = "Saved.";
 	}
 </script>
 
@@ -152,10 +172,12 @@
 	<!-- Notes -->
 	<div class="form-floating mt-4">
         <textarea id="notes" class="form-control" placeholder=" " style="height: 150px"
-				  value={teamData && teamData.notes || ""}
-				  on:change={debounce(notesChange)}
+				  bind:value={notes}
 				  disabled={currentSelectedTeamItem==null}></textarea>
 		<label for="notes">Notes</label>
+	</div>
+	<div class="float-end mt-1">
+		{saveStatusMessage}
 	</div>
 
 	<!-- Facts-->
