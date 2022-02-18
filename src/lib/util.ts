@@ -1,3 +1,6 @@
+import type { RxDocument } from 'rxdb';
+import type { Match } from '$lib/schema/match-schema';
+
 export const capitalizeFirst = function (str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1);
 };
@@ -74,3 +77,18 @@ export function debounce(func, timeout = 300) {
 		}, timeout);
 	};
 }
+
+export const extractTeamsFromMatch = (match: RxDocument<Match>) => {
+	const teamKeys = match.alliances.red.teamKeys.concat(match.alliances.blue.teamKeys);
+	const matchTeams = teamKeys.map((t) => parseInt(t.replace('frc', '')));
+	return matchTeams;
+};
+
+export const extractRedTeamsFromMatch = (match: RxDocument<Match>) => {
+	const teamKeys = match.alliances.red.teamKeys;
+	return teamKeys.map((t) => parseInt(t.replace('frc', '')));
+};
+export const extractBlueTeamsFromMatch = (match: RxDocument<Match>) => {
+	const teamKeys = match.alliances.blue.teamKeys;
+	return teamKeys.map((t) => parseInt(t.replace('frc', '')));
+};

@@ -106,8 +106,6 @@
 			} else {
 				console.log("Unknown export format");
 			}
-
-
 		};
 	};
 

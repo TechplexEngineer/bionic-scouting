@@ -42,8 +42,13 @@
 			ourTeamNumber = parseInt(entry.value);
 		}
 
+		let [first, number] = $adapterName.split("-");
+		if (first.toUpperCase() !== "SS") {
+			return; // nothing to do for non super scouts
+		}
+
 		//@todo get the correct SS given tablet name
-		scout = await db.super_scouts.findOne().where({ active: true }).exec();
+		scout = await db.super_scouts.findOne().where({ active: true }).skip(number - 1).exec();
 		if (!scout) {
 			return;
 		}
@@ -66,7 +71,6 @@
 		for (let m of scout.assignedMatches) {
 			// console.log(m.teamMatches);
 			let filter = m.teamMatches.filter(tm => tm.team == teamNumber && tm.match == matchKey);
-			console.log("filter", filter);
 			if (filter.length > 0) {
 				return m.assignedMatch;
 			}
@@ -109,7 +113,8 @@
 								class:toWatch={toWatch(m.matchKey, parseInt(t.replace('frc','')))}>
 								{t.replace('frc', '')}
 								{#if toWatch(m.matchKey, parseInt(t.replace('frc', '')))}
-									<button class="btn btn-success">Scout</button>
+									<a class="btn btn-success"
+									   href={`/match/subjective?match=${m.matchKey}&team=${t.replace('frc','')}&for=${getPrepFor(m.matchKey, parseInt(t.replace('frc', '')))}`}>Scout</a>
 									<br>
 									For: {getPrepFor(m.matchKey, parseInt(t.replace('frc', '')))}
 								{/if}
