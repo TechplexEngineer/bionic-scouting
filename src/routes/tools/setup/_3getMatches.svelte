@@ -15,11 +15,12 @@
     import {matchSort, tbaMatchSort} from "$lib/matches";
     import {Match as TBAMatch} from "tba-api-v3client-ts";
     import comp_level = TBAMatch.comp_level;
+    import {goto} from "$app/navigation";
 
     // List of events to choose from
     type SelectOption = { label: string, value: string };
     let eventsToSelect: SelectOption[] = [];
-    let currentYear = 2020; //@todo change to new Date().getFullYear()
+    let currentYear = 2022; //@todo change to new Date().getFullYear() if unset or use localstorage setting
     let db: MyDatabase;
 
     async function getEventList(): Promise<SelectOption[]> {
@@ -85,6 +86,22 @@
             return;
         }
         let selectedEventKey = $selectedEvent.value;
+        let matches = await db.matches.find().exec()
+        if (matches.length > 0) {
+            let res = await Swal.fire({
+                icon: "warning",
+                title: "Matches Already Loaded",
+                html: `Do you want to remove existing matches?`,
+                showCloseButton: true,
+                confirmButtonText: "Clear Existing Matches",
+                showCancelButton: true,
+                cancelButtonText: "Cancel. Make no changes."
+            });
+            if (!res.isConfirmed) {
+                return;
+            }
+            await db.matches.find().remove()
+        }
         try {
             const tbaMatches = await tba.getMatches(selectedEventKey);
             if (tbaMatches.length == 0) {
