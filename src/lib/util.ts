@@ -39,6 +39,9 @@ export const keysToCamel = function (o) {
 };
 
 export const formatDate = function (d) {
+	if (!d) {
+		return '';
+	}
 	const date1 = new Date(d * 1000); //unix timestamp to javascript millis
 
 	const dateTimeFormat3 = new Intl.DateTimeFormat('en-US', {
@@ -50,6 +53,9 @@ export const formatDate = function (d) {
 };
 
 export const formatDateTime = function (d) {
+	if (!d) {
+		return '';
+	}
 	const date1 = new Date(d * 1000); //unix timestamp to javascript millis
 
 	const dateTimeFormat3 = new Intl.DateTimeFormat('en-US', {
