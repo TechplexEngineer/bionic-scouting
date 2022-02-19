@@ -198,10 +198,12 @@
                     };
                     await db.pit_scouting.insert(r);
                 }
-                // ;
-                /*
+
                 let counter = 1;
                 for (let teams of results.data) {
+                    if (teams.length != 6) {
+                        return
+                    }
                     let blue = teams.slice(0, 3)
                     let red = teams.slice(3, 6)
                     let matchKey = `qm${counter + 1}`;
@@ -231,7 +233,7 @@
                     counter++
                     await db.matches.insert(m);
                 }
-                */
+
 
                 /*
                 if (scouts.length > 0) {
