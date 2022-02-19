@@ -10,7 +10,7 @@
     import {debounce} from "$lib/util";
     import {Match, TBAMatchToMatch} from "$lib/schema/match-schema";
     import {Settings} from "$lib/schema/settings-schema";
-    import {TBATeamToPitReport} from "$lib/schema/pit-scout-schema";
+    import {PitReport, TBATeamToPitReport} from "$lib/schema/pit-scout-schema";
     import SpinButton from "$lib/compontents/SpinButton.svelte";
     import {matchSort, tbaMatchSort} from "$lib/matches";
     import {Match as TBAMatch} from "tba-api-v3client-ts";
@@ -146,21 +146,66 @@
 
     let fileInput;
 
+    function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
+    }
+
     async function uploadMatches(e) {
         const papa = await import("papaparse");
         let file = e.target.files[0];
 
+        if (!confirm("This will remove Pit Scouting Data and Match Data. Proceed?")) {
+            return;
+        }
+
+        let matches = await db.matches.find().exec()
+        if (matches.length > 0) {
+            let res = await Swal.fire({
+                icon: "warning",
+                title: "Matches Already Loaded",
+                html: `Do you want to remove existing matches?`,
+                showCloseButton: true,
+                confirmButtonText: "Clear Existing Matches",
+                showCancelButton: true,
+                cancelButtonText: "Cancel. Make no changes."
+            });
+            if (!res.isConfirmed) {
+                return;
+            }
+            await db.matches.find().remove()
+        }
+
+
         papa.parse(file, {
             header: false,
             complete: async function (results) {
-                console.log("parse", results.data);
 
+                // console.log("parse", );
+
+                let eventKey = "2022week0";
+
+
+                await db.pit_scouting.find().remove()
+                for (let team of results.data.flat().filter(onlyUnique).filter(i => i.length > 0)) {
+                    let r: PitReport = {
+                        eventKey: eventKey,
+                        createdAt: new Date().getTime(),
+                        updatedAt: new Date().getTime(),
+                        teamNumber: parseInt(team),
+                        imageUrl: "",
+                        notes: "",
+                        facts: [],
+                    };
+                    await db.pit_scouting.insert(r);
+                }
+                // ;
+                /*
                 let counter = 1;
                 for (let teams of results.data) {
                     let blue = teams.slice(0, 3)
                     let red = teams.slice(3, 6)
                     let matchKey = `qm${counter + 1}`;
-                    let eventKey = "2022week0";
+
                     let m: Match = {
                         order: counter,
                         eventMatchKey: `${eventKey}_${matchKey}`,
@@ -186,6 +231,8 @@
                     counter++
                     await db.matches.insert(m);
                 }
+                */
+
                 /*
                 if (scouts.length > 0) {
                     // ask if we should merge or replace
