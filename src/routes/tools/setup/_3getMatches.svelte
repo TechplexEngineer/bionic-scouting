@@ -206,7 +206,7 @@
                     }
                     let blue = teams.slice(0, 3)
                     let red = teams.slice(3, 6)
-                    let matchKey = `qm${counter + 1}`;
+                    let matchKey = `qm${counter}`;
 
                     let m: Match = {
                         order: counter,
