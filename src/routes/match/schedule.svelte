@@ -83,18 +83,34 @@
                 </td>
             {/each}
 
-            <td class="redbg"
-                class:fw-bold={m.alliances.red.score > m.alliances.blue.score}>{m.alliances.red.score}</td>
-            <td class="redbg"
-                class:fw-bold={m.scoreBreakdown.red.rp > m.scoreBreakdown.blue.rp}>{m.scoreBreakdown.red.rp}
-                RP
-            </td>
+            {#if m?.alliances?.red?.score && m?.alliances?.blue?.score}
+                <td class="redbg"
+                    class:fw-bold={m.alliances.red.score > m.alliances.blue.score}>{m.alliances.red.score}</td>
+            {:else}
+                <td class="redbg">-</td>
+            {/if}
+            {#if m?.alliances?.red?.rp && m?.alliances?.blue?.rp}
+                <td class="redbg"
+                    class:fw-bold={m.scoreBreakdown.red.rp > m.scoreBreakdown.blue.rp}>{m.scoreBreakdown.red.rp}
+                    RP
+                </td>
+            {:else}
+                <td class="redbg">-</td>
+            {/if}
 
-            <td class="bluebg"
-                class:fw-bold={m.alliances.blue.score > m.alliances.red.score}>{m.alliances.blue.score}</td>
-            <td class="bluebg"
-                class:fw-bold={m.scoreBreakdown.blue.rp > m.scoreBreakdown.red.rp}>{m.scoreBreakdown.blue.rp} RP
-            </td>
+            {#if m?.alliances?.red?.score && m?.alliances?.blue?.score}
+                <td class="bluebg"
+                    class:fw-bold={m.alliances.blue.score > m.alliances.red.score}>{m.alliances.blue.score}</td>
+            {:else}
+                <td class="bluebg">-</td>
+            {/if}
+            {#if m?.alliances?.red?.rp && m?.alliances?.blue?.rp}
+                <td class="bluebg"
+                    class:fw-bold={m.scoreBreakdown.blue.rp > m.scoreBreakdown.red.rp}>{m.scoreBreakdown.blue.rp} RP
+                </td>
+            {:else}
+                <td class="bluebg">-</td>
+            {/if}
         </tr>
     {/each}
     </tbody>
