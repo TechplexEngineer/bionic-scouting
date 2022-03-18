@@ -72,9 +72,10 @@
         })
         let num = localStorage.getItem("matchPreview_curNum");
         num = parseInt(num)
-        if (typeof num !== "number") {
+        if (typeof num !== "number" || isNaN(num)) {
             num = 1;
         }
+        console.log("Here?", num);
         matchNumber.set(num); //trigger update
     });
 

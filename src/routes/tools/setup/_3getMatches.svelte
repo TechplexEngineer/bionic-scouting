@@ -121,26 +121,38 @@
                 }
             }
 
-            const tbaTeams = await tba.getTeams(selectedEventKey);
-            if (tbaTeams.length == 0) {
-                Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: `TBA has no teams for ${selectedEventKey}`
-                });
-                return;
-            }
-            for (const team of tbaTeams) {
-                const t = TBATeamToPitReport(team, selectedEventKey);
-                await db.pit_scouting.insert(t);
-            }
-
         } catch (e) {
             Swal.fire({
                 icon: "error",
                 title: "Oops...",
                 text: `Unable to get data from TBA. Error: ${e.message}`
             });
+        }
+    }
+
+    async function pullTeams() {
+        if (!$selectedEvent) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Event must be selected first!"
+            });
+            return;
+        }
+        let selectedEventKey = $selectedEvent.value;
+
+        const tbaTeams = await tba.getTeams(selectedEventKey);
+        if (tbaTeams.length == 0) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: `TBA has no teams for ${selectedEventKey}`
+            });
+            return;
+        }
+        for (const team of tbaTeams) {
+            const t = TBATeamToPitReport(team, selectedEventKey);
+            await db.pit_scouting.insert(t);
         }
     }
 
@@ -182,7 +194,7 @@
 
                 // console.log("parse", );
 
-                let eventKey = "2022week0";
+                let eventKey = $selectedEvent.value;
 
 
                 await db.pit_scouting.find().remove()
@@ -293,5 +305,6 @@
     </div>
     <div style="min-width: 250px">
         <SpinButton class="btn-primary ms-2" onClick={pullMatches}>Pull Matches</SpinButton>
+        <SpinButton class="btn-info ms-2" onClick={pullTeams}>Pull Teams</SpinButton>
     </div>
 </div>

@@ -38,7 +38,7 @@ export const keysToCamel = function (o) {
 	return o;
 };
 
-export const formatDate = function (d) {
+export const formatDate = function (d: number): string {
 	if (!d) {
 		return '';
 	}

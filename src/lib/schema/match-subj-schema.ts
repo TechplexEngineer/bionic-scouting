@@ -6,7 +6,7 @@ export type Fact = {
 };
 
 export type MatchSubjReport = {
-	eventMatchKey: string;
+	primaryKey: string;
 	eventKey: string;
 	matchKey: string;
 	matchForKey: string;
@@ -27,14 +27,14 @@ const matchSubjectiveSchema: RxJsonSchema<MatchSubjReport> = {
 	indexes: ['createdAt', 'updatedAt'],
 	primaryKey: {
 		// where should the composed string be stored
-		key: 'eventMatchKey',
+		key: 'primaryKey',
 		// fields that will be used to create the composed key
-		fields: ['eventKey', 'matchKey'],
+		fields: ['eventKey', 'matchKey', 'teamNumber', 'matchForKey'],
 		// separator which is used to concat the fields values.
 		separator: '_'
 	},
 	properties: {
-		eventMatchKey: {
+		primaryKey: {
 			type: 'string'
 		},
 		eventKey: {
@@ -77,6 +77,6 @@ const matchSubjectiveSchema: RxJsonSchema<MatchSubjReport> = {
 			}
 		}
 	},
-	required: ['eventKey', 'matchKey']
+	required: ['eventKey', 'matchKey', 'teamNumber', 'matchForKey']
 };
 export default matchSubjectiveSchema;

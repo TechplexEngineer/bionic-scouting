@@ -23,6 +23,7 @@ export type PitReport = {
 	rookieYear?: number;
 	schoolName?: string;
 	stateProv?: string;
+	numAttachments?: number;
 };
 
 export type PitReportCollection = RxCollection<PitReport>;
@@ -99,9 +100,14 @@ const pitSchema: RxJsonSchema<PitReport> = {
 		},
 		stateProv: {
 			type: 'string'
+		},
+		numAttachments: {
+			default: 0,
+			type: 'number'
 		}
 	},
-	required: ['eventKey', 'teamNumber']
+	required: ['eventKey', 'teamNumber'],
+	attachments: {}
 };
 export default pitSchema;
 import type { Team } from 'tba-api-v3client-ts';

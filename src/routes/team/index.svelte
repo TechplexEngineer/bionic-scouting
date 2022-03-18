@@ -44,6 +44,7 @@
         <tr>
             <th>Number</th>
             <th>Name</th>
+            <th>Photos</th>
             <th></th>
         </tr>
         </thead>
@@ -54,8 +55,13 @@
                     <a href="/team/{t.teamNumber}">{t.teamNumber}</a>
                 </td>
                 <td>{t.nickname}</td>
+                <td>{t.numAttachments || 0}</td>
                 <td>
-                    <a class="btn btn-sm btn-primary" href="/pit?team={t.teamNumber}">Scout</a>
+                    {#if t.notes && t.notes.length > 1}
+                        <a class="btn btn-sm btn-success" href="/pit?team={t.teamNumber}">ReScout</a>
+                    {:else}
+                        <a class="btn btn-sm btn-primary" href="/pit?team={t.teamNumber}">Scout</a>
+                    {/if}
                 </td>
             </tr>
         {/each}
