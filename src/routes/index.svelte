@@ -13,6 +13,7 @@
     import type {Match} from "$lib/schema/match-schema";
     import type {SuperScout} from "$lib/schema/super-scout-schema";
     import {adapterName} from "$lib/bluetooth";
+    import type {MatchSubjReport} from "$lib/schema/match-subj-schema";
 
     let deviceName = "...";
     let eventName = "...";
@@ -27,6 +28,8 @@
 
     let myTeamMatchesToScout: { team: number, match: string }[] = [];
     let myAssignedMatches: RxDocument<Match>[] = [];
+
+    let matchReports: RxDocument<MatchSubjReport>[] = [];
 
     onMount(async () => {
         deviceName = (await BluetoothSerial.getName()).result;
@@ -68,6 +71,11 @@
         db.matches.find().where({matchKey: {$in: myMatches}}).$.subscribe(m => {
             scoutMatches = m.sort(matchSort);
         });
+
+        db.match_subjective.find().where({eventKey: eventName}).$.subscribe(mr => {
+            matchReports = mr;
+            console.log("matchReports", matchReports);
+        })
     });
 
     const toWatch = function (matchKey: string, teamNumber: number) {
@@ -83,6 +91,17 @@
         }
         return "???";
     };
+
+    // Lesson I keep having to relearn, make pure functions, then the reactivity works
+    const isScouted = (matchKey: string, teamNumber: number, matchForKey: string, mr) => {
+        return mr.filter((mr) => {
+            // console.log("mk:", mr.matchKey == matchKey, mr.matchKey, matchKey);
+            // console.log("tn:", mr.teamNumber == teamNumber, mr.teamNumber, teamNumber);
+            // console.log("mfk:", mr.matchForKey == matchForKey, mr.matchForKey, matchForKey);
+            // console.log("");
+            return mr.matchKey == matchKey && mr.teamNumber == teamNumber && mr.matchForKey == matchForKey
+        }).length > 0
+    }
 
 </script>
 
@@ -119,8 +138,15 @@
                                 class:toWatch={toWatch(m.matchKey, parseInt(t.replace('frc','')))}>
                                 {t.replace('frc', '')}
                                 {#if toWatch(m.matchKey, parseInt(t.replace('frc', '')))}
-                                    <a class="btn btn-success"
-                                       href={`/match/subjective?match=${m.matchKey}&team=${t.replace('frc','')}&for=${getPrepFor(m.matchKey, parseInt(t.replace('frc', '')))}`}>Scout</a>
+
+                                    <a class={isScouted(m.matchKey, parseInt(t.replace('frc', '')), getPrepFor(m.matchKey, parseInt(t.replace('frc', ''))), matchReports) ? "btn btn-success" : "btn btn-warning"}
+                                       href={`/match/subjective?match=${m.matchKey}&team=${t.replace('frc','')}&for=${getPrepFor(m.matchKey, parseInt(t.replace('frc', '')))}`}>
+                                        {#if isScouted(m.matchKey, parseInt(t.replace('frc', '')), getPrepFor(m.matchKey, parseInt(t.replace('frc', ''))), matchReports) }
+                                            ReScout
+                                        {:else}
+                                            Scout
+                                        {/if}
+                                    </a>
                                     <br>
                                     For: {getPrepFor(m.matchKey, parseInt(t.replace('frc', '')))}
                                 {/if}

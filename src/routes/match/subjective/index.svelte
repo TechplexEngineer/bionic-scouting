@@ -142,7 +142,7 @@
             return;
         }
         saveStatusMessage = "Saving...";
-        console.log("Saving", "|", eventKey, "|", selectedMatch.value.matchKey, "|", selectedPrepMatch.label, "|", notes);
+        // console.log("Saving", "|", eventKey, "|", selectedMatch.value.matchKey, "|", selectedPrepMatch.label, "|", notes);
         await db.match_subjective.atomicUpsert({
             eventKey: eventKey,
 
