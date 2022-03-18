@@ -109,16 +109,34 @@
     }
 
     const getOurAllianceMembers = (match: RxDocument<Match>): number[] => {
+        if (!match) {
+            return []
+        }
         if (weAreBlue(match)) {
             return extractBlueTeamsFromMatch(match)
         }
         return extractRedTeamsFromMatch(match)
     }
     const getOpposingAllianceMembers = (match: RxDocument<Match>): number[] => {
+        if (!match) {
+            return []
+        }
         if (!weAreBlue(match)) {
             return extractBlueTeamsFromMatch(match)
         }
         return extractRedTeamsFromMatch(match)
+    }
+
+    const onlyTeam = (teamNumber: number) => {
+        return (item: RxDocument<MatchSubjReport>, index, self) => {
+            return item.teamNumber == teamNumber
+        }
+    }
+    const byMatchNumber = (a: RxDocument<MatchSubjReport>, b: RxDocument<MatchSubjReport>) => {
+        //@todo make this work for matches above QM
+        let aMatchNumber = parseInt(a.matchKey.slice(2));
+        let bMatchNumber = parseInt(b.matchKey.slice(2));
+        return aMatchNumber - bMatchNumber;
     }
 
 </script>
@@ -172,25 +190,37 @@
     {/if}
 
     <h2 class="border-bottom border-4">Opposing Alliance</h2>
-    {#each matchReports.filter(OnlyOpposingAlliance) as r}
-        <div class="row">
-            <div class="col">
-                <h3>In {r.matchKey} team {r.teamNumber} had these notes:</h3>
-                <pre>{r.notes}</pre>
-            </div>
-        </div>
+    {#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}
+        <h3>{t}</h3>
+        <ul>
+            {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumber) as mr}
+                <li>{mr.matchKey}
+                    <pre>{mr.notes}</pre>
+                </li>
+            {/each}
+        </ul>
     {/each}
 
     <h2 class="border-bottom border-4">Our Alliance</h2>
-    <!--{#each }-->
-    {#each matchReports.filter(OnlyOurAlliance) as r}
-        <div class="row">
-            <div class="col">
-                <h3>In {r.matchKey} team {r.teamNumber} had these notes:</h3>
-                {r.notes}
-            </div>
-        </div>
+    {#each getOurAllianceMembers(selectedPrepMatch?.value) as t}
+        <h3>{t}</h3>
+        <ul>
+            {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumber) as mr}
+                <li>{mr.matchKey}
+                    <pre>{mr.notes}</pre>
+                </li>
+            {/each}
+        </ul>
     {/each}
+    <!--{#each }-->
+    <!--{#each matchReports.filter(OnlyOurAlliance) as r}-->
+    <!--    <div class="row">-->
+    <!--        <div class="col">-->
+    <!--            <h3>In {r.matchKey} team {r.teamNumber} had these notes:</h3>-->
+    <!--            {r.notes}-->
+    <!--        </div>-->
+    <!--    </div>-->
+    <!--{/each}-->
 
 
 </div>
