@@ -19,7 +19,7 @@
     import type {RxDocument} from "rxdb";
     import type {MatchSubjReport} from "$lib/schema/match-subj-schema";
     import type {Match} from "$lib/schema/match-schema";
-    import {extractBlueTeamsFromMatch, formatDateTime} from "$lib/util";
+    import {extractBlueTeamsFromMatch, extractRedTeamsFromMatch, formatDateTime} from "$lib/util";
 
     let matches: RxDocument<Match>[] = [];
     let matchSelections: { label: string, value: RxDocument<Match> }[] = [];
@@ -29,7 +29,7 @@
 
     const handleSelectMatch = async function (event) {
         let match: RxDocument<MatchSubjReport> = event.detail.value;
-        console.log("selected match", match);
+        // console.log("selected match", match);
 
         const query = {
             eventKey: eventKey,
@@ -37,7 +37,7 @@
         };
 
         matchReports = await db.match_subjective.find().where(query).exec();
-        console.log("reports", matchReports);
+        // console.log("reports", matchReports);
     }
 
     let db: MyDatabase;
@@ -102,6 +102,25 @@
         let weAreBlue = blueTeams.includes(ourTeamNumber)
         return (weAreBlue && !blueTeams.includes(value.teamNumber)) || (!weAreBlue && blueTeams.includes(value.teamNumber))
     }
+
+    const weAreBlue = (match: RxDocument<Match>): boolean => {
+        let blueTeams = extractBlueTeamsFromMatch(match)
+        return blueTeams.includes(ourTeamNumber)
+    }
+
+    const getOurAllianceMembers = (match: RxDocument<Match>): number[] => {
+        if (weAreBlue(match)) {
+            return extractBlueTeamsFromMatch(match)
+        }
+        return extractRedTeamsFromMatch(match)
+    }
+    const getOpposingAllianceMembers = (match: RxDocument<Match>): number[] => {
+        if (!weAreBlue(match)) {
+            return extractBlueTeamsFromMatch(match)
+        }
+        return extractRedTeamsFromMatch(match)
+    }
+
 </script>
 
 <div class="content">
@@ -134,9 +153,6 @@
                     <td>
                         <a href="/match/{m.matchKey}">{m.matchKey.toUpperCase()}</a>
                     </td>
-                    <!--                    <td>-->
-                    <!--                        {formatDateTime(m.scheduledTime)}-->
-                    <!--                    </td>-->
 
                     {#each ['red', 'blue'] as color}
                         {#each m.alliances[color].teamKeys as t}
@@ -155,8 +171,18 @@
         </table>
     {/if}
 
+    <h2 class="border-bottom border-4">Opposing Alliance</h2>
+    {#each matchReports.filter(OnlyOpposingAlliance) as r}
+        <div class="row">
+            <div class="col">
+                <h3>In {r.matchKey} team {r.teamNumber} had these notes:</h3>
+                <pre>{r.notes}</pre>
+            </div>
+        </div>
+    {/each}
 
     <h2 class="border-bottom border-4">Our Alliance</h2>
+    <!--{#each }-->
     {#each matchReports.filter(OnlyOurAlliance) as r}
         <div class="row">
             <div class="col">
@@ -166,15 +192,6 @@
         </div>
     {/each}
 
-    <h2 class="border-bottom border-4">Opposing Alliance</h2>
-    {#each matchReports.filter(OnlyOpposingAlliance) as r}
-        <div class="row">
-            <div class="col">
-                <h3>In {r.matchKey} team {r.teamNumber} had these notes:</h3>
-                {r.notes}
-            </div>
-        </div>
-    {/each}
 
 </div>
 
