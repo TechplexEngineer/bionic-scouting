@@ -74,7 +74,7 @@
 
         db.match_subjective.find().where({eventKey: eventName}).$.subscribe(mr => {
             matchReports = mr;
-            console.log("matchReports", matchReports);
+            // console.log("matchReports", matchReports);
         })
     });
 

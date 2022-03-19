@@ -66,8 +66,9 @@
     const takePicture = async () => {
         const image = await Camera.getPhoto({
             quality: 90,
-            allowEditing: true,
+            allowEditing: false,
             resultType: CameraResultType.DataUrl
+            // @todo saveToGallery: true
         });
 
         // image.webPath will contain a path that can be set as an image src.
