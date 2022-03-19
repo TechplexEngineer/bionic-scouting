@@ -166,7 +166,7 @@
         const papa = await import("papaparse");
         let file = e.target.files[0];
 
-        if (!confirm("This will remove Pit Scouting Data and Match Data. Proceed?")) {
+        if (!confirm("This will remove Match Data. Proceed?")) {
             return;
         }
 
@@ -197,19 +197,19 @@
                 let eventKey = $selectedEvent.value;
 
 
-                await db.pit_scouting.find().remove()
-                for (let team of results.data.flat().filter(onlyUnique).filter(i => i.length > 0)) {
-                    let r: PitReport = {
-                        eventKey: eventKey,
-                        createdAt: new Date().getTime(),
-                        updatedAt: new Date().getTime(),
-                        teamNumber: parseInt(team),
-                        imageUrl: "",
-                        notes: "",
-                        facts: [],
-                    };
-                    await db.pit_scouting.insert(r);
-                }
+                // await db.pit_scouting.find().remove()
+                // for (let team of results.data.flat().filter(onlyUnique).filter(i => i.length > 0)) {
+                //     let r: PitReport = {
+                //         eventKey: eventKey,
+                //         createdAt: new Date().getTime(),
+                //         updatedAt: new Date().getTime(),
+                //         teamNumber: parseInt(team),
+                //         imageUrl: "",
+                //         notes: "",
+                //         facts: [],
+                //     };
+                //     await db.pit_scouting.insert(r);
+                // }
 
                 let counter = 1;
                 for (let teams of results.data) {
