@@ -52,6 +52,16 @@
         matches = matches.filter(m => {
             return m.alliances.red.teamKeys.includes(`frc${ourTeamNumber}`) || m.alliances.blue.teamKeys.includes(`frc${ourTeamNumber}`)
         })
+
+        if (matches.length == 0) {
+            Swal.fire({
+                icon: "error",
+                title: `Team ${ourTeamNumber} Not Found`,
+                html: `FRC ${ourTeamNumber} was not found in any matches.`,
+                showConfirmButton: false
+            });
+        }
+
         let num = localStorage.getItem("matchPreview_curNum");
         num = parseInt(num)
         if (typeof num !== "number" || isNaN(num)) {
@@ -77,7 +87,7 @@
 <div class="container-fluid">
     <h1>Match Preview</h1>
 
-    <MatchPicker {matchNumber} numberOfMatches={matches.length} matchKey={match && match.matchKey}/>
+    <MatchPicker {matchNumber} numberOfMatches={matches.length} matchKey={match && match.matchKey || ""}/>
 </div>
 
 {#if match}
