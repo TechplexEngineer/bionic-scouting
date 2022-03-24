@@ -15,19 +15,20 @@
 	} from "sveltestrap";
 	import Swal from "sweetalert2";
 	import "sweetalert2/dist/sweetalert2.css";
-	import { writable } from "svelte/store";
-	import { onMount } from "svelte";
-	import { getDb, MyDatabase } from "$lib/store";
-	import { Settings } from "$lib/schema/settings-schema";
-	import { goto } from "$app/navigation";
-	import type { RxDocument } from "rxdb";
-	import type { Match } from "$lib/schema/match-schema";
-	import { matchSort } from "$lib/matches";
-	import { adapterName } from "$lib/bluetooth";
+	import {writable} from "svelte/store";
+	import {onMount} from "svelte";
+	import {getDb, MyDatabase} from "$lib/store";
+	import {Settings} from "$lib/schema/settings-schema";
+	import {goto} from "$app/navigation";
+	import type {RxDocument} from "rxdb";
+	import type {Match} from "$lib/schema/match-schema";
+	import {matchSort} from "$lib/matches";
+	import {adapterName} from "$lib/bluetooth";
 	import InputControl from "./_inputControl.svelte";
-	import { page } from "$app/stores";
+	import {page} from "$app/stores";
 
-	import matchObjectiveSchema, { MatchMetricsReport } from "$lib/schema/match-metrics-schema";
+	import matchObjectiveSchema, {MatchMetricsReport} from "$lib/schema/match-metrics-schema";
+	import {getCurrentEvent} from "$lib/util";
 
 	let activeTab = 0; // start on first tab
 
@@ -78,22 +79,9 @@
 	onMount(async () => {
 		db = await getDb();
 
-		const settingEvent = await db.settings.findOne().where({ key: Settings.CurrentEvent }).exec();
-		if (!settingEvent) {
-			let res = await Swal.fire({
-				icon: "error",
-				title: "Oops...",
-				html: `Current event not set. Head over to Setup`,
-				showCloseButton: true,
-				confirmButtonText: "Go to Setup"
-			});
-			if (res.isConfirmed) {
-				await goto("/tools/setup");
-				return;
-			}
-		}
-		eventKey = settingEvent.value;
-		matches = await db.matches.find().where({ eventKey: eventKey }).exec();
+		eventKey = await getCurrentEvent(db);
+
+		matches = await db.matches.find().where({eventKey: eventKey}).exec();
 		matches.sort(matchSort);
 
 		if ($page.query.get("match")) {
@@ -107,7 +95,7 @@
 		} else {
 
 			// find first un-submitted match
-			const lastSubmitted = await db.match_metrics.findOne().where({ submitted: true }).sort({ order: "desc" }).exec();
+			const lastSubmitted = await db.match_metrics.findOne().where({submitted: true}).sort({order: "desc"}).exec();
 			if (lastSubmitted == null) {
 				// no matches submitted yet, go to first match
 				matchNumber.set(1); //trigger update
@@ -232,11 +220,11 @@
 									<!--{JSON.stringify(d)}-->
 									<h5 class="card-title">{d.metadata.label || makeNiceName(tabName, d.key)}</h5>
 									<InputControl
-										{eventKey}
-										matchKey={match && match.matchKey}
-										teamNumber={teamNumber}
-										propertyName={d.key}
-										def={d}
+											{eventKey}
+											matchKey={match && match.matchKey}
+											teamNumber={teamNumber}
+											propertyName={d.key}
+											def={d}
 									/>
 
 								</div>

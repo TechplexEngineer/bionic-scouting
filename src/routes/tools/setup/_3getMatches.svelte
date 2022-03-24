@@ -89,11 +89,11 @@
         let matches = await db.matches.find().exec()
         if (matches.length > 0) {
             let res = await Swal.fire({
-                icon: "warning",
+                icon: "danger",
                 title: "Matches Already Loaded",
-                html: `Do you want to remove existing matches?`,
+                html: `Do you want to remove existing matches?<br> <h3>THIS REMOVES MATCH SCOUTING DATA!!!!</h3>`,
                 showCloseButton: true,
-                confirmButtonText: "Clear Existing Matches",
+                confirmButtonText: "Clear Existing Matches & Data",
                 showCancelButton: true,
                 cancelButtonText: "Cancel. Make no changes."
             });
@@ -140,6 +140,24 @@
             return;
         }
         let selectedEventKey = $selectedEvent.value;
+
+
+        let teams = await db.pit_scouting.find().exec()
+        if (teams.length > 0) {
+            let res = await Swal.fire({
+                icon: "danger",
+                title: "Teams Already Loaded",
+                html: `Do you want to remove existing teams?<br> <h3>THIS REMOVES PIT SCOUTING DATA!!!!</h3>`,
+                showCloseButton: true,
+                confirmButtonText: "Clear Existing Teams & Data",
+                showCancelButton: true,
+                cancelButtonText: "Cancel. Make no changes."
+            });
+            if (!res.isConfirmed) {
+                return;
+            }
+            await db.pit_scouting.find().remove()
+        }
 
         const tbaTeams = await tba.getTeams(selectedEventKey);
         if (tbaTeams.length == 0) {
@@ -291,20 +309,22 @@
     <input type="file" class="form-control d-none" bind:this={fileInput} on:change={uploadMatches}>
 </div>
 
-<div class="mb-3 d-flex">
+<div class="d-flex mb-2">
     <div>
         <input bind:value={currentYear} on:blur={updateEventList} type="number" placeholder="Season Year"
                class="form-control me-2" style="width: 100px">
     </div>
-    <div style="max-width: 52.125vw" class="flex-grow-1">
+    <div class="flex-grow-1">
         <Select
                 items={eventsToSelect}
                 bind:value={$selectedEvent}
                 isCreatable={true}
-                containerStyles="width:100%"/>
+                containerStyles="width:100%"
+        />
     </div>
-    <div style="min-width: 250px">
-        <SpinButton class="btn-primary ms-2" onClick={pullMatches}>Pull Matches</SpinButton>
-        <SpinButton class="btn-info ms-2" onClick={pullTeams}>Pull Teams</SpinButton>
-    </div>
+
+</div>
+<div class="d-flex mb-3 justify-content-end">
+    <SpinButton class="btn-primary ms-2" onClick={pullMatches}>Pull Matches</SpinButton>
+    <SpinButton class="btn-info ms-2" onClick={pullTeams}>Pull Teams</SpinButton>
 </div>

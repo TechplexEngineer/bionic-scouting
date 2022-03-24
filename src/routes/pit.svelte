@@ -204,7 +204,8 @@
 
     <div class="d-flex" style="min-height: 100px">
         {#if photosReady && robotPhotos.length > 0}
-            <Carousel items={robotPhotos} bind:activeIndex={activeRobotPhotoIndex} dark interval={false} style="margin: 0 auto;">
+            <Carousel items={robotPhotos} bind:activeIndex={activeRobotPhotoIndex} dark interval={false}
+                      style="margin: 0 auto;">
                 <CarouselIndicators bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos}/>
 
                 <div class="carousel-inner" style="width:100%; padding-bottom: 50px">
@@ -216,12 +217,16 @@
                     {/each}
                 </div>
 
-                <CarouselControl direction="prev" bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos} style="margin-left: -80px"/>
-                <CarouselControl direction="next" bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos} style="margin-right: -80px"/>
+                <CarouselControl direction="prev" bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos}
+                                 style="margin-left: -80px"/>
+                <CarouselControl direction="next" bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos}
+                                 style="margin-right: -80px"/>
             </Carousel>
         {:else}
             {#if !photosReady}
-                <h4> &nbsp; &nbsp; &nbsp;Loading... <Spinner color="dark" /></h4>
+                <h4> &nbsp; &nbsp; &nbsp;Loading...
+                    <Spinner color="dark"/>
+                </h4>
             {:else}
                 <h4> &nbsp; &nbsp; &nbsp;No Photos Yet</h4>
             {/if}

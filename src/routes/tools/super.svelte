@@ -48,7 +48,7 @@
             }
         }
 
-        db.super_scouts.find().where({active: true}).$.subscribe((d: RxDocument<SuperScout>[]) => {
+        db.super_scouts.find().where({active: true}).sort({createdAt: "asc"}).$.subscribe((d: RxDocument<SuperScout>[]) => {
             superScoutsLoaded = false;
             // console.log("Scouts Loaded");
             scoutsSelectOptions = d.map(s => ({label: s.name, value: s}));
