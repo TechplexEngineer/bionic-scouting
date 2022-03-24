@@ -13,9 +13,10 @@
     import type {RxDocument} from "rxdb";
     import type {PitReport} from "$lib/schema/pit-scout-schema";
     import {page} from "$app/stores";
-    import {Camera, CameraResultType} from "@capacitor/camera";
+    import {Camera, CameraResultType, CameraSource} from "@capacitor/camera";
     import {debounce} from "$lib/util";
-    import {Carousel, CarouselCaption, CarouselControl, CarouselIndicators, CarouselItem} from "sveltestrap";
+    import {Carousel, CarouselControl, CarouselIndicators, CarouselItem} from "sveltestrap";
+    import {CapacitorException} from "@capacitor/core";
 
 
     let db: MyDatabase;
@@ -64,46 +65,33 @@
     let saveStatusMessage = "Waiting for changes...";
 
     const takePicture = async () => {
-        const image = await Camera.getPhoto({
-            quality: 90,
-            allowEditing: false,
-            resultType: CameraResultType.DataUrl
-            // @todo saveToGallery: true
-        });
+        try {
+            const image = await Camera.getPhoto({
+                quality: 90,
+                allowEditing: false,
+                source: CameraSource.Camera,
+                resultType: CameraResultType.DataUrl
+                // @todo saveToGallery: true
+            });
 
-        // image.webPath will contain a path that can be set as an image src.
-        // You can access the original file using image.path, which can be
-        // passed to the Filesystem API to read the raw data of the image,
-        // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-        // var imageUrl = image.webPath;
-
-        // Can be set to the src of an image now
-        // imageElement.src = imageUrl;
-        // robotPhotoUrl = image.dataUrl;
-
-        // const regex = /^data:(.+\/.+);base64,(.*)$/;
-        // const matches = image.dataUrl.match(regex);
-        // const ext = matches[1];
-        // const data = matches[2];
-
-        await teamData.putAttachment(
-            {
-                id: String(Date.now()),     // (string) name of the attachment like 'cat.jpg'
-                data: new Blob([image.dataUrl]),   // (string|Blob|Buffer) data of the attachment
-                type: "text/plain"   // (string) type of the attachment-data like 'image/jpeg'
-            },
-            true // (boolean, optional, default=true) skipIfSame:If true and attachment already exists with same data, the write will be skipped
-        );
-        await teamData.atomicUpdate(d => {
-            d.numAttachments += 1;
-            return d
-        })
-
-        // await teamData.atomicUpdate(data => {
-        //     data.imageUrl = image.dataUrl;
-        //     data.updatedAt = new Date().getTime();
-        //     return data;
-        // });
+            await teamData.putAttachment(
+                {
+                    id: String(Date.now()),     // (string) name of the attachment like 'cat.jpg'
+                    data: new Blob([image.dataUrl]),   // (string|Blob|Buffer) data of the attachment
+                    type: "text/plain"   // (string) type of the attachment-data like 'image/jpeg'
+                },
+                true // (boolean, optional, default=true) skipIfSame:If true and attachment already exists with same data, the write will be skipped
+            );
+            await teamData.atomicUpdate(d => {
+                d.numAttachments += 1;
+                return d
+            })
+        } catch (e) {
+            if (e instanceof CapacitorException && e.message == 'User cancelled photos app') {
+                return
+            }
+            throw e
+        }
     };
 
     let robotPhotos = [
@@ -128,7 +116,7 @@
         teamData.allAttachments$.subscribe(debounce(async (attachments) => {
             robotPhotos = [];
             photosReady = false;
-            console.log("got: ", attachments);
+            // console.log("attachments: ", attachments);
 
             for (let a of attachments) {
                 let d = await a.getStringData()
@@ -149,7 +137,7 @@
             //     }
             // })
 
-        }), 500);
+        }, 500));
     }
 
     let factNames = ["climber", "drivetrain", "shooter"];
