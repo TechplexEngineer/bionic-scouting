@@ -20,6 +20,7 @@
     import {onMount} from "svelte";
     import {BluetoothSerial} from "bionic-bt-serial";
     import {AppUpdate, AppUpdateAvailability} from "@robingenz/capacitor-app-update";
+    import Swal from "sweetalert2";
 
     let isOpen = false;
 
@@ -104,9 +105,24 @@
     }
 
     const checkForUpdates = async () => {
+        console.log("Checking for updates.");
+        Swal.fire({
+            icon: "info",
+            title: "Starting update check...",
+            // html: `Error: ${event.reason}`,
+            showConfirmButton: false
+        });
 
         const result = await AppUpdate.getAppUpdateInfo();
+        console.log("Result", result);
         if (result.updateAvailability !== AppUpdateAvailability.UPDATE_AVAILABLE) {
+            // console.log("Already up to date");
+            Swal.fire({
+                icon: "success",
+                title: "Already up to date",
+                // html: `Error: ${event.reason}`,
+                showConfirmButton: false
+            });
             return;
         }
         if (result.flexibleUpdateAllowed) {
