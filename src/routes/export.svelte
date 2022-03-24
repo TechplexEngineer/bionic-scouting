@@ -192,11 +192,17 @@
                 let docs = await getData(table)
                 for (let doc:RxDocument<PitReport> of docs) {
                     let imgs = doc.allAttachments()
+                    const teamImages = new JSZip();
                     for (let [idx, img] of imgs.entries()) {
                         let dataurlImg = await img.getStringData()
                         let base64img = dataurlImg.substring(dataurlImg.indexOf(',') + 1);
 
-                        zip.file(`robot_image-${doc.teamNumber}-${idx}`, base64img, {base64: true})
+                        teamImages.file(`robot_image-${doc.teamNumber}-${idx}`, base64img, {base64: true})
+                    }
+                    let teamImagesb64 = await teamImages.generateAsync({ type: 'base64' });
+                    let fileName = `${eventKey}-${doc.teamNumber}-${new Date().toISOString()}.zip`
+                    if (imgs.length > 0) {
+                        await saveBase64File(teamImagesb64, fileName);
                     }
                 }
             }
@@ -205,8 +211,12 @@
         let datab64 = await zip.generateAsync({ type: 'base64' });
 
 
-        let fileName = `${eventKey}-${new Date().toISOString()}.zip`
+        let fileName = `${eventKey}-ALL_DATA-${new Date().toISOString()}.zip`
 
+        await saveBase64File(datab64, fileName, true);
+    };
+
+    const saveBase64File = async (datab64: string, fileName: string, showSuccess?: boolean) => {
         if (Capacitor.getPlatform() == "web") {
             const csvContent = "data:application/zip;base64;charset=utf-8," + datab64;
 
@@ -222,23 +232,25 @@
                 path: fileName,
                 data: datab64,
                 directory: Directory.External,
-                encoding: Encoding.UTF8
+                // encoding: Encoding.UTF8 // omit encoding to use base64
             });
-            console.log("create file", res);
+            // console.log("create file", res);
             let res2 = await Mediastore.saveToDownloads({
                 filename: fileName,
                 path: decodeURIComponent(res.uri)
             });
-            console.log("savetodownloads", res2);
+            // console.log("savetodownloads", res2);
 
-            Swal.fire({
-                title: "Export All Complete",
-                html: `File is available in downloads folder<br>${fileName}`,
-                icon: "success"
-            });
+            if (showSuccess) {
+                Swal.fire({
+                    title: "Export All Complete",
+                    html: `File is available in downloads folder<br>${fileName}`,
+                    icon: "success"
+                });
+            }
 
         }
-    };
+    }
 </script>
 
 <h1>Data Export</h1>
