@@ -89,7 +89,7 @@
         let matches = await db.matches.find().exec()
         if (matches.length > 0) {
             let res = await Swal.fire({
-                icon: "danger",
+                icon: "error",
                 title: "Matches Already Loaded",
                 html: `Do you want to remove existing matches?<br> <h3>THIS REMOVES MATCH SCOUTING DATA!!!!</h3>`,
                 showCloseButton: true,
@@ -112,9 +112,13 @@
                 });
                 return;
             }
+
+
             const sortedTbaMatches = tbaMatches.sort(tbaMatchSort);
             for (let i = 0; i < sortedTbaMatches.length; i++) {
-                const m = TBAMatchToMatch(sortedTbaMatches[i]);
+                let m = TBAMatchToMatch(sortedTbaMatches[i]);
+                // for testing... Don't commit this
+
                 m.order = i;
                 if (m.compLevel == comp_level.QM) {
                     await db.matches.insert(m);
@@ -127,6 +131,7 @@
                 title: "Oops...",
                 text: `Unable to get data from TBA. Error: ${e.message}`
             });
+            throw e
         }
     }
 
@@ -145,7 +150,7 @@
         let teams = await db.pit_scouting.find().exec()
         if (teams.length > 0) {
             let res = await Swal.fire({
-                icon: "danger",
+                icon: "error",
                 title: "Teams Already Loaded",
                 html: `Do you want to remove existing teams?<br> <h3>THIS REMOVES PIT SCOUTING DATA!!!!</h3>`,
                 showCloseButton: true,
