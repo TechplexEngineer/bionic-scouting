@@ -70,8 +70,8 @@
                 quality: 90,
                 allowEditing: false,
                 source: CameraSource.Camera,
-                resultType: CameraResultType.DataUrl
-                // @todo saveToGallery: true
+                resultType: CameraResultType.DataUrl,
+                saveToGallery: true
             });
 
             await teamData.putAttachment(
