@@ -14,6 +14,7 @@
     import JSZip from 'jszip';
     import type {RxDocument} from "rxdb";
     import type {PitReport} from "$lib/schema/pit-scout-schema";
+    import SpinButton from "$lib/compontents/SpinButton.svelte";
 
 
     let db: MyDatabase;
@@ -246,7 +247,7 @@
     <div class="col col-12 card">
         <div class="card-body">
             <h5 class="card-title">Export All</h5>
-            <button class="btn btn-primary" on:click={doExportAll}>Export All</button>
+            <SpinButton class="btn btn-primary" onClick={doExportAll}>Export All</SpinButton>
         </div>
     </div>
     {#each collections as col}
