@@ -76,20 +76,24 @@
 			<span class="flex-1 fs-5 text-end"><b>Rookie Year:</b> {team.rookieYear}</span>
 		</div>
 
-		<div class="robotPhoto text-center">
-			{#if team.imageUrl}
-				<img src={team.imageUrl} alt="Team Robot Photo" class="mx-auto" />
-			{:else}
-				No photo yet
-			{/if}
-		</div>
+<!--		<div class="robotPhoto text-center">-->
+<!--			{#if team.imageUrl}-->
+<!--				<img src={team.imageUrl} alt="Team Robot Photo" class="mx-auto" />-->
+<!--			{:else}-->
+<!--				No photo yet-->
+<!--			{/if}-->
+<!--		</div>-->
 
-		<h1 class="mt-5">@todo metrics</h1>
+<!--		<h1 class="mt-5">@todo metrics</h1>-->
 
 		<h2>Pit Scouting</h2>
-		<pre>
-        {JSON.stringify(team.toJSON(), null, 4)}
-        </pre>
+		<pre>{team?.notes}</pre>
+		<details>
+  			<summary>Raw Pit Scouting Data</summary>
+			<pre>
+			{JSON.stringify(team.toJSON(), null, 4)}
+			</pre>
+		</details>
 
 		<h2>Scouted Matches</h2>
 		<pre>
