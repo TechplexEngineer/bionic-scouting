@@ -19,7 +19,13 @@
     import type {RxDocument} from "rxdb";
     import type {MatchSubjReport} from "$lib/schema/match-subj-schema";
     import type {Match} from "$lib/schema/match-schema";
-    import {extractBlueTeamsFromMatch, extractRedTeamsFromMatch, formatDateTime} from "$lib/util";
+    import {
+        extractBlueTeamsFromMatch,
+        extractRedTeamsFromMatch,
+        formatDateTime,
+        getCurrentEvent,
+        getOurTeamNumber
+    } from "$lib/util";
 
     let matches: RxDocument<Match>[] = [];
     let matchSelections: { label: string, value: RxDocument<Match> }[] = [];
@@ -47,26 +53,8 @@
     onMount(async () => {
         db = await getDb();
 
-        const settingEvent = await db.settings.findOne().where({key: Settings.CurrentEvent}).exec();
-        if (!settingEvent) {
-            let res = await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Current event not set. Head over to Setup`,
-                showCloseButton: true,
-                confirmButtonText: "Go to Setup"
-            });
-            if (res.isConfirmed) {
-                await goto("/tools/setup");
-                return;
-            }
-        }
-        eventKey = settingEvent.value;
-
-        const entry = await db.settings.findOne({selector: {key: Settings.TeamNumber}}).exec();
-        if (entry && entry.value) {
-            ourTeamNumber = parseInt(entry.value);
-        }
+        eventKey = await getCurrentEvent(db);
+        ourTeamNumber = await getOurTeamNumber(db);
 
         matches = await db.matches.find().where({eventKey: eventKey}).exec();
         // console.log("Matches", matches);

@@ -14,7 +14,7 @@
     import type {PitReport} from "$lib/schema/pit-scout-schema";
     import {page} from "$app/stores";
     import {Camera, CameraResultType, CameraSource} from "@capacitor/camera";
-    import {debounce} from "$lib/util";
+    import {debounce, getCurrentEvent} from "$lib/util";
     import {Carousel, CarouselControl, CarouselIndicators, CarouselItem, Spinner} from "sveltestrap";
     import {CapacitorException} from "@capacitor/core";
 
@@ -29,22 +29,7 @@
     onMount(async () => {
         db = await getDb();
 
-        const eventSetting = await db.settings.findOne().where({key: Settings.CurrentEvent}).exec();
-        if (!eventSetting) {
-            let res = await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Current event not set. Head over to Setup`,
-                showCloseButton: true,
-                confirmButtonText: "Go to Setup"
-            });
-            if (res.isConfirmed) {
-                await goto("/tools/setup");
-                return;
-            }
-            return;
-        }
-        eventKey = eventSetting.value;
+        eventKey = await getCurrentEvent(db);
 
         const teams = await db.pit_scouting.find().where({eventKey}).sort({teamNumber: "asc"}).exec();
         teamsToChoose = teams.map(t => {

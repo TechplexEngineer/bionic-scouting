@@ -9,28 +9,16 @@
     import {goto} from "$app/navigation";
     import type {RxDocument} from "rxdb";
     import type {PitReport} from "$lib/schema/pit-scout-schema";
+    import {getCurrentEvent} from "$lib/util";
 
     let teams: RxDocument<PitReport>[] = [];
 
     onMount(async () => {
         const db = await getDb();
 
-        const settingEvent = await db.settings.findOne({selector: {key: Settings.CurrentEvent}}).exec();
-        if (!settingEvent) {
-            let res = await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Current event not set. Head over to Setup`,
-                showCloseButton: true,
-                confirmButtonText: 'Go to Setup',
-            });
-            if (res.isConfirmed) {
-                await goto("/tools/setup");
-                return;
-            }
-        }
+        const eventKey = await getCurrentEvent(db);
 
-        db.pit_scouting.find().where({eventKey: settingEvent.value}).sort('teamNumber').$.subscribe(t => {
+        db.pit_scouting.find().where({eventKey: eventKey}).sort('teamNumber').$.subscribe(t => {
             // console.log("teams", t);
             teams = t;
         });

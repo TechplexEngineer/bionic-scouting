@@ -19,27 +19,14 @@
     import {goto} from "$app/navigation";
     import type {RxDocument} from "rxdb";
     import type {Match} from "$lib/schema/match-schema";
+    import {getCurrentEvent} from "$lib/util";
 
     let match: RxDocument<Match>;
 
     onMount(async () => {
         const db = await getDb();
 
-        const settingEvent = await db.settings.findOne({selector: {key: Settings.CurrentEvent}}).exec();
-        if (!settingEvent) {
-            let res = await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Current event not set. Head over to Setup`,
-                showCloseButton: true,
-                confirmButtonText: 'Go to Setup',
-            });
-            if (res.isConfirmed) {
-                goto("/tools/setup");
-                return;
-            }
-        }
-        let eventKey = settingEvent.value;
+        const eventKey = await getCurrentEvent(db);
 
         match = await db.matches.findOne().where({eventKey, matchKey: $page.params.match}).exec();
     });

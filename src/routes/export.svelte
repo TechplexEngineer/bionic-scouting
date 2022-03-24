@@ -15,6 +15,7 @@
     import type {RxDocument} from "rxdb";
     import type {PitReport} from "$lib/schema/pit-scout-schema";
     import SpinButton from "$lib/compontents/SpinButton.svelte";
+    import {getCurrentEvent} from "$lib/util";
 
 
     let db: MyDatabase;
@@ -23,22 +24,7 @@
     onMount(async () => {
         db = await getDb();
 
-        const eventSetting = await db.settings.findOne().where({key: Settings.CurrentEvent}).exec();
-        if (!eventSetting) {
-            let res = await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Current event not set. Head over to Setup`,
-                showCloseButton: true,
-                confirmButtonText: "Go to Setup"
-            });
-            if (res.isConfirmed) {
-                await goto("/tools/setup");
-                return;
-            }
-            return;
-        }
-        eventKey = eventSetting.value;
+        eventKey = await getCurrentEvent(db);
 
         collections = Object.keys(db.collections);
     });
@@ -190,7 +176,7 @@
             zip.file(`${table}-${new Date().toISOString()}.json`, json)
             if (table.toLowerCase() == "pit_scouting") {
                 let docs = await getData(table)
-                for (let doc:RxDocument<PitReport> of docs) {
+                for (let doc: RxDocument<PitReport> of docs) {
                     let imgs = doc.allAttachments()
                     const teamImages = new JSZip();
                     for (let [idx, img] of imgs.entries()) {
@@ -199,7 +185,7 @@
 
                         teamImages.file(`robot_image-${doc.teamNumber}-${idx}`, base64img, {base64: true})
                     }
-                    let teamImagesb64 = await teamImages.generateAsync({ type: 'base64' });
+                    let teamImagesb64 = await teamImages.generateAsync({type: 'base64'});
                     let fileName = `${eventKey}-${doc.teamNumber}-${new Date().toISOString()}.zip`
                     if (imgs.length > 0) {
                         await saveBase64File(teamImagesb64, fileName);
@@ -208,7 +194,7 @@
             }
         }
 
-        let datab64 = await zip.generateAsync({ type: 'base64' });
+        let datab64 = await zip.generateAsync({type: 'base64'});
 
 
         let fileName = `${eventKey}-ALL_DATA-${new Date().toISOString()}.zip`

@@ -16,32 +16,15 @@
     import Swal from "sweetalert2";
     import "sweetalert2/dist/sweetalert2.css";
     import {goto} from "$app/navigation";
+    import {getCurrentEvent, getOurTeamNumber} from "$lib/util.js";
 
     let ourTeamNumber = -1;
     let matches = [];
     onMount(async () => {
         const db = await getDb();
 
-        let eventSetting = await db.settings.findOne({selector: {key: Settings.CurrentEvent}}).exec()
-        if (!eventSetting) {
-            let res = await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Current event not set. Head over to Setup`,
-                showCloseButton: true,
-                confirmButtonText: 'Go to Setup',
-            });
-            if (res.isConfirmed) {
-                await goto("/tools/setup");
-                return;
-            }
-
-            return;
-        }
-        let eventKey = eventSetting.value;
-
-        let teamSetting = await db.settings.findOne({selector: {key: Settings.TeamNumber}}).exec()
-        ourTeamNumber = teamSetting.value;
+        const eventKey = await getCurrentEvent(db);
+        ourTeamNumber = await getOurTeamNumber(db);
 
         db.matches.find({selector: {eventKey: eventKey}}).$.subscribe(m => {
             m.sort(matchSort)

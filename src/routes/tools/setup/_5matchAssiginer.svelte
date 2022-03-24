@@ -139,52 +139,52 @@
 <h2>5. [Auto] Assign students to matches</h2>
 <small>Defaults to first 6 scouts alphabetically</small>
 <table class="table table-striped">
-	<thead>
-	<tr>
-		<th>Member 1</th>
-		<th>Member 2</th>
-		<th>Member 3</th>
-		<th>
-			<button on:click={add} class="btn btn-outline-success">Add</button>
-		</th>
-	</tr>
-	</thead>
-	<tbody>
-	{#each scoutGroups as g, idx}
-		{#if g}
-			<tr>
-				<td>
-					<Select items={scoutsSelect}
-							on:select={assign(idx, 'scout1')}
-							value={scoutsSelect[idx*3]}
-							containerStyles="--itemPadding:5px" />
-				</td>
-				<td>
-					<Select items={scoutsSelect}
-							on:select={assign(idx, 'scout2')}
-							value={scoutsSelect[idx*3+1]}
-							containerStyles="--itemPadding:5px" />
-				</td>
-				<td>
-					<Select items={scoutsSelect}
-							on:select={assign(idx, 'scout3')}
-							value={scoutsSelect[idx*3+2]}
-							containerStyles="--itemPadding:5px" />
-				</td>
-				<td>
-					<button on:click={remove(idx)} class="btn btn-outline-danger">Remove</button>
-				</td>
-			</tr>
-		{/if}
-	{/each}
-	</tbody>
+    <thead>
+    <tr>
+        <th>Member 1</th>
+        <th>Member 2</th>
+        <th>Member 3</th>
+        <th>
+            <button on:click={add} class="btn btn-outline-success">Add</button>
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    {#each scoutGroups as g, idx}
+        {#if g}
+            <tr>
+                <td>
+                    <Select items={scoutsSelect}
+                            on:select={assign(idx, 'scout1')}
+                            value={scoutsSelect[idx*3]}
+                            containerStyles="--itemPadding:5px"/>
+                </td>
+                <td>
+                    <Select items={scoutsSelect}
+                            on:select={assign(idx, 'scout2')}
+                            value={scoutsSelect[idx*3+1]}
+                            containerStyles="--itemPadding:5px"/>
+                </td>
+                <td>
+                    <Select items={scoutsSelect}
+                            on:select={assign(idx, 'scout3')}
+                            value={scoutsSelect[idx*3+2]}
+                            containerStyles="--itemPadding:5px"/>
+                </td>
+                <td>
+                    <button on:click={remove(idx)} class="btn btn-outline-danger">Remove</button>
+                </td>
+            </tr>
+        {/if}
+    {/each}
+    </tbody>
 </table>
 
 <div class="mb-3 row">
-	<label for="matchesPerShift" class="col-sm-3 col-form-label">Matches per shift</label>
-	<div class="col-sm-9">
-		<input type="number" class="form-control" id="matchesPerShift" bind:value={matchesPerShift}>
-	</div>
+    <label for="matchesPerShift" class="col-sm-3 col-form-label">Matches per shift</label>
+    <div class="col-sm-9">
+        <input type="number" class="form-control" id="matchesPerShift" bind:value={matchesPerShift}>
+    </div>
 </div>
 
 <SpinButton onClick={build} class="btn-primary">Build Assignments</SpinButton>

@@ -7,7 +7,7 @@
     import {onMount} from "svelte";
     import {getDb} from "$lib/store";
     import {Settings} from "$lib/schema/settings-schema";
-    import {formatDateTime} from "$lib/util";
+    import {formatDateTime, getOurTeamNumber} from "$lib/util";
     import {matchSort} from "$lib/matches";
     import type {RxDocument} from "rxdb";
     import type {Match} from "$lib/schema/match-schema";
@@ -41,18 +41,20 @@
             }
         });
 
-        const entry = await db.settings.findOne({selector: {key: Settings.TeamNumber}}).exec();
-        if (entry && entry.value) {
-            ourTeamNumber = parseInt(entry.value);
-        }
+
+        ourTeamNumber = getOurTeamNumber(db);
+
 
         let [first, number] = $adapterName.split("-");
         if (first.toUpperCase() !== "SS") {
             return; // nothing to do for non super scouts
         }
+        if (number == "lead") {
+            // show all
+        }
 
         //@todo get the correct SS given tablet name
-        scout = await db.super_scouts.findOne().where({active: true}).skip(number - 1).exec();
+        scout = await db.super_scouts.findOne().where({active: true}).sort({createdAt: "asc"}).skip(number - 1).exec();
         if (!scout) {
             return;
         }

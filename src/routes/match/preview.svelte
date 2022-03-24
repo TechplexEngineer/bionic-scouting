@@ -23,7 +23,7 @@
     import "sweetalert2/dist/sweetalert2.css";
     import {goto} from '$app/navigation';
     import {matchSort} from "$lib/matches";
-    import {capitalizeFirst} from "$lib/util";
+    import {capitalizeFirst, getCurrentEvent, getOurTeamNumber} from "$lib/util";
 
     let matchNumber: writable<null | number> = writable(null); // starts at null so the set(1) triggers update
     let match: RxDocument<Match>;
@@ -34,31 +34,13 @@
     onMount(async () => {
         db = await getDb();
 
-        window.db = db
+        eventKey = await getCurrentEvent(db);
+        ourTeamNumber = await getOurTeamNumber(db);
 
-        const settingEvent = await db.settings.findOne({selector: {key: Settings.CurrentEvent}}).exec();
-        if (!settingEvent) {
-            let res = await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Current event not set. Head over to Setup`,
-                showCloseButton: true,
-                confirmButtonText: 'Go to Setup',
-            });
-            if (res.isConfirmed) {
-                goto("/tools/setup");
-                return;
-            }
-        }
-        eventKey = settingEvent.value;
         matches = await db.matches.find({
             selector: {eventKey: eventKey}
         }).exec();
 
-        const entry = await db.settings.findOne({selector: {key: Settings.TeamNumber}}).exec();
-        if (entry && entry.value) {
-            ourTeamNumber = parseInt(entry.value)
-        }
 
         matches.sort(matchSort)
         // feels like we should be able to query for just the matches we are in but it isn't working

@@ -19,7 +19,13 @@
     import {matchSort} from "$lib/matches";
     import type {RxDocument} from "rxdb";
     import type {Match} from "$lib/schema/match-schema";
-    import {debounce, extractBlueTeamsFromMatch, extractRedTeamsFromMatch, extractTeamsFromMatch} from "$lib/util";
+    import {
+        debounce,
+        extractBlueTeamsFromMatch,
+        extractRedTeamsFromMatch,
+        extractTeamsFromMatch,
+        getCurrentEvent
+    } from "$lib/util";
 
     let factNames = ["climber", "drivetrain"];
     let facts: { name: string, value: string }[] = [
@@ -47,21 +53,7 @@
     onMount(async () => {
         db = await getDb();
 
-        const settingEvent = await db.settings.findOne().where({key: Settings.CurrentEvent}).exec();
-        if (!settingEvent) {
-            let res = await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Current event not set. Head over to Setup`,
-                showCloseButton: true,
-                confirmButtonText: "Go to Setup"
-            });
-            if (res.isConfirmed) {
-                await goto("/tools/setup");
-                return;
-            }
-        }
-        eventKey = settingEvent.value;
+        eventKey = await getCurrentEvent(db);
 
         matches = await db.matches.find().where({eventKey: eventKey}).exec();
         matches.sort(matchSort);

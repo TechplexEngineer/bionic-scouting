@@ -16,7 +16,7 @@
     import type {Match} from "$lib/schema/match-schema";
     import Scouts from "./setup/_2scouts.svelte";
     import Select from "svelte-select";
-    import {formatDate} from "$lib/util";
+    import {formatDate, getCurrentEvent, getOurTeamNumber} from "$lib/util";
 
 
     let db: MyDatabase;
@@ -32,42 +32,8 @@
     onMount(async () => {
         db = await getDb();
 
-        window.db = db;
-
-        const eventSetting = await db.settings.findOne().where({key: Settings.CurrentEvent}).exec();
-        if (!eventSetting) {
-            let res = await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Current event not set. Head over to Setup`,
-                showCloseButton: true,
-                confirmButtonText: "Go to Setup"
-            });
-            if (res.isConfirmed) {
-                await goto("/tools/setup");
-                return;
-            }
-            return;
-        }
-        eventKey = eventSetting.value;
-
-        const entry = await db.settings.findOne({selector: {key: Settings.TeamNumber}}).exec();
-        if (entry && entry.value) {
-            ourTeamNumber = parseInt(entry.value);
-        } else {
-            let res = await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Team number not set. Head over to Setup`,
-                showCloseButton: true,
-                confirmButtonText: "Go to Setup"
-            });
-            if (res.isConfirmed) {
-                await goto("/tools/setup");
-                return;
-            }
-            return;
-        }
+        eventKey = await getCurrentEvent(db);
+        ourTeamNumber = await getOurTeamNumber(db);
 
         matches = await db.matches.find().where({eventKey}).sort({order: "asc"}).exec();
 
