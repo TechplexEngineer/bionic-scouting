@@ -16,6 +16,10 @@
 		"classpath": "com.capacitorjs.plugins.filesystem.FilesystemPlugin"
 	},
 	{
+		"pkg": "@robingenz/capacitor-app-update",
+		"classpath": "dev.robingenz.capacitor.appupdate.AppUpdatePlugin"
+	},
+	{
 		"pkg": "bionic-bt-serial",
 		"classpath": "org.team4909.scouting.BluetoothSerialPlugin"
 	}

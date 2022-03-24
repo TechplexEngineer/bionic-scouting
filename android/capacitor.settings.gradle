@@ -14,5 +14,8 @@ project(':capacitor-camera').projectDir = new File('../node_modules/@capacitor/c
 include ':capacitor-filesystem'
 project(':capacitor-filesystem').projectDir = new File('../node_modules/@capacitor/filesystem/android')
 
+include ':robingenz-capacitor-app-update'
+project(':robingenz-capacitor-app-update').projectDir = new File('../node_modules/@robingenz/capacitor-app-update/android')
+
 include ':bionic-bt-serial'
 project(':bionic-bt-serial').projectDir = new File('../node_modules/bionic-bt-serial/android')
