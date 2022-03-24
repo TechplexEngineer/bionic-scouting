@@ -11,6 +11,9 @@
     import Swal from "sweetalert2";
     import {goto} from "$app/navigation";
     import {Settings} from "$lib/schema/settings-schema";
+    import JSZip from 'jszip';
+    import type {RxDocument} from "rxdb";
+    import type {PitReport} from "$lib/schema/pit-scout-schema";
 
 
     let db: MyDatabase;
@@ -99,13 +102,16 @@
 
             } else if (format == ExportType.CSV) {
                 let data = await getCSVForExport(colName);
+
+                let filename = `${colName}-${new Date().toISOString()}.csv`
+
                 if (Capacitor.getPlatform() == "web") {
                     const csvContent = "data:text/csv;charset=utf-8," + data;
 
                     const encodedUri = encodeURI(csvContent);
                     const link = document.createElement("a");
                     link.setAttribute("href", encodedUri);
-                    link.setAttribute("download", `${colName}-${eventKey}.csv`);
+                    link.setAttribute("download", filename);
                     document.body.appendChild(link); // Required for FF
 
                     link.click(); // This will download the data file named "my_data.csv".
@@ -116,12 +122,24 @@
                     // 	recursive: true
                     // });
                     let res = await Filesystem.writeFile({
-                        path: `${colName}-${new Date().toISOString()}.csv`,
+                        path: filename,
                         data: data,
                         directory: Directory.External,
                         encoding: Encoding.UTF8
                     });
                     console.log(res);
+                    console.log("create file", res);
+                    let res2 = await Mediastore.saveToDownloads({
+                        filename: filename,
+                        path: decodeURIComponent(res.uri)
+                    });
+                    console.log("savetodownloads", res2);
+
+                    Swal.fire({
+                        title: makeNiceName(colName) + " Export Complete",
+                        html: `File is available in downloads folder<br>${filename}`,
+                        icon: "success"
+                    });
                 }
             } else {
                 console.log("Unknown export format");
@@ -155,11 +173,82 @@
     const getData = async (colName: string) => {
         return await db[colName].find().exec();
     };
+
+    const doExportAll = async () => {
+        console.log("Export All");
+
+        const zip = new JSZip();
+
+        for (let table of collections) {
+            console.log(table);
+
+            let json = await getJSONForExport(table);
+            let csv = await getCSVForExport(table);
+
+            zip.file(`${table}-${new Date().toISOString()}.csv`, csv)
+            zip.file(`${table}-${new Date().toISOString()}.json`, json)
+            if (table.toLowerCase() == "pit_scouting") {
+                let docs = await getData(table)
+                for (let doc:RxDocument<PitReport> of docs) {
+                    let imgs = doc.allAttachments()
+                    for (let [idx, img] of imgs.entries()) {
+                        let dataurlImg = await img.getStringData()
+                        let base64img = dataurlImg.substring(dataurlImg.indexOf(',') + 1);
+
+                        zip.file(`robot_image-${doc.teamNumber}-${idx}`, base64img, {base64: true})
+                    }
+                }
+            }
+        }
+
+        let datab64 = await zip.generateAsync({ type: 'base64' });
+
+
+        let fileName = `${eventKey}-${new Date().toISOString()}.zip`
+
+        if (Capacitor.getPlatform() == "web") {
+            const csvContent = "data:application/zip;base64;charset=utf-8," + datab64;
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", fileName);
+            document.body.appendChild(link); // Required for FF
+
+            link.click(); // This will download the data file named "my_data.csv".
+        } else {
+            let res = await Filesystem.writeFile({
+                path: fileName,
+                data: datab64,
+                directory: Directory.External,
+                encoding: Encoding.UTF8
+            });
+            console.log("create file", res);
+            let res2 = await Mediastore.saveToDownloads({
+                filename: fileName,
+                path: decodeURIComponent(res.uri)
+            });
+            console.log("savetodownloads", res2);
+
+            Swal.fire({
+                title: "Export All Complete",
+                html: `File is available in downloads folder<br>${fileName}`,
+                icon: "success"
+            });
+
+        }
+    };
 </script>
 
 <h1>Data Export</h1>
 
 <div class="row">
+    <div class="col col-12 card">
+        <div class="card-body">
+            <h5 class="card-title">Export All</h5>
+            <button class="btn btn-primary" on:click={doExportAll}>Export All</button>
+        </div>
+    </div>
     {#each collections as col}
         <div class="col col-6 card">
             <div class="card-body">
