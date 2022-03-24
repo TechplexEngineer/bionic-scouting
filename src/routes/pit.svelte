@@ -15,7 +15,7 @@
     import {page} from "$app/stores";
     import {Camera, CameraResultType, CameraSource} from "@capacitor/camera";
     import {debounce} from "$lib/util";
-    import {Carousel, CarouselControl, CarouselIndicators, CarouselItem} from "sveltestrap";
+    import {Carousel, CarouselControl, CarouselIndicators, CarouselItem, Spinner} from "sveltestrap";
     import {CapacitorException} from "@capacitor/core";
 
 
@@ -64,33 +64,35 @@
     let notes = "";
     let saveStatusMessage = "Waiting for changes...";
 
-    const takePicture = async () => {
-        try {
-            const image = await Camera.getPhoto({
-                quality: 90,
-                allowEditing: false,
-                source: CameraSource.Camera,
-                resultType: CameraResultType.DataUrl,
-                saveToGallery: true
-            });
+    const takePicture = (source) => {
+        return async () => {
+            try {
+                const image = await Camera.getPhoto({
+                    quality: 90,
+                    allowEditing: false,
+                    source: source,
+                    resultType: CameraResultType.DataUrl,
+                    // saveToGallery: true // image is not being saved to app?
+                });
 
-            await teamData.putAttachment(
-                {
-                    id: String(Date.now()),     // (string) name of the attachment like 'cat.jpg'
-                    data: new Blob([image.dataUrl]),   // (string|Blob|Buffer) data of the attachment
-                    type: "text/plain"   // (string) type of the attachment-data like 'image/jpeg'
-                },
-                true // (boolean, optional, default=true) skipIfSame:If true and attachment already exists with same data, the write will be skipped
-            );
-            await teamData.atomicUpdate(d => {
-                d.numAttachments += 1;
-                return d
-            })
-        } catch (e) {
-            if (e instanceof CapacitorException && e.message == 'User cancelled photos app') {
-                return
+                await teamData.putAttachment(
+                    {
+                        id: String(Date.now()),     // (string) name of the attachment like 'cat.jpg'
+                        data: new Blob([image.dataUrl]),   // (string|Blob|Buffer) data of the attachment
+                        type: "text/plain"   // (string) type of the attachment-data like 'image/jpeg'
+                    },
+                    true // (boolean, optional, default=true) skipIfSame:If true and attachment already exists with same data, the write will be skipped
+                );
+                await teamData.atomicUpdate(d => {
+                    d.numAttachments += 1;
+                    return d
+                })
+            } catch (e) {
+                if (e instanceof CapacitorException && e.message == 'User cancelled photos app') {
+                    return
+                }
+                throw e
             }
-            throw e
         }
     };
 
@@ -201,7 +203,10 @@
     <!-- Robot Photo -->
     <div class="d-flex mb-2 mt-4">
         <h3 class="flex-fill">Robot Image</h3>
-        <button class="btn btn-info align-self-end" on:click={takePicture}
+        <button class="btn btn-warning align-self-end me-4" on:click={takePicture(CameraSource.Photos)}
+                class:disabled={currentSelectedTeamItem==null}>Pick Photo
+        </button>
+        <button class="btn btn-info align-self-end" on:click={takePicture(CameraSource.Camera)}
                 class:disabled={currentSelectedTeamItem==null}>Take Photo
         </button>
     </div>
@@ -224,7 +229,11 @@
                 <CarouselControl direction="next" bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos}/>
             </Carousel>
         {:else}
-            <h4> &nbsp; &nbsp; &nbsp;No Photos Yet</h4>
+            {#if !photosReady}
+                <h4> &nbsp; &nbsp; &nbsp;Loading... <Spinner color="dark" /></h4>
+            {:else}
+                <h4> &nbsp; &nbsp; &nbsp;No Photos Yet</h4>
+            {/if}
         {/if}
     </div>
 
