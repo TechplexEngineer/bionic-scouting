@@ -64,7 +64,7 @@
     let notes = "";
     let saveStatusMessage = "Waiting for changes...";
 
-    const takePicture = (source) => {
+    const takePicture = (source: CameraSource) => {
         return async () => {
             try {
                 const image = await Camera.getPhoto({
@@ -116,16 +116,20 @@
         notes = teamData.notes;
 
         teamData.allAttachments$.subscribe(debounce(async (attachments) => {
-            robotPhotos = [];
-            photosReady = false;
+            console.log("Attachments Changed");
+
             // console.log("attachments: ", attachments);
 
+            let newPhotos = [];
             for (let a of attachments) {
                 let d = await a.getStringData()
-                robotPhotos = [...robotPhotos, {
+                newPhotos.push({
                     url: d,
-                }]
+                })
             }
+
+            robotPhotos = newPhotos;
+            // photosReady = false;
 
             photosReady = true;
 
@@ -171,6 +175,8 @@
         saveStatusMessage = "Saved.";
     }
 
+    $: console.log("photos!", photosReady)
+
 
 </script>
 
@@ -213,10 +219,10 @@
 
     <div class="d-flex" style="min-height: 100px">
         {#if photosReady && robotPhotos.length > 0}
-            <Carousel items={robotPhotos} bind:activeIndex={activeRobotPhotoIndex} dark interval={false}>
+            <Carousel items={robotPhotos} bind:activeIndex={activeRobotPhotoIndex} dark interval={false} style="margin: 0 auto;">
                 <CarouselIndicators bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos}/>
 
-                <div class="carousel-inner" style="width:100vw; padding-bottom: 50px">
+                <div class="carousel-inner" style="width:100%; padding-bottom: 50px">
                     {#each robotPhotos as item, index}
                         <CarouselItem bind:activeIndex={activeRobotPhotoIndex} itemIndex={index}>
                             <img src={item.url} class="d-block" alt="Robot Photo"
@@ -225,8 +231,8 @@
                     {/each}
                 </div>
 
-                <CarouselControl direction="prev" bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos}/>
-                <CarouselControl direction="next" bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos}/>
+                <CarouselControl direction="prev" bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos} style="margin-left: -80px"/>
+                <CarouselControl direction="next" bind:activeIndex={activeRobotPhotoIndex} items={robotPhotos} style="margin-right: -80px"/>
             </Carousel>
         {:else}
             {#if !photosReady}
@@ -238,11 +244,11 @@
     </div>
 
     <!-- Notes -->
-    <div class="form-floating mt-4">
-        <textarea id="notes" class="form-control" placeholder=" " style="height: 150px"
+    <div class="mt-4">
+        <label for="notes" class="form-label">Notes</label>
+        <textarea id="notes" class="form-control" placeholder=" " rows="15"
                   bind:value={notes}
                   disabled={currentSelectedTeamItem==null}></textarea>
-        <label for="notes">Notes</label>
     </div>
     <div class="float-end mt-1">
         {saveStatusMessage}
