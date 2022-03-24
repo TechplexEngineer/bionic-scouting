@@ -16,7 +16,7 @@
     import Swal from "sweetalert2";
     import "sweetalert2/dist/sweetalert2.css";
     import {goto} from "$app/navigation";
-    import {getCurrentEvent, getOurTeamNumber} from "$lib/util.js";
+    import {getCurrentEvent, getOurTeamNumber} from "$lib/util";
 
     let ourTeamNumber = -1;
     let matches = [];
