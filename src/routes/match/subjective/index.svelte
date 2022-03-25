@@ -13,9 +13,6 @@
     import {page} from "$app/stores";
     import type {MyDatabase} from "$lib/store";
     import {getDb} from "$lib/store";
-    import {Settings} from "$lib/schema/settings-schema";
-    import Swal from "sweetalert2";
-    import {goto} from "$app/navigation";
     import {matchSort} from "$lib/matches";
     import type {RxDocument} from "rxdb";
     import type {Match} from "$lib/schema/match-schema";
@@ -26,6 +23,9 @@
         extractTeamsFromMatch,
         getCurrentEvent
     } from "$lib/util";
+    import {adapterName} from "$lib/bluetooth";
+    import type {SuperScout} from "$lib/schema/super-scout-schema";
+    import type {Team} from "tba-api-v3client-ts";
 
     let factNames = ["climber", "drivetrain"];
     let facts: { name: string, value: string }[] = [
@@ -37,19 +37,30 @@
     let matches: RxDocument<Match>[] = [];
 
     let matchSelections: { label: string, value: RxDocument<Match> }[] = [];
-    let selectedMatch: { label: string, value: any };
+    let selectedMatch: { label: string, value: RxDocument<Match> };
 
-    let teamSelections = [];
-    let selectedTeam: { label: string, value: number };
+    let teamSelections: { label: string, value: { teamNumber: number, color: TeamColor } }[] = [];
+    let selectedTeam: { label: string, value: { teamNumber: number, color: TeamColor } };
 
     let matchForSelections: { label: string, value: RxDocument<Match> }[] = [];
-    let selectedPrepMatch: { label: string, value: any };
+    let selectedPrepMatch: { label: string, value: RxDocument<Match> };
 
     let db: MyDatabase;
     let eventKey = "";
 
     let countMatchChange = 0;
     let countMatchForChange = 0;
+
+    let scout: RxDocument<SuperScout>;
+    let scoutTeams = [];
+
+
+    enum TeamColor {
+        RED,
+        BLUE,
+        ERROR
+    }
+
     onMount(async () => {
         db = await getDb();
 
@@ -69,21 +80,56 @@
             }
         }
 
+        let [first, number] = $adapterName.split("-");
+        if (first.toUpperCase() !== "SS" && !isNaN(parseInt(number))) {
+            return; // nothing to do for non super scouts or lead ss
+        }
+        scout = await db.super_scouts.findOne().where({active: true}).sort({createdAt: "asc"}).skip(number - 1).exec();
+
+        console.log(scout.assignedMatches)
+
+        let currentMatchKey = selectedMatch.value.matchKey
+        // console.log("Current Match", currentMatchKey);
+        // for each assignedMatches find any teamMatches for the current match
+        for (let am of scout.assignedMatches) {
+            // console.log(am.teamMatches);
+            for (let tm of am.teamMatches) {
+                if (tm.match == currentMatchKey) {
+                    // console.log("am:", am.assignedMatch, "tm", tm);
+
+                    let ts = teamSelections.filter(ts => ts.value.teamNumber == tm.team);
+                    let color = ts.length > 0 ? ts[0].value.color : TeamColor.BLUE
+                    // console.log("MONEY", ts, ts[0].value.color)
+                    scoutTeams = [...scoutTeams, {
+                        teamNumber: tm.team,
+                        color: color
+                    }]
+                }
+            }
+            // if (am.teamMatches.map.includes(selectedMatch.value.matchKey)) {
+            //     console.log(`Includes`);
+            // }
+        }
     });
 
 
     function handleSelectMatch(event) {
         let match: RxDocument<Match> = event.detail.value;
-        // console.log("selected match", match);
-        teamSelections = extractRedTeamsFromMatch(match).map(t => ({label: t + " (Red)", value: t}));
+        console.log("handleSelectMatch", match);
+        teamSelections = extractRedTeamsFromMatch(match).map(t => ({
+            label: t + " (Red)",
+            value: {teamNumber: t, color: TeamColor.RED}
+        }));
         teamSelections = teamSelections.concat(extractBlueTeamsFromMatch(match).map(t => ({
             label: t + " (Blue)",
-            value: t
+            value: {teamNumber: t, color: TeamColor.BLUE}
         })));
+
+        // console.log("Current Match has possibly changed");
 
         if ($page.query.get("team") && countMatchChange++ == 0) {
             for (let t of teamSelections) {
-                if (t.value == $page.query.get("team")) {
+                if (t.value.teamNumber == $page.query.get("team")) {
                     selectedTeam = t;
                     break;
                 }
@@ -92,7 +138,8 @@
     }
 
     async function handleSelectTeam(event) {
-        let teamNumber = event.detail.value
+        let teamNumber = event.detail.value.teamNumber
+        // console.log("handleSelectTeam", teamNumber);
         matchForSelections = matches.filter((m: RxDocument<Match>) => {
             return extractTeamsFromMatch(m).includes(teamNumber)
         }).map(m => ({label: m.matchKey, value: m}));
@@ -108,25 +155,7 @@
     }
 
     async function handleSelectPrepForMatch(event) {
-        // console.log("Prep For:", event.detail.label);
-
-        // look for existing data
-        const query = {
-            eventKey: eventKey,
-
-            matchKey: selectedMatch.value.matchKey,
-            teamNumber: selectedTeam.value,
-            matchForKey: event.detail.label
-        };
-        // console.log("Query", query);
-        let doc = await db.match_subjective.findOne().where(query).exec();
-        // console.log("Doc:", doc);
-        if (!doc) {
-            notes = ""; //clear the field
-            return; // nothing to do this will be an upsert
-        }
-        // console.log(doc);
-        notes = doc.notes;
+        console.log("handleSelectPrepForMatch:", event.detail.label);
     }
 
     const debouncedSaveNotes = debounce(async (notes) => { // probably should wait for the promise
@@ -139,7 +168,7 @@
             eventKey: eventKey,
 
             matchKey: selectedMatch.value.matchKey,
-            teamNumber: selectedTeam.value,
+            teamNumber: selectedTeam.value.teamNumber,
             matchForKey: selectedPrepMatch.label,
 
             updatedAt: new Date().getTime(),
@@ -175,6 +204,50 @@
     $: notesDirty(notes);
     $: selectChange(selectedMatch, selectedTeam, selectedPrepMatch)
 
+    const changeTeam = (teamNumber: number) => {
+        return () => {
+            // console.log("Change Team");
+            for (let ts of teamSelections) {
+                // console.log(ts.value, teamNumber);
+                if (ts.value.teamNumber == teamNumber) {
+                    selectedTeam = ts;
+                    // console.log("Changing selectedTeam", selectedTeam);
+                    return
+                }
+            }
+        }
+    }
+
+    const updateNotes = async (matchKey: string, teamNumber: number, matchForKey: string) => {
+
+        if (!selectedMatch || !selectedTeam || !selectedPrepMatch) {
+            //Can't Update
+            return;
+        }
+
+        // console.log("HEREEEE", matchKey, teamNumber, matchForKey);
+
+        // look for existing data
+        const query = {
+            eventKey: eventKey,
+
+            matchKey: matchKey,
+            teamNumber: teamNumber,
+            matchForKey: matchForKey
+        };
+        // console.log("Query", query);
+        let doc = await db.match_subjective.findOne().where(query).exec();
+        // console.log("Doc:", doc);
+        if (!doc) {
+            notes = ""; //clear the field
+            return; // nothing to do this will be an upsert
+        }
+        // console.log(doc);
+        notes = doc.notes;
+    }
+
+    $: updateNotes(selectedMatch?.value?.matchKey, selectedTeam?.value?.teamNumber, selectedPrepMatch?.label)
+
 </script>
 
 <div class="content">
@@ -190,7 +263,6 @@
             <!--			Nothing here yet-->
         </div>
     </div>
-
 
     <div class="row">
         <div class="col">
@@ -208,6 +280,20 @@
         </div>
     </div>
 
+    <div class="d-flex justify-content-evenly mt-4">
+        {#each scoutTeams as team}
+            <button class="btn"
+                    class:btn-primary={team.color == TeamColor.BLUE && team.teamNumber == selectedTeam?.value?.teamNumber}
+                    class:btn-danger={team.color == TeamColor.RED && team.teamNumber == selectedTeam?.value?.teamNumber}
+                    class:btn-success={team.color == TeamColor.ERROR && team.teamNumber == selectedTeam?.value?.teamNumber}
+
+                    class:btn-outline-primary={team.color == TeamColor.BLUE && team.teamNumber != selectedTeam?.value?.teamNumber}
+                    class:btn-outline-danger={team.color == TeamColor.RED && team.teamNumber != selectedTeam?.value?.teamNumber}
+                    class:btn-outline-success={team.color == TeamColor.ERROR && team.teamNumber != selectedTeam?.value?.teamNumber}
+
+                    on:click={changeTeam(team.teamNumber)}>{team.teamNumber}</button>
+        {/each}
+    </div>
 
     <!-- Notes -->
     <div class="form-floating mt-4">
