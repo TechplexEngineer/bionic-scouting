@@ -86,30 +86,6 @@
         }
         scout = await db.super_scouts.findOne().where({active: true}).sort({createdAt: "asc"}).skip(number - 1).exec();
 
-        console.log(scout.assignedMatches)
-
-        let currentMatchKey = selectedMatch.value.matchKey
-        // console.log("Current Match", currentMatchKey);
-        // for each assignedMatches find any teamMatches for the current match
-        for (let am of scout.assignedMatches) {
-            // console.log(am.teamMatches);
-            for (let tm of am.teamMatches) {
-                if (tm.match == currentMatchKey) {
-                    // console.log("am:", am.assignedMatch, "tm", tm);
-
-                    let ts = teamSelections.filter(ts => ts.value.teamNumber == tm.team);
-                    let color = ts.length > 0 ? ts[0].value.color : TeamColor.BLUE
-                    // console.log("MONEY", ts, ts[0].value.color)
-                    scoutTeams = [...scoutTeams, {
-                        teamNumber: tm.team,
-                        color: color
-                    }]
-                }
-            }
-            // if (am.teamMatches.map.includes(selectedMatch.value.matchKey)) {
-            //     console.log(`Includes`);
-            // }
-        }
     });
 
 
@@ -219,13 +195,11 @@
     }
 
     const updateNotes = async (matchKey: string, teamNumber: number, matchForKey: string) => {
-
         if (!selectedMatch || !selectedTeam || !selectedPrepMatch) {
             //Can't Update
             return;
         }
 
-        // console.log("HEREEEE", matchKey, teamNumber, matchForKey);
 
         // look for existing data
         const query = {
@@ -247,6 +221,30 @@
     }
 
     $: updateNotes(selectedMatch?.value?.matchKey, selectedTeam?.value?.teamNumber, selectedPrepMatch?.label)
+
+    const updateQuickJump = (currentMatchKey: string, ss) => {
+        // console.log("Current Match", currentMatchKey);
+
+        // for each assignedMatches find any teamMatches for the current match
+        scoutTeams = [];
+        for (let am of ss?.assignedMatches || []) {
+            // console.log(am.teamMatches);
+            for (let tm of am.teamMatches) {
+                if (tm.match == currentMatchKey) {
+                    // console.log("am:", am.assignedMatch, "tm", tm);
+
+                    let ts = teamSelections.filter(ts => ts.value.teamNumber == tm.team);
+                    let color = ts.length > 0 ? ts[0].value.color : TeamColor.BLUE
+                    // console.log("MONEY", ts, ts[0].value.color)
+                    scoutTeams = [...scoutTeams, {
+                        teamNumber: tm.team,
+                        color: color
+                    }]
+                }
+            }
+        }
+    }
+    $: updateQuickJump(selectedMatch?.value?.matchKey, scout)
 
 </script>
 
