@@ -1,5 +1,6 @@
-import { createRxDatabase, addDefaultRxPlugins, addPouchPlugin, getRxStoragePouch } from 'rxdb';
+import {createRxDatabase, addDefaultRxPlugins, addPouchPlugin, getRxStoragePouch} from 'rxdb';
 import * as idb from 'pouchdb-adapter-idb';
+import * as pouchHttp from 'pouchdb-adapter-http';
 
 import matchMetricsSchema from '$lib/schema/match-metrics-schema';
 import matchSchema from '$lib/schema/match-schema';
@@ -10,55 +11,56 @@ import scoutsSchema from '$lib/schema/scouts-schema';
 import settingsSchema from '$lib/schema/settings-schema';
 import SuperScoutSchema from '$lib/schema/super-scout-schema';
 
-import type { MatchMetricsCollection } from '$lib/schema/match-metrics-schema';
-import type { MatchCollection } from '$lib/schema/match-schema';
-import type { MatchSubjCollection } from '$lib/schema/match-subj-schema';
-import type { NoteCollection } from '$lib/schema/note-schema';
-import type { PitReportCollection } from '$lib/schema/pit-scout-schema';
-import type { ScoutCollection } from '$lib/schema/scouts-schema';
-import type { SettingsCollection } from '$lib/schema/settings-schema';
-import type { RxDatabase } from 'rxdb';
-import type { SuperScoutCollection } from '$lib/schema/super-scout-schema';
+import type {MatchMetricsCollection} from '$lib/schema/match-metrics-schema';
+import type {MatchCollection} from '$lib/schema/match-schema';
+import type {MatchSubjCollection} from '$lib/schema/match-subj-schema';
+import type {NoteCollection} from '$lib/schema/note-schema';
+import type {PitReportCollection} from '$lib/schema/pit-scout-schema';
+import type {ScoutCollection} from '$lib/schema/scouts-schema';
+import type {SettingsCollection} from '$lib/schema/settings-schema';
+import type {RxDatabase} from 'rxdb';
+import type {SuperScoutCollection} from '$lib/schema/super-scout-schema';
 
 addDefaultRxPlugins();
 addPouchPlugin(idb);
+addPouchPlugin(pouchHttp);
 
 let dbPromise;
 
 type MyDatabaseCollections = {
-	match_metrics: MatchMetricsCollection;
-	matches: MatchCollection;
-	match_subjective: MatchSubjCollection;
-	notes: NoteCollection;
-	pit_scouting: PitReportCollection;
-	scouts: ScoutCollection;
-	settings: SettingsCollection;
-	super_scouts: SuperScoutCollection;
+    match_metrics: MatchMetricsCollection;
+    matches: MatchCollection;
+    match_subjective: MatchSubjCollection;
+    notes: NoteCollection;
+    pit_scouting: PitReportCollection;
+    scouts: ScoutCollection;
+    settings: SettingsCollection;
+    super_scouts: SuperScoutCollection;
 };
 
 export type MyDatabase = RxDatabase<MyDatabaseCollections>;
 
 const _create = async () => {
-	const db: MyDatabase = await createRxDatabase<MyDatabaseCollections>({
-		name: 'tgadb',
-		storage: getRxStoragePouch('idb'),
-		ignoreDuplicate: true
-	});
+    const db: MyDatabase = await createRxDatabase<MyDatabaseCollections>({
+        name: 'tgadb',
+        storage: getRxStoragePouch('idb'),
+        ignoreDuplicate: true
+    });
 
-	await db.addCollections({
-		match_metrics: { schema: matchMetricsSchema },
-		matches: { schema: matchSchema },
-		match_subjective: { schema: matchSubjectiveSchema },
-		notes: { schema: noteSchema },
-		pit_scouting: { schema: pitSchema },
-		scouts: { schema: scoutsSchema },
-		settings: { schema: settingsSchema },
-		super_scouts: { schema: SuperScoutSchema }
-	});
-	dbPromise = db;
-	return db;
+    await db.addCollections({
+        match_metrics: {schema: matchMetricsSchema},
+        matches: {schema: matchSchema},
+        match_subjective: {schema: matchSubjectiveSchema},
+        notes: {schema: noteSchema},
+        pit_scouting: {schema: pitSchema},
+        scouts: {schema: scoutsSchema},
+        settings: {schema: settingsSchema},
+        super_scouts: {schema: SuperScoutSchema}
+    });
+    dbPromise = db;
+    return db;
 };
 
 export function getDb(): Promise<MyDatabase> {
-	return dbPromise ? dbPromise : _create();
+    return dbPromise ? dbPromise : _create();
 }
