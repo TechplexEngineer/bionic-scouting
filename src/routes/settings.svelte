@@ -12,6 +12,9 @@
         db = await getDb();
     })
 
+    console.log(import.meta.env);
+    console.log(process.env);
+
     let syncMessages = "Sync not started.";
 
     enum SyncDirection {
@@ -35,7 +38,7 @@
             LogSyncMessage(`Started Sync: Direction ${syncDir}`);
 
             const replicationState = db.pit_scouting.syncCouchDB({
-                remote: "http://tga_app:oH2955UqY8bg@104.248.113.190:5984/events_2022/", // remote database. This can be the serverURL, another RxCollection or a PouchDB-instance
+                remote: import.meta.env.VITE_COUCHDB_URL, // remote database. This can be the serverURL, another RxCollection or a PouchDB-instance
                 waitForLeadership: true,              // (optional) [default=true] to save performance, the sync starts on leader-instance only
                 direction: {                          // direction (optional) to specify sync-directions
                     pull: syncDir == SyncDirection.PULL || syncDir == SyncDirection.BOTH, // default=true

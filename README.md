@@ -102,3 +102,11 @@ The aab will be stored in `android/app/build/outputs/`
 ### Our build and release process
 
 We use GitHub Actions to build an android app on each push to the main branch.
+
+## Sync
+
+The app uses RxDB with an underlying PouchDB for storage which supports sync with CouchDB For the competition season we
+run a CouchDB server on a Digital Ocean VPS.
+
+When running the app locally create a .env file at the root of the repository with content:
+`VITE_COUCHDB_URL=http://<USERNAME>:<PASSWORD>@<HOST>:5984/events_2022/`

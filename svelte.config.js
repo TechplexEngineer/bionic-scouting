@@ -14,6 +14,9 @@ const config = {
         target: '#svelte',
 
         vite: {
+            define: {
+                'process.env': process.env,
+            },
             server: {
                 fs: {
                     allow: ['capacitor-plugin-bluteooth-serial']

@@ -67,8 +67,8 @@
             </ul>
         {/if}
         {#each scouts as scout}
-            <a id={scout.name}></a>
-            <MySchedule scout={scout}></MySchedule>
+            <a id={scout.name}>Scout Anchor</a>
+            <MySchedule scout={scout}/>
         {/each}
 
     {/if}
