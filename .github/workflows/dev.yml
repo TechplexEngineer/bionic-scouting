@@ -114,24 +114,4 @@ jobs:
       #          whatsNewDirectory: distribution/whatsnew
       #          mappingFile: app/build/outputs/mapping/release/mapping.txt
 
-      - name: Configure Identity for GH Pages Publish
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-      - name: Change Branch
-        run: git switch gh-pages
 
-      #      - name: Preserve CNAME & Copy new files
-      #        run: |
-      #          cp ./docs/CNAME .  # preserve CNAME
-      #          rm -rf ./docs      # remove old files
-      #          mv ./public ./docs # move new files into proper directory
-      #          cp ./CNAME ./docs/ # restore CNAME
-
-      - name: Commit and Publish
-        run: |
-          mv ./build docs
-          git add ./docs
-          git commit -m "Publishing site at ${GITHUB_SHA} - $(date)"
-          remote_repo="https://${GITHUB_ACTOR}:${{secrets.GITHUB_TOKEN}}@github.com/${GITHUB_REPOSITORY}.git"
-          git push "${remote_repo}" HEAD:gh-pages
