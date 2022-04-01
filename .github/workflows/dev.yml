@@ -130,7 +130,8 @@ jobs:
 
       - name: Commit and Publish
         run: |
-          git add ./build
+          mv ./build docs
+          git add ./docs
           git commit -m "Publishing site at ${GITHUB_SHA} - $(date)"
           remote_repo="https://${GITHUB_ACTOR}:${{secrets.GITHUB_TOKEN}}@github.com/${GITHUB_REPOSITORY}.git"
           git push "${remote_repo}" HEAD:gh-pages
