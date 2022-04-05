@@ -27,6 +27,8 @@ jobs:
           npm ci
 
       - name: Build Svelte App
+        env:
+          VITE_COUCHDB_URL: "${{ secrets.VITE_COUCHDB_URL }}"
         run: |
           npm run build
 
