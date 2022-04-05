@@ -12,8 +12,6 @@
         db = await getDb();
     })
 
-    console.log(import.meta.env);
-    console.log(process.env);
 
     let syncMessages = "Sync not started.";
 
@@ -35,10 +33,15 @@
             // this solves our sync problem
 
             syncMessages = '';
+            let dbURL = import.meta.env.VITE_COUCHDB_URL;
             LogSyncMessage(`Started Sync: Direction ${syncDir}`);
+            const url = new URL(dbURL);
+            url.password = "<REDACTED>";
+            LogSyncMessage(`    URL: ${url.toString()}`) //@todo remove password before printing
+
 
             const replicationState = db.pit_scouting.syncCouchDB({
-                remote: import.meta.env.VITE_COUCHDB_URL, // remote database. This can be the serverURL, another RxCollection or a PouchDB-instance
+                remote: dbURL, // remote database. This can be the serverURL, another RxCollection or a PouchDB-instance
                 waitForLeadership: true,              // (optional) [default=true] to save performance, the sync starts on leader-instance only
                 direction: {                          // direction (optional) to specify sync-directions
                     pull: syncDir == SyncDirection.PULL || syncDir == SyncDirection.BOTH, // default=true
