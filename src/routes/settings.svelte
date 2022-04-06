@@ -81,7 +81,7 @@
             });
             replicationState.error$.subscribe(error => {
                 console.log("error", error);
-                LogSyncMessage(`Error Syncing: ${error.message}`);
+                LogSyncMessage(`Error Syncing: ${error.message} ${error.stack} ${error}`);
             });
         }
     }
