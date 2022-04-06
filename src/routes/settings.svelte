@@ -77,7 +77,7 @@
                     LogSyncMessage(`Sync Complete: read:${completed.docs_read} written:${completed.docs_written}`);
                 }
                 // undo our nasty hack
-                process.browser = undefined;
+//                 process.browser = undefined;
             });
             replicationState.error$.subscribe(error => {
                 console.log("error", error);
