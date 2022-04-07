@@ -29,6 +29,8 @@
     let superScouts: RxDocument<SuperScout>[] = [];
     let superScoutsLoaded = false;
 
+    let numMatchesToScout = 2;
+
     onMount(async () => {
         db = await getDb();
 
@@ -114,7 +116,7 @@
                 if (teamNumber == ourTeamNumber) {
                     continue;
                 }
-                let matches = getMatches(teamNumber, currentMatch.order);
+                let matches = getMatches(teamNumber, currentMatch.order, numMatchesToScout);
                 let tm: { team: number, match: string }[] = matches.map(m => ({
                     team: teamNumber,
                     match: m + ""
@@ -142,7 +144,7 @@
     }
 
     // get matches this team played in before this match (currentOrder)
-    function getMatches(team, currentOrder): number[] {
+    function getMatches(team, currentOrder, numMatchesToScout): number[] {
         let teamMatches = [];
         for (let match of matches) {
             const matchTeams = getTeamsInMatch(match);
@@ -150,8 +152,8 @@
                 teamMatches.push(match.matchKey);
             }
         }
-        // get last fest matches items
-        let m = teamMatches.slice(Math.max(teamMatches.length - 3, 0));
+        // get last few matches items
+        let m = teamMatches.slice(Math.max(teamMatches.length - numMatchesToScout, 0));
         return m;
     }
 
@@ -207,6 +209,10 @@
 
 
     <h2>2. Our Matches <small class="text-muted fw-light fs-5">Assign super scouts to teams</small></h2>
+
+    <label for="numMatchesToScout">Num Matches to Scout [1,5]</label>
+    <input type="number" class="form-control" id="numMatchesToScout" min="1" max="5" bind:value={numMatchesToScout}>
+
     <Table striped>
         <thead>
         <tr>
@@ -245,7 +251,7 @@
                     {#each m.alliances[color].teamKeys as t}
                         <td class="{color}bg">
                             {#if t !== `frc${ourTeamNumber}`}
-                                {matchContainsOurTeam(m) && getMatches(parseInt(t.replace('frc', '')), m.order).join(", ") || ""}
+                                {matchContainsOurTeam(m) && getMatches(parseInt(t.replace('frc', '')), m.order, numMatchesToScout).join(", ") || ""}
                             {/if}
                         </td>
                     {/each}
