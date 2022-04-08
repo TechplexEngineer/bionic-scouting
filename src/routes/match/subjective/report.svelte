@@ -368,20 +368,20 @@
             <tr>
                 <td>RP</td>
                 <td colspan="3">
-                    RP1
+                    Cargo
                     {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_1}:
                     {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_1_prob * 100, 2)}%
                     &mdash;
-                    RP2
+                    Rung
                     {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_2}:
                     {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_2_prob * 100, 2)}%
                 </td>
                 <td colspan="3">
-                    RP1
+                    Cargo
                     {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_1}:
                     {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_1_prob * 100, 2)}%
                     &mdash;
-                    RP2
+                    Rung
                     {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_2}:
                     {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_2_prob * 100, 2)}%
                 </td>
