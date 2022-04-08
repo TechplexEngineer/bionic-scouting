@@ -331,7 +331,7 @@
                 {#each ['red', 'blue'] as color}
                     {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
                         <td>
-                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Match Pts")}
+                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Rung Succ.")}
                         </td>
                     {/each}
                     <!--                    <td></td>-->
