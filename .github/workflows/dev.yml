@@ -29,6 +29,7 @@ jobs:
       - name: Build Svelte App
         env:
           VITE_COUCHDB_URL: "${{ secrets.VITE_COUCHDB_URL }}"
+          VITE_SHEETS_API_KEY: "${{ secrets.VITE_SHEETS_API_KEY }}"
         run: |
           npm run build
 

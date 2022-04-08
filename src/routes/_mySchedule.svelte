@@ -84,7 +84,9 @@
 </script>
 
 <h2 class="mt-3">Match Reports / Assigned Matches: <small class="text-muted fs-5">{scout && scout.name}</small>
+    <a href="#top" class="float-end text-muted fs-5">Top &#9650;</a>
 </h2>
+
 <table class="table table-striped">
     <thead>
     <tr>
@@ -117,8 +119,6 @@
             <td>
                 <a href="match/subjective/report?for={m.matchKey}" class="btn btn-success">Report</a>
             </td>
-
-
         </tr>
     {/each}
     </tbody>

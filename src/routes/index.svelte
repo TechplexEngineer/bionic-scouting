@@ -55,6 +55,7 @@
         <h3>This device is <b>{deviceName}</b></h3>
         <h3>Current Event <b>{eventName}</b></h3>
     </div>
+    <a id="top" style="visibility: hidden">Top Anchor</a>
 
 
     {#if $adapterName.toLowerCase().startsWith("ss")}
@@ -67,7 +68,7 @@
             </ul>
         {/if}
         {#each scouts as scout}
-            <a id={scout.name}>Scout Anchor</a>
+            <a id={scout.name} style="visibility: hidden">Scout Anchor</a>
             <MySchedule scout={scout}/>
         {/each}
 

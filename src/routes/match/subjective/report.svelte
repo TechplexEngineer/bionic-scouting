@@ -12,9 +12,6 @@
     import {page} from "$app/stores";
     import {onMount} from "svelte";
     import {getDb, MyDatabase} from "$lib/store";
-    import {Settings} from "$lib/schema/settings-schema";
-    import Swal from "sweetalert2";
-    import {goto} from "$app/navigation";
     import {matchSort} from "$lib/matches";
     import type {RxDocument} from "rxdb";
     import type {MatchSubjReport} from "$lib/schema/match-subj-schema";
@@ -26,6 +23,8 @@
         getCurrentEvent,
         getOurTeamNumber
     } from "$lib/util";
+    import * as GSheetReader from "g-sheets-api";
+    import Swal from "sweetalert2";
 
     let matches: RxDocument<Match>[] = [];
     let matchSelections: { label: string, value: RxDocument<Match> }[] = [];
@@ -50,6 +49,11 @@
     let eventKey = "";
     let ourTeamNumber = 0;
 
+
+    // data from google sheet
+    let scoutingData = [];
+    let statboticsData = [];
+
     onMount(async () => {
         db = await getDb();
 
@@ -70,7 +74,44 @@
                 }
             }
         }
+
+        const DCMP_2022 = '1Q6Llv-qqZ5uo3ufbzTvExyut1etuelWR-eoPXmnbs9o'; //@todo make this configurable
+
+        const apiKey = import.meta.env.VITE_SHEETS_API_KEY;
+
+        const sheetName = "Team Info";
+
+        const readerOptions = {
+            apiKey: apiKey,
+            sheetId: DCMP_2022,
+            returnAllResults: false,
+            sheetName: sheetName
+        };
+        GSheetReader(readerOptions, (data) => {
+            scoutingData = data;
+            // console.log(data);
+        }, async (err) => {
+            await Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                html: `Unable to pull data from google sheets`,
+                showCloseButton: true
+            });
+        });
+
+        await populateStatboticMatchData(eventKey)
+
+
     });
+
+    async function populateStatboticMatchData(eventKey) {
+        const res = await fetch(`https://api.statbotics.io/v1/matches/event/${eventKey}`);
+        if (!res.ok) {
+            return
+        }
+        statboticsData = await res.json()
+        // console.log(data);
+    }
 
     const OnlyOurAlliance = (value: RxDocument<MatchSubjReport>, index, self) => {
         if (!selectedPrepMatch) {
@@ -127,6 +168,36 @@
         return aMatchNumber - bMatchNumber;
     }
 
+    const getFrom = (scoutingData, team, field) => {
+        let rows = scoutingData.filter(r => r.Team == team)
+        if (rows.length < 1) {
+            return "???";
+        }
+        const row = rows[0];
+        if (!row) {
+            return "?";
+        }
+        return row[field]
+    }
+
+    const getSBData = (sb, matchKey) => {
+        // console.log("SB Data", statboticsData);
+        return sb.filter(m => {
+            // console.log(m.key == `${eventKey}_${selectedPrepMatch?.value.matchKey}`, m.key, `${eventKey}_${matchKey}`);
+            return m.key == `${eventKey}_${matchKey}`
+        })[0]
+    }
+
+
+    export function clamp(input: number, min: number, max: number): number {
+        return input < min ? min : input > max ? max : input;
+    }
+
+    export function map(current: number, in_min: number, in_max: number, out_min: number, out_max: number): number {
+        const mapped: number = ((current - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
+        return clamp(mapped, out_min, out_max);
+    }
+
 </script>
 
 <div class="content">
@@ -148,7 +219,6 @@
             <thead>
             <tr>
                 <th>Match</th>
-                <!--                <th>Date</th>-->
                 <th colspan="3">Red Alliance</th>
                 <th colspan="3">Blue Alliance</th>
             </tr>
@@ -168,11 +238,155 @@
 
                             </td>
                         {/each}
+                        <!--                        <td></td>-->
                     {/each}
-
 
                 </tr>
             {/each}
+            <!--            <tr>-->
+            <!--                <td>Auto</td>-->
+            <!--                {#each ['red', 'blue'] as color}-->
+            <!--                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
+            <!--                        <td>-->
+            <!--                            {getFrom(scoutingData, t.replace('frc', ''), "Average Auto Balls")}-->
+            <!--                        </td>-->
+            <!--                    {/each}-->
+            <!--                {/each}-->
+            <!--            </tr>-->
+            <!--            <tr>-->
+            <!--                <td>Auto Lo</td>-->
+            <!--                {#each ['red', 'blue'] as color}-->
+            <!--                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
+            <!--                        <td>-->
+            <!--                            &lt;!&ndash;{getFrom(scoutingData, t.replace('frc', ''), "Min Auto Lo")} |&ndash;&gt;-->
+            <!--                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Auto Lo")}-->
+            <!--                            | {getFrom(scoutingData, t.replace('frc', ''), "Max Auto Lo")}-->
+            <!--                        </td>-->
+            <!--                    {/each}-->
+            <!--                {/each}-->
+            <!--            </tr>-->
+            <!--            <tr>-->
+            <!--                <td>Auto Hi</td>-->
+            <!--                {#each ['red', 'blue'] as color}-->
+            <!--                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
+            <!--                        <td>-->
+            <!--                            &lt;!&ndash;{getFrom(scoutingData, t.replace('frc', ''), "Min Auto Hi")} |&ndash;&gt;-->
+            <!--                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Auto Hi")}-->
+            <!--                            | {getFrom(scoutingData, t.replace('frc', ''), "Max Auto Hi")}-->
+            <!--                        </td>-->
+            <!--                    {/each}-->
+            <!--                {/each}-->
+            <!--            </tr>-->
+
+            <tr>
+                <td>Auto (a|m)</td>
+                {#each ['red', 'blue'] as color}
+                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
+                        <td>
+                            <!--{getFrom(scoutingData, t.replace('frc', ''), "Min Auto Hi")} |-->
+                            {parseFloat(getFrom(scoutingData, t.replace('frc', ''), "Avg Auto Hi")) + parseFloat(getFrom(scoutingData, t.replace('frc', ''), "Avg Auto Lo"))}
+                            | {parseFloat(getFrom(scoutingData, t.replace('frc', ''), "Max Auto Hi")) + parseFloat(getFrom(scoutingData, t.replace('frc', ''), "Max Auto Lo"))}
+                        </td>
+                    {/each}
+                    <!--                    <td></td>-->
+                {/each}
+            </tr>
+            <tr>
+                <td>Taxi</td>
+                {#each ['red', 'blue'] as color}
+                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
+                        <td>
+                            {getFrom(scoutingData, t.replace('frc', ''), "Taxi %")}
+                        </td>
+                    {/each}
+                    <!--                    <td></td>-->
+                {/each}
+            </tr>
+            <tr>
+                <td>Tele H</td>
+                {#each ['red', 'blue'] as color}
+                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
+                        <td>
+                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Tele Hi")} |
+                            {getFrom(scoutingData, t.replace('frc', ''), "Max Tele Hi")}
+                        </td>
+                    {/each}
+                    <!--                    <td></td>-->
+                {/each}
+            </tr>
+            <tr>
+                <td>Tele L</td>
+                {#each ['red', 'blue'] as color}
+                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
+                        <td>
+                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Tele Lo")} |
+                            {getFrom(scoutingData, t.replace('frc', ''), "Max Tele Lo")}
+                        </td>
+                    {/each}
+                    <!--                    <td></td>-->
+                {/each}
+            </tr>
+            <tr>
+                <td>Avg Climb</td>
+                {#each ['red', 'blue'] as color}
+                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
+                        <td>
+                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Match Pts")}
+                        </td>
+                    {/each}
+                    <!--                    <td></td>-->
+                {/each}
+            </tr>
+            <!--            <tr>-->
+            <!--                <td>Prediction</td>-->
+            <!--                <td colspan="3">-->
+            <!--                    <pre>{JSON.stringify(getSBData(statboticsData, selectedPrepMatch?.value.matchKey), null, 4)}</pre>-->
+            <!--                </td>-->
+            <!--                <td colspan="3"></td>-->
+            <!--            </tr>-->
+            <tr>
+                <td>W: {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.winner}</td>
+                <td colspan="3">
+                    <!--elo:{getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.elo_win_prob} &mdash;-->
+                    opr: {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.opr_win_prob * 100, 2)}
+                    % &mdash;
+                    mix: {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.mix_win_prob * 100, 2)}
+                    %
+                </td>
+                <!--                <td></td>-->
+                <td colspan="3">
+                    <!--elo:{getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.elo_win_prob} &mdash;-->
+                    opr: {Math.round((1 - getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.opr_win_prob) * 100, 2)}
+                    %
+                    &mdash;
+                    mix: {Math.round((1 - getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.mix_win_prob) * 100, 2)}
+                    %
+                </td>
+                <!--                <td></td>-->
+            </tr>
+
+            <tr>
+                <td>RP</td>
+                <td colspan="3">
+                    RP1
+                    {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_1}:
+                    {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_1_prob * 100, 2)}%
+                    &mdash;
+                    RP2
+                    {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_2}:
+                    {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_2_prob * 100, 2)}%
+                </td>
+                <td colspan="3">
+                    RP1
+                    {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_1}:
+                    {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_1_prob * 100, 2)}%
+                    &mdash;
+                    RP2
+                    {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_2}:
+                    {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_2_prob * 100, 2)}%
+                </td>
+            </tr>
+
             </tbody>
         </table>
     {/if}
