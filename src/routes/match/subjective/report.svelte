@@ -225,6 +225,19 @@
     const blue3Color = "#4E8DF8";
     const blueColors = [blue1Color, blue2Color, blue3Color]
 
+    // teleop
+    // auto 6
+    // climb 4
+
+    const teleOptions = {
+        scales: {
+            y: {
+                suggestedMin: 0,
+                suggestedMax: 14
+            }
+        },
+        responsive: true
+    }
 
     function calcDataForTeleGraph(handlerScoutingData, redTeams, blueTeams) {
         if (!handlerScoutingData) {
@@ -264,7 +277,153 @@
                 }
 
                 dataLine.datasets.push({
-                    label: `Red${i + 1}`,
+                    label: team,
+                    fill: false,
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(184, 185, 210, .3)",
+                    borderColor: color,
+                    borderCapStyle: "butt",
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: "miter",
+                    pointBorderColor: color,
+                    pointBackgroundColor: "rgb(255, 255, 255)",
+                    pointBorderWidth: 10,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: "rgb(0, 0, 0)",
+                    pointHoverBorderColor: "rgba(220, 220, 220, 1)",
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    pointHitRadius: 10,
+                    data: scores
+                })
+            }
+        }
+        return dataLine
+    }
+
+    const autoOptions = {
+        scales: {
+            y: {
+                suggestedMin: 0,
+                suggestedMax: 6
+            }
+        },
+        responsive: true
+    }
+
+    function calcDataForAutoGraph(handlerScoutingData, redTeams, blueTeams) {
+        if (!handlerScoutingData) {
+            return {};
+        }
+
+        let dataLine = {
+            labels: [], // "","",...
+            datasets: []
+        };
+
+        let iterate = [
+            {
+                teams: redTeams,
+                colors: redColors
+            },
+            {
+                teams: blueTeams,
+                colors: blueColors
+            }
+        ];
+
+        for (let item of iterate) {
+            for (let i = 0; i < item.teams.length; i++) {
+                let team = item.teams[i];
+                let color = item.colors[i];
+                let scoresHi = getRawScoutingData(handlerScoutingData, team, "Auto Hi Score");
+                let scoresLo = getRawScoutingData(handlerScoutingData, team, "Auto Lo Score");
+
+                let scores = scoresHi.map((el, idx) => el + scoresLo[idx])
+
+                let lenDiff = scores.length - dataLine.labels.length
+                if (lenDiff > 0) {
+                    for (let j = 0; j < lenDiff; j++) {
+                        dataLine.labels.push("")
+                    }
+                }
+
+                dataLine.datasets.push({
+                    label: team,
+                    fill: false,
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(184, 185, 210, .3)",
+                    borderColor: color,
+                    borderCapStyle: "butt",
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: "miter",
+                    pointBorderColor: color,
+                    pointBackgroundColor: "rgb(255, 255, 255)",
+                    pointBorderWidth: 10,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: "rgb(0, 0, 0)",
+                    pointHoverBorderColor: "rgba(220, 220, 220, 1)",
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    pointHitRadius: 10,
+                    data: scores
+                })
+            }
+        }
+        return dataLine
+    }
+
+    const climbOptions = {
+        scales: {
+            y: {
+                suggestedMin: 0,
+                suggestedMax: 4
+            }
+        },
+        responsive: true
+    }
+
+    function calcDataForClimbGraph(handlerScoutingData, redTeams, blueTeams) {
+        if (!handlerScoutingData) {
+            return {};
+        }
+
+        let dataLine = {
+            labels: [], // "","",...
+            datasets: []
+        };
+
+        let iterate = [
+            {
+                teams: redTeams,
+                colors: redColors
+            },
+            {
+                teams: blueTeams,
+                colors: blueColors
+            }
+        ];
+
+        for (let item of iterate) {
+            for (let i = 0; i < item.teams.length; i++) {
+                let team = item.teams[i];
+                let color = item.colors[i];
+                let scores = getRawScoutingData(handlerScoutingData, team, "Highest Succ.");
+                // let scoresLo = getRawScoutingData(handlerScoutingData, team, "Auto Lo Score");
+
+                // let scores = scoresHi.map((el, idx) => el + scoresLo[idx])
+
+                let lenDiff = scores.length - dataLine.labels.length
+                if (lenDiff > 0) {
+                    for (let j = 0; j < lenDiff; j++) {
+                        dataLine.labels.push("")
+                    }
+                }
+
+                dataLine.datasets.push({
+                    label: team,
                     fill: false,
                     lineTension: 0.3,
                     backgroundColor: "rgba(184, 185, 210, .3)",
@@ -376,8 +535,8 @@
                     {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
                         <td>
                             <!--{getFrom(scoutingData, t.replace('frc', ''), "Min Auto Hi")} |-->
-                            {parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Auto Hi")) + parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Auto Lo"))}
-                            | {parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Auto Hi")) + parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Auto Lo"))}
+                            {Math.round(parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Auto Hi")) + parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Auto Lo")), 2)}
+                            | {Math.round(parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Auto Hi")) + parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Auto Lo")), 2)}
                         </td>
                     {/each}
                     <!--                    <td></td>-->
@@ -395,7 +554,7 @@
                 {/each}
             </tr>
             <tr>
-                <td>Tele H</td>
+                <td>Tele H (a|m)</td>
                 {#each ['red', 'blue'] as color}
                     {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
                         <td>
@@ -407,7 +566,7 @@
                 {/each}
             </tr>
             <tr>
-                <td>Tele L</td>
+                <td>Tele L (a|m)</td>
                 {#each ['red', 'blue'] as color}
                     {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
                         <td>
@@ -485,10 +644,15 @@
 
     <h2 class="border-bottom border-4">Teleop Goals</h2>
     <Line data={calcDataForTeleGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}
-          options={{ responsive: true }}/>
+          options={teleOptions}/>
 
-    <!--    <h2 class="border-bottom border-4">Auto Goals</h2>-->
-    <!--    <Line data={calcDataForGraph(handlerScoutingData)} options={{ responsive: true }}/>-->
+    <h2 class="border-bottom border-4">Auto Goals</h2>
+    <Line data={calcDataForAutoGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}
+          options={autoOptions}/>
+
+    <h2 class="border-bottom border-4">Climb (Highest Reached)</h2>
+    <Line data={calcDataForClimbGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}
+          options={climbOptions}/>
     <!--{#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}-->
     <!--    <h3>{t}</h3>-->
     <!--    -->
