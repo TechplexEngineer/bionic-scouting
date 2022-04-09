@@ -183,6 +183,12 @@
         let bMatchNumber = parseInt(b.matchKey.slice(2));
         return aMatchNumber - bMatchNumber;
     }
+    const byMatchNumberReverse = (a: RxDocument<MatchSubjReport>, b: RxDocument<MatchSubjReport>) => {
+        //@todo make this work for matches above QM
+        let aMatchNumber = parseInt(a.matchKey.slice(2));
+        let bMatchNumber = parseInt(b.matchKey.slice(2));
+        return bMatchNumber - aMatchNumber;
+    }
 
     const getFrom = (scoutingData, team, field) => {
         let rows = scoutingData.filter(r => r.Team == team)
@@ -489,11 +495,13 @@
     <!--{/each}-->
 
 
-    <h2 class="border-bottom border-4">Opposing Alliance</h2>
+    <h2 class="border-bottom border-4">Super Scout Notes</h2>
+
+    <h2 class="border-bottom border-4 text-end">Opposing Alliance</h2>
     {#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}
         <h3>{t}</h3>
         <ul>
-            {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumber) as mr}
+            {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumberReverse) as mr}
                 <li>{mr.matchKey}
                     <pre>{mr.notes}</pre>
                 </li>
@@ -501,11 +509,11 @@
         </ul>
     {/each}
 
-    <h2 class="border-bottom border-4">Our Alliance</h2>
+    <h2 class="border-bottom border-4 text-end">Our Alliance</h2>
     {#each getOurAllianceMembers(selectedPrepMatch?.value) as t}
         <h3>{t}</h3>
         <ul>
-            {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumber) as mr}
+            {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumberReverse) as mr}
                 <li>{mr.matchKey}
                     <pre>{mr.notes}</pre>
                 </li>
