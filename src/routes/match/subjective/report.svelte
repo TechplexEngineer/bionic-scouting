@@ -25,6 +25,7 @@
     } from "$lib/util";
     import * as GSheetReader from "g-sheets-api";
     import Swal from "sweetalert2";
+    import Line from "svelte-chartjs/src/Line.svelte"
 
     let matches: RxDocument<Match>[] = [];
     let matchSelections: { label: string, value: RxDocument<Match> }[] = [];
@@ -51,7 +52,8 @@
 
 
     // data from google sheet
-    let scoutingData = [];
+    let scoutingDataAverages = [];
+    let handlerScoutingData = [];
     let statboticsData = [];
 
     onMount(async () => {
@@ -88,19 +90,33 @@
             sheetName: sheetName
         };
         GSheetReader(readerOptions, (data) => {
-            scoutingData = data;
+            scoutingDataAverages = data;
             // console.log(data);
         }, async (err) => {
+            console.log(err);
             await Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                html: `Unable to pull data from google sheets`,
+                html: `Unable to pull data from google sheets<br>${err}`,
                 showCloseButton: true
             });
         });
 
-        await populateStatboticMatchData(eventKey)
+        const readerOptions2 = {
+            apiKey: apiKey,
+            sheetId: DCMP_2022,
+            returnAllResults: false,
+            sheetName: "Handler"
+        };
+        GSheetReader(readerOptions2, (data) => {
+            handlerScoutingData = data;
+            // console.log("Handler", data);
+            // console.log(getRawScoutingData(handlerScoutingData, "4909", "Name"));
+        }, async (err) => {
+            console.log(err);
+        });
 
+        await populateStatboticMatchData(eventKey)
 
     });
 
@@ -188,15 +204,85 @@
         })[0]
     }
 
-
-    export function clamp(input: number, min: number, max: number): number {
-        return input < min ? min : input > max ? max : input;
+    const getRawScoutingData = (handlerScoutingData, team, field) => {
+        const teamData = handlerScoutingData.filter(r => r.Team == team)
+        return teamData.map(r => parseFloat(r[field]))
     }
 
-    export function map(current: number, in_min: number, in_max: number, out_min: number, out_max: number): number {
-        const mapped: number = ((current - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
-        return clamp(mapped, out_min, out_max);
+    const red1Color = "#F4BBBB";
+    const red2Color = "#F49090";
+    const red3Color = "#F46D6D";
+    const redColors = [red1Color, red2Color, red3Color]
+
+    const blue1Color = "#B7CFF8";
+    const blue2Color = "#82AEF8";
+    const blue3Color = "#4E8DF8";
+    const blueColors = [blue1Color, blue2Color, blue3Color]
+
+
+    function calcDataForTeleGraph(handlerScoutingData, redTeams, blueTeams) {
+        if (!handlerScoutingData) {
+            return {};
+        }
+
+        let dataLine = {
+            labels: [], // "","",...
+            datasets: []
+        };
+
+        let iterate = [
+            {
+                teams: redTeams,
+                colors: redColors
+            },
+            {
+                teams: blueTeams,
+                colors: blueColors
+            }
+        ];
+
+        for (let item of iterate) {
+            for (let i = 0; i < item.teams.length; i++) {
+                let team = item.teams[i];
+                let color = item.colors[i];
+                let scoresHi = getRawScoutingData(handlerScoutingData, team, "Tele Hi Score");
+                let scoresLo = getRawScoutingData(handlerScoutingData, team, "Tele Lo Score");
+
+                let scores = scoresHi.map((el, idx) => el + scoresLo[idx])
+
+                let lenDiff = scores.length - dataLine.labels.length
+                if (lenDiff > 0) {
+                    for (let j = 0; j < lenDiff; j++) {
+                        dataLine.labels.push("")
+                    }
+                }
+
+                dataLine.datasets.push({
+                    label: `Red${i + 1}`,
+                    fill: false,
+                    lineTension: 0.3,
+                    backgroundColor: "rgba(184, 185, 210, .3)",
+                    borderColor: color,
+                    borderCapStyle: "butt",
+                    borderDash: [],
+                    borderDashOffset: 0.0,
+                    borderJoinStyle: "miter",
+                    pointBorderColor: color,
+                    pointBackgroundColor: "rgb(255, 255, 255)",
+                    pointBorderWidth: 10,
+                    pointHoverRadius: 5,
+                    pointHoverBackgroundColor: "rgb(0, 0, 0)",
+                    pointHoverBorderColor: "rgba(220, 220, 220, 1)",
+                    pointHoverBorderWidth: 2,
+                    pointRadius: 1,
+                    pointHitRadius: 10,
+                    data: scores
+                })
+            }
+        }
+        return dataLine
     }
+
 
 </script>
 
@@ -284,8 +370,8 @@
                     {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
                         <td>
                             <!--{getFrom(scoutingData, t.replace('frc', ''), "Min Auto Hi")} |-->
-                            {parseFloat(getFrom(scoutingData, t.replace('frc', ''), "Avg Auto Hi")) + parseFloat(getFrom(scoutingData, t.replace('frc', ''), "Avg Auto Lo"))}
-                            | {parseFloat(getFrom(scoutingData, t.replace('frc', ''), "Max Auto Hi")) + parseFloat(getFrom(scoutingData, t.replace('frc', ''), "Max Auto Lo"))}
+                            {parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Auto Hi")) + parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Auto Lo"))}
+                            | {parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Auto Hi")) + parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Auto Lo"))}
                         </td>
                     {/each}
                     <!--                    <td></td>-->
@@ -296,7 +382,7 @@
                 {#each ['red', 'blue'] as color}
                     {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
                         <td>
-                            {getFrom(scoutingData, t.replace('frc', ''), "Taxi %")}
+                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Taxi %")}
                         </td>
                     {/each}
                     <!--                    <td></td>-->
@@ -307,8 +393,8 @@
                 {#each ['red', 'blue'] as color}
                     {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
                         <td>
-                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Tele Hi")} |
-                            {getFrom(scoutingData, t.replace('frc', ''), "Max Tele Hi")}
+                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Tele Hi")} |
+                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Tele Hi")}
                         </td>
                     {/each}
                     <!--                    <td></td>-->
@@ -319,8 +405,8 @@
                 {#each ['red', 'blue'] as color}
                     {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
                         <td>
-                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Tele Lo")} |
-                            {getFrom(scoutingData, t.replace('frc', ''), "Max Tele Lo")}
+                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Tele Lo")} |
+                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Tele Lo")}
                         </td>
                     {/each}
                     <!--                    <td></td>-->
@@ -331,7 +417,7 @@
                 {#each ['red', 'blue'] as color}
                     {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
                         <td>
-                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Rung Succ.")}
+                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Rung Succ.")}
                         </td>
                     {/each}
                     <!--                    <td></td>-->
@@ -390,6 +476,18 @@
             </tbody>
         </table>
     {/if}
+
+    <h2 class="border-bottom border-4">Teleop Goals</h2>
+    <Line data={calcDataForTeleGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}
+          options={{ responsive: true }}/>
+
+    <!--    <h2 class="border-bottom border-4">Auto Goals</h2>-->
+    <!--    <Line data={calcDataForGraph(handlerScoutingData)} options={{ responsive: true }}/>-->
+    <!--{#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}-->
+    <!--    <h3>{t}</h3>-->
+    <!--    -->
+    <!--{/each}-->
+
 
     <h2 class="border-bottom border-4">Opposing Alliance</h2>
     {#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}

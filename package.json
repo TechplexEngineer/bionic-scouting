@@ -55,6 +55,7 @@
     "papaparse": "^5.3.1",
     "pouchdb-adapter-idb": "^7.2.2",
     "rxdb": "^10.5.4",
+    "svelte-chartjs": "^1.1.4",
     "svelte-select": "^4.4.6",
     "sveltestrap": "^5.6.3",
     "sweetalert2": "^11.3.0",

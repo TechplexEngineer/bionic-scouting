@@ -91,7 +91,7 @@
 
     function handleSelectMatch(event) {
         let match: RxDocument<Match> = event.detail.value;
-        console.log("handleSelectMatch", match);
+        // console.log("handleSelectMatch", match);
         teamSelections = extractRedTeamsFromMatch(match).map(t => ({
             label: t + " (Red)",
             value: {teamNumber: t, color: TeamColor.RED}
