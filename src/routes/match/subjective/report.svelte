@@ -18,7 +18,7 @@
     import type {Match} from "$lib/schema/match-schema";
     import {
         extractBlueTeamsFromMatch,
-        extractRedTeamsFromMatch,
+        extractRedTeamsFromMatch, extractTeamsFromMatch,
         formatDateTime,
         getCurrentEvent,
         getOurTeamNumber
@@ -26,16 +26,19 @@
     import * as GSheetReader from "g-sheets-api";
     import Swal from "sweetalert2";
     import Line from "svelte-chartjs/src/Line.svelte"
+    import {checkPouchAdapter} from "rxdb";
+    import type {PitReport} from "$lib/schema/pit-scout-schema";
 
     let matches: RxDocument<Match>[] = [];
     let matchSelections: { label: string, value: RxDocument<Match> }[] = [];
     let selectedPrepMatch: { label: string, value: RxDocument<Match> };
 
     let matchReports: RxDocument<MatchSubjReport>[] = [];
+    let teamPitScoutingData: RxDocument<PitReport>[] = [];
 
     const handleSelectMatch = async function (event) {
-        let match: RxDocument<MatchSubjReport> = event.detail.value;
-        // console.log("selected match", match);
+        let match: RxDocument<Match> = event.detail.value;
+        console.log("selected match", match);
 
         const query = {
             eventKey: eventKey,
@@ -44,6 +47,15 @@
 
         matchReports = await db.match_subjective.find().where(query).exec();
         // console.log("reports", matchReports);
+
+        // console.log(extractTeamsFromMatch(match));
+
+        teamPitScoutingData = await db.pit_scouting.find().where({
+            eventKey: eventKey,
+            teamNumber: {$in: extractTeamsFromMatch(match)}
+        }).exec();
+
+        // console.log(teamPitScoutingData);
     }
 
     let db: MyDatabase;
@@ -76,6 +88,7 @@
                 }
             }
         }
+
 
         // const DCMP_2022 = '1Q6Llv-qqZ5uo3ufbzTvExyut1etuelWR-eoPXmnbs9o'; //@todo make this configurable
         const NEWTON_2022 = '1_m1-8Oj4uOOR2BYn7oqRHNNAyVFA-UTfaRABNQ0aUrY';
@@ -449,6 +462,16 @@
         return dataLine
     }
 
+    function getNotesForTeam(team: number, teams: RxDocument<PitReport>[]) {
+        const teamPitReport = teams.filter((t: RxDocument<PitReport>) => t.teamNumber == team);
+        console.log(teamPitReport);
+        if (teamPitReport.length == 0) {
+            return `no notes for ${team}`
+        }
+        return teamPitReport[0].notes || ""
+
+    }
+
 
 </script>
 
@@ -677,6 +700,8 @@
     <h2 class="border-bottom border-4 text-end">Our Alliance</h2>
     {#each getOurAllianceMembers(selectedPrepMatch?.value) as t}
         <h3>{t}</h3>
+        <pre>{getNotesForTeam(t, teamPitScoutingData)}</pre>
+
         <ul>
             {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumberReverse) as mr}
                 <li>{mr.matchKey}
