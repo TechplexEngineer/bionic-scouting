@@ -77,7 +77,8 @@
             }
         }
 
-        const DCMP_2022 = '1Q6Llv-qqZ5uo3ufbzTvExyut1etuelWR-eoPXmnbs9o'; //@todo make this configurable
+        // const DCMP_2022 = '1Q6Llv-qqZ5uo3ufbzTvExyut1etuelWR-eoPXmnbs9o'; //@todo make this configurable
+        const NEWTON_2022 = '1_m1-8Oj4uOOR2BYn7oqRHNNAyVFA-UTfaRABNQ0aUrY';
 
         const apiKey = import.meta.env.VITE_SHEETS_API_KEY;
 
@@ -85,7 +86,7 @@
 
         const readerOptions = {
             apiKey: apiKey,
-            sheetId: DCMP_2022,
+            sheetId: NEWTON_2022,
             returnAllResults: false,
             sheetName: sheetName
         };
@@ -104,7 +105,7 @@
 
         const readerOptions2 = {
             apiKey: apiKey,
-            sheetId: DCMP_2022,
+            sheetId: NEWTON_2022,
             returnAllResults: false,
             sheetName: "Handler"
         };
