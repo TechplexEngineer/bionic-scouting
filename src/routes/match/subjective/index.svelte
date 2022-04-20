@@ -92,12 +92,12 @@
     function handleSelectMatch(event) {
         let match: RxDocument<Match> = event.detail.value;
         // console.log("handleSelectMatch", match);
-        teamSelections = extractRedTeamsFromMatch(match).map(t => ({
-            label: t + " (Red)",
+        teamSelections = extractRedTeamsFromMatch(match).map((t, idx) => ({
+            label: `${t} (Red ${idx + 1})`,
             value: {teamNumber: t, color: TeamColor.RED}
         }));
-        teamSelections = teamSelections.concat(extractBlueTeamsFromMatch(match).map(t => ({
-            label: t + " (Blue)",
+        teamSelections = teamSelections.concat(extractBlueTeamsFromMatch(match).map((t, idx) => ({
+            label: `${t} (Blue ${idx + 1})`,
             value: {teamNumber: t, color: TeamColor.BLUE}
         })));
 
