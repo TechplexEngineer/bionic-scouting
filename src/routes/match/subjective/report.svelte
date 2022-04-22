@@ -36,6 +36,9 @@
     let matchReports: RxDocument<MatchSubjReport>[] = [];
     let teamPitScoutingData: RxDocument<PitReport>[] = [];
 
+    const defaultStatusMessage = "loading..."
+    let statusMessage = defaultStatusMessage;
+
     const handleSelectMatch = async function (event) {
         let match: RxDocument<Match> = event.detail.value;
         console.log("selected match", match);
@@ -107,13 +110,17 @@
             scoutingDataAverages = data;
             // console.log(data);
         }, async (err) => {
-            console.log(err);
-            await Swal.fire({
-                icon: "error",
-                title: "Oops...",
-                html: `Unable to pull data from google sheets<br>${err}`,
-                showCloseButton: true
-            });
+            // console.log(err);
+            if (statusMessage == defaultStatusMessage) {
+                statusMessage = "";
+            }
+            statusMessage += `Unable to pull data from google sheets<br>${err}`
+            // await Swal.fire({
+            //     icon: "error",
+            //     title: "Oops...",
+            //     html: `Unable to pull data from google sheets<br>${err}`,
+            //     showCloseButton: true
+            // });
         });
 
         const readerOptions2 = {
@@ -135,11 +142,15 @@
     });
 
     async function populateStatboticMatchData(eventKey) {
-        const res = await fetch(`https://api.statbotics.io/v1/matches/event/${eventKey}`);
-        if (!res.ok) {
-            return
+        try {
+            const res = await fetch(`https://api.statbotics.io/v1/matches/event/${eventKey}`);
+            if (!res.ok) {
+                return
+            }
+            statboticsData = await res.json()
+        } catch (e) {
         }
-        statboticsData = await res.json()
+
         // console.log(data);
     }
 
@@ -665,6 +676,12 @@
             </tbody>
         </table>
     {/if}
+    {#if statusMessage}
+        <div class="alert alert-danger" role="alert">
+            {@html statusMessage}
+        </div>
+    {/if}
+
 
     <h2 class="border-bottom border-4">Teleop Goals</h2>
     <Line data={calcDataForTeleGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}
@@ -688,6 +705,8 @@
     <h2 class="border-bottom border-4 text-end">Opposing Alliance</h2>
     {#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}
         <h3>{t}</h3>
+        <pre>Pit: {getNotesForTeam(t, teamPitScoutingData)}</pre>
+
         <ul>
             {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumberReverse) as mr}
                 <li>{mr.matchKey}
@@ -700,7 +719,7 @@
     <h2 class="border-bottom border-4 text-end">Our Alliance</h2>
     {#each getOurAllianceMembers(selectedPrepMatch?.value) as t}
         <h3>{t}</h3>
-        <pre>{getNotesForTeam(t, teamPitScoutingData)}</pre>
+        <pre>Pit: {getNotesForTeam(t, teamPitScoutingData)}</pre>
 
         <ul>
             {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumberReverse) as mr}
