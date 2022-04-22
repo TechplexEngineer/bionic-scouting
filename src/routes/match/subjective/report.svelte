@@ -704,7 +704,7 @@
 
     <h2 class="border-bottom border-4 text-end">Opposing Alliance</h2>
     {#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}
-        <h3>{t}</h3>
+        <h3><a href="/pit?team={t}">{t}</a></h3>
         <pre>Pit: {getNotesForTeam(t, teamPitScoutingData)}</pre>
 
         <ul>
@@ -718,7 +718,7 @@
 
     <h2 class="border-bottom border-4 text-end">Our Alliance</h2>
     {#each getOurAllianceMembers(selectedPrepMatch?.value) as t}
-        <h3>{t}</h3>
+        <h3><a href="/pit?team={t}">{t}</a></h3>
         <pre>Pit: {getNotesForTeam(t, teamPitScoutingData)}</pre>
 
         <ul>
