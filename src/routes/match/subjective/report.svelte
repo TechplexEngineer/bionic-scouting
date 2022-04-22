@@ -19,14 +19,11 @@
     import {
         extractBlueTeamsFromMatch,
         extractRedTeamsFromMatch, extractTeamsFromMatch,
-        formatDateTime,
         getCurrentEvent,
         getOurTeamNumber
     } from "$lib/util";
-    import * as GSheetReader from "g-sheets-api";
-    import Swal from "sweetalert2";
+    import GSheetReader from 'g-sheets-api';
     import Line from "svelte-chartjs/src/Line.svelte"
-    import {checkPouchAdapter} from "rxdb";
     import type {PitReport} from "$lib/schema/pit-scout-schema";
 
     let matches: RxDocument<Match>[] = [];
