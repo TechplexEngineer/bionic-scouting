@@ -136,7 +136,7 @@
 
 <Navbar dark style="background-color: #0b4833;" class="d-flex fixed-top">
 
-    <div class="flex-1 justify-content-center">
+    <div class="flex-1 justify-content-center text-nowrap">
         <NavbarBrand href="/">TGA</NavbarBrand>
         <button class="btn btn-outline-secondary px-2 py-0" on:click={back}>
             <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
