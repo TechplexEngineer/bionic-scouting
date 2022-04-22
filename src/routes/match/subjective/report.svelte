@@ -38,7 +38,7 @@
 
     const handleSelectMatch = async function (event) {
         let match: RxDocument<Match> = event.detail.value;
-        console.log("selected match", match);
+        // console.log("selected match", match);
 
         const query = {
             eventKey: eventKey,
@@ -472,7 +472,7 @@
 
     function getNotesForTeam(team: number, teams: RxDocument<PitReport>[]) {
         const teamPitReport = teams.filter((t: RxDocument<PitReport>) => t.teamNumber == team);
-        console.log(teamPitReport);
+        // console.log(teamPitReport);
         if (teamPitReport.length == 0) {
             return `no notes for ${team}`
         }
