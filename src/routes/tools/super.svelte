@@ -36,8 +36,10 @@
     onMount(async () => {
         db = await getDb();
 
-        eventKey = await getCurrentEvent(db);
-        ourTeamNumber = await getOurTeamNumber(db);
+        eventKey = await getCurrentEvent(db, true);
+        ourTeamNumber = await getOurTeamNumber(db, true);
+        console.log("eventKey", eventKey);
+        console.log("ourTeamNumber", ourTeamNumber);
 
         matches = await db.matches.find().where({eventKey}).sort({order: "asc"}).exec();
 

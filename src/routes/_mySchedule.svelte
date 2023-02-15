@@ -124,7 +124,7 @@
     </tbody>
 </table>
 
-<h2 class="mt-3">My Schedule: <small class="text-muted fs-5">{scout && scout.name} (Super Scout)</small></h2>
+<h2 class="mt-3">My Schedule: <small class="text-muted fs-5">{scout && scout.name}</small></h2>
 <table class="table table-striped">
     <thead>
     <tr>

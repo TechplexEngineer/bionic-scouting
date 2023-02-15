@@ -26,6 +26,8 @@
     let teamsToChoose: { label: string, value: string }[] = [];
     let currentSelectedTeamItem: { label: string, value: string } = null;
 
+
+
     onMount(async () => {
         db = await getDb();
 
@@ -89,7 +91,7 @@
     ];
     let activeRobotPhotoIndex = 0;
     let photosReady = false;
-
+    const notesTemplate = `Chassis:\n\nPlacer:\n\nIntaker:\n\nExtension:\n\nAuto:\n\nScoring Place:\n\n`
 
     // When the team dropdown select changes.
     // Also triggers when loading from query string
@@ -99,7 +101,7 @@
             teamNumber: parseInt(event.detail.value)
         };
         teamData = await db.pit_scouting.findOne().where(query).exec();
-        notes = teamData.notes;
+        notes = teamData.notes || notesTemplate;
 
         teamData.allAttachments$.subscribe(debounce(async (attachments) => {
             console.log("Attachments Changed");
@@ -132,10 +134,19 @@
         }, 500));
     }
 
-    let factNames = ["climber", "drivetrain", "shooter"];
+    let factNames = ["chassis", "placer", "intaker", "extension", "auto", "scoring place"];
     let facts: { name: string, value: string }[] = [
         {name: "", value: ""} // need to start with at least one to show the form
     ];
+    const addFact = () => {
+        facts = [{name: "", value: ""}, ...facts]
+        console.log(facts);
+    }
+    const factChanged = (factName: string) => {
+        return debounce(() => {
+            //@todo write to document
+        })
+    }
 
     let debouncedSaveNotes = debounce(notesChange);
     const notesDirty = (n) => {
@@ -160,6 +171,8 @@
         });
         saveStatusMessage = "Saved.";
     }
+
+
 
 </script>
 
@@ -242,39 +255,38 @@
     </div>
 
     <!-- Facts-->
-    <!--    <div class="d-flex mb-2 mt-4">-->
-    <!--        <h3 class="flex-fill">Facts</h3>-->
-    <!--        <button on:click={()=>{facts = [{name:"", value:""}, ...facts]}} class="btn btn-success align-self-end"-->
-    <!--                class:disabled={currentSelectedTeamItem==null}>+ Add-->
-    <!--            Fact-->
-    <!--        </button>-->
-    <!--    </div>-->
-
-    <!--    {#if false}-->
-    <!--        {#each facts as fact, idx}-->
-    <!--            <div class="d-flex">-->
-    <!--                <div class="flex-grow-1 pe-1">-->
-    <!--                    <Select items={factNames} bind:value={fact.value} isCreatable="true"/>-->
-    <!--                </div>-->
-    <!--                <button class="btn btn-warning" on:click={()=>{-->
-    <!--				if (confirm("Are you sure?")) {-->
-    <!--					facts = facts.filter((f, idx) => f !== fact)-->
-    <!--				}-->
-    <!--			}}>Remove</button>-->
-    <!--            </div>-->
-
-    <!--            <div class="form-floating mt-1 mb-2">-->
-    <!--                <textarea id="fact" class="form-control" placeholder="Leave a comment here"-->
-    <!--                          style="height: 75px"></textarea>-->
-    <!--                <label for="fact">Notes</label>-->
-    <!--            </div>-->
-    <!--        {/each}-->
-    <!--    {/if}-->
+    <div class="d-flex mb-2 mt-5">
+        <h3 class="flex-fill">Facts</h3>
+        <button on:click={addFact} class="btn btn-success"
+                class:disabled={currentSelectedTeamItem==null}>+ Add Fact
+        </button>
+    </div>
 
 
-    <!--    <div class="d-flex justify-content-end mt-2">-->
-    <!--        <button class="btn btn-success">Save</button>-->
-    <!--    </div>-->
+    {#each facts as fact, idx}
+        <div class="d-flex">
+            <div class="flex-grow-1 pe-1">
+                <Select items={factNames} bind:value={fact.value} isCreatable="true"/>
+            </div>
+            <button class="btn btn-warning" on:click={()=>{
+                if (confirm("Are you sure?")) {
+                    facts = facts.filter((f, idx) => f !== fact)
+                }
+            }}>Remove
+            </button>
+        </div>
+
+        <div class="form-floating mt-1 mb-2">
+                <textarea id="fact" class="form-control" placeholder="Leave a comment here"
+                          style="height: 75px" on:change={factChanged(fact)}></textarea>
+            <label for="fact">Notes</label>
+        </div>
+    {/each}
+    <div class="d-flex">
+        <button on:click={addFact} class="btn btn-success ms-auto"
+                class:disabled={currentSelectedTeamItem==null}>+ Add Fact
+        </button>
+    </div>
 
 
 </div>

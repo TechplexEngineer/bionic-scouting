@@ -13,23 +13,15 @@
     import type {RxDocument} from "rxdb";
     import type {SuperScout} from "$lib/schema/super-scout-schema";
 
-    let deviceName = "...";
-    let eventName = "...";
+
 
     let ourTeamNumber;
 
     let scouts: RxDocument<SuperScout>[] = [];
 
     onMount(async () => {
-        deviceName = (await BluetoothSerial.getName()).result;
-        const db = await getDb();
-        db.settings.findOne({selector: {key: Settings.CurrentEvent}}).$.subscribe(v => {
-            // console.log(v);
-            if (v && v.value) {
-                eventName = v.value;
-            }
-        });
 
+        const db = await getDb();
 
         ourTeamNumber = getOurTeamNumber(db);
 
@@ -51,10 +43,6 @@
 </script>
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-around">
-        <h3>This device is <b>{deviceName}</b></h3>
-        <h3>Current Event <b>{eventName}</b></h3>
-    </div>
     <a id="top" style="visibility: hidden">Top Anchor</a>
 
 

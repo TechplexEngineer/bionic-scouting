@@ -140,6 +140,7 @@
         let db = await getDb();
 
         db.settings.findOne({ selector: { key: Settings.CurrentEvent } }).$.subscribe(s => {
+            if (!s) { return }
             currentEvent = s.value
         });
     })

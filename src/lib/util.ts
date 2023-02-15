@@ -109,11 +109,14 @@ export const extractBlueTeamsFromMatch = (match: RxDocument<Match>) => {
 	return teamKeys.map((t) => parseInt(t.replace('frc', '')));
 };
 
-export const getCurrentEvent = async (db: MyDatabase) => {
+export const getCurrentEvent = async (db: MyDatabase, skipError?: boolean) => {
 	const settingEvent = await db.settings
 		.findOne({ selector: { key: Settings.CurrentEvent } })
 		.exec();
 	if (!settingEvent) {
+		if (skipError) {
+			return;
+		}
 		const res = await Swal.fire({
 			icon: 'error',
 			title: 'Oops...',
@@ -122,16 +125,20 @@ export const getCurrentEvent = async (db: MyDatabase) => {
 			confirmButtonText: 'Go to Setup'
 		});
 		if (res.isConfirmed) {
-			goto('/tools/setup');
+			goto('/tools/super');
 			return;
 		}
 	}
 	return settingEvent.value;
 };
 
-export const getOurTeamNumber = async (db: MyDatabase) => {
+export const getOurTeamNumber = async (db: MyDatabase, skipError?: true) => {
 	const entry = await db.settings.findOne({ selector: { key: Settings.TeamNumber } }).exec();
+
 	if (!entry) {
+		if (skipError) {
+			return;
+		}
 		const res = await Swal.fire({
 			icon: 'error',
 			title: 'Oops...',
@@ -140,7 +147,7 @@ export const getOurTeamNumber = async (db: MyDatabase) => {
 			confirmButtonText: 'Go to Setup'
 		});
 		if (res.isConfirmed) {
-			goto('/tools/setup');
+			goto('/tools/super');
 			return;
 		}
 	}
