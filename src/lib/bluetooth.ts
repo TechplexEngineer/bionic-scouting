@@ -38,7 +38,11 @@ export const connections = readable([], (set) => {
 
 export const adapterName = readable('', (set) => {
 	(async () => {
-		set((await BluetoothSerial.getName()).result);
+		let name = (await BluetoothSerial.getName()).result;
+		if (name == "default adapter name") {
+			name = "SS-1"
+		}
+		set(name);
 	})();
 	const handle = setInterval(async () => {
 		set((await BluetoothSerial.getName()).result);
