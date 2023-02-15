@@ -255,38 +255,38 @@
     </div>
 
     <!-- Facts-->
-    <div class="d-flex mb-2 mt-5">
-        <h3 class="flex-fill">Facts</h3>
-        <button on:click={addFact} class="btn btn-success"
-                class:disabled={currentSelectedTeamItem==null}>+ Add Fact
-        </button>
-    </div>
+<!--    <div class="d-flex mb-2 mt-5">-->
+<!--        <h3 class="flex-fill">Facts</h3>-->
+<!--        <button on:click={addFact} class="btn btn-success"-->
+<!--                class:disabled={currentSelectedTeamItem==null}>+ Add Fact-->
+<!--        </button>-->
+<!--    </div>-->
 
 
-    {#each facts as fact, idx}
-        <div class="d-flex">
-            <div class="flex-grow-1 pe-1">
-                <Select items={factNames} bind:value={fact.value} isCreatable="true"/>
-            </div>
-            <button class="btn btn-warning" on:click={()=>{
-                if (confirm("Are you sure?")) {
-                    facts = facts.filter((f, idx) => f !== fact)
-                }
-            }}>Remove
-            </button>
-        </div>
+<!--    {#each facts as fact, idx}-->
+<!--        <div class="d-flex">-->
+<!--            <div class="flex-grow-1 pe-1">-->
+<!--                <Select items={factNames} bind:value={fact.value} isCreatable="true"/>-->
+<!--            </div>-->
+<!--            <button class="btn btn-warning" on:click={()=>{-->
+<!--                if (confirm("Are you sure?")) {-->
+<!--                    facts = facts.filter((f, idx) => f !== fact)-->
+<!--                }-->
+<!--            }}>Remove-->
+<!--            </button>-->
+<!--        </div>-->
 
-        <div class="form-floating mt-1 mb-2">
-                <textarea id="fact" class="form-control" placeholder="Leave a comment here"
-                          style="height: 75px" on:change={factChanged(fact)}></textarea>
-            <label for="fact">Notes</label>
-        </div>
-    {/each}
-    <div class="d-flex">
-        <button on:click={addFact} class="btn btn-success ms-auto"
-                class:disabled={currentSelectedTeamItem==null}>+ Add Fact
-        </button>
-    </div>
+<!--        <div class="form-floating mt-1 mb-2">-->
+<!--                <textarea id="fact" class="form-control" placeholder="Leave a comment here"-->
+<!--                          style="height: 75px" on:change={factChanged(fact)}></textarea>-->
+<!--            <label for="fact">Notes</label>-->
+<!--        </div>-->
+<!--    {/each}-->
+<!--    <div class="d-flex">-->
+<!--        <button on:click={addFact} class="btn btn-success ms-auto"-->
+<!--                class:disabled={currentSelectedTeamItem==null}>+ Add Fact-->
+<!--        </button>-->
+<!--    </div>-->
 
 
 </div>
