@@ -6,10 +6,15 @@
     import {onMount} from "svelte";
     import {getDb, MyDatabase} from "$lib/store";
     import SpinButton from "$lib/compontents/SpinButton.svelte";
+    import {getCurrentEvent} from "$lib/util";
 
     let db: MyDatabase;
+    let eventKey: string; //eg. 2020week0 (current event)
+
     onMount(async () => {
         db = await getDb();
+
+        eventKey = await getCurrentEvent(db);
     })
 
 
@@ -27,61 +32,66 @@
 
     //@todo only one sync should happen at a time for messages to make any sense.
     const sync = (syncDir: SyncDirection) => {
-        return () => {
-            // this is a total hack
-            process.browser = true;
-            // this solves our sync problem
+        return (): Promise<void> => {
 
-            syncMessages = '';
-            let dbURL = import.meta.env.VITE_COUCHDB_URL;
-            LogSyncMessage(`Started Sync: Direction ${syncDir}`);
-            const url = new URL(dbURL);
-            url.password = "<REDACTED>";
-            LogSyncMessage(`    URL: ${url.toString()}`) //@todo remove password before printing
+            return new Promise((resolve, reject) => {
+                // this is a total hack
+                process.browser = true;
+                // this solves our sync problem
 
-
-            const replicationState = db.pit_scouting.syncCouchDB({
-                remote: dbURL, // remote database. This can be the serverURL, another RxCollection or a PouchDB-instance
-                waitForLeadership: true,              // (optional) [default=true] to save performance, the sync starts on leader-instance only
-                direction: {                          // direction (optional) to specify sync-directions
-                    pull: syncDir == SyncDirection.PULL || syncDir == SyncDirection.BOTH, // default=true
-                    push: syncDir == SyncDirection.PUSH || syncDir == SyncDirection.BOTH  // default=true
-                },
-                options: {                             // sync-options (optional) from https://pouchdb.com/api.html#replication
-                    live: false, // false means one shot
-                    retry: false
-                },
-                // query: myCollection.find().where('age').gt(18) // query (optional) only documents that match that query will be synchronised
-            });
+                syncMessages = '';
+                let dbURL = import.meta.env.VITE_COUCHDB_URL;
+                LogSyncMessage(`Started Sync: Direction ${syncDir}`);
+                const url = new URL(dbURL);
+                url.password = "<REDACTED>";
+                LogSyncMessage(`    URL: ${url.toString()}`)
 
 
-            // replicationState.
-            replicationState.change$.subscribe(change => {
-                console.log("change", change);
-            });
-            replicationState.docs$.subscribe(docData => {
-                console.log("docData", docData);
-            });
-            replicationState.denied$.subscribe(docData => {
-                console.log("docData", docData);
-            });
-            replicationState.active$.subscribe(active => {
-                console.log("active", active);
-            });
-            replicationState.alive$.subscribe(alive => {
-                console.log("alive", alive);
-            });
-            replicationState.complete$.subscribe((completed: boolean | { ok: boolean, errors: string[], last_seq: number, start_time: string, end_time: string, docs_read: number, docs_written: number, doc_write_failures: number, status: string }) => {
-                console.log("completed", completed);
-                if (completed && typeof completed !== "boolean") {
-                    LogSyncMessage(`Sync Complete: read:${completed.docs_read} written:${completed.docs_written}`);
-                }
-                // undo our nasty hack
+                const replicationState = db.pit_scouting.syncCouchDB({
+                    remote: dbURL, // remote database. This can be the serverURL, another RxCollection or a PouchDB-instance
+                    waitForLeadership: true,              // (optional) [default=true] to save performance, the sync starts on leader-instance only
+                    direction: {                          // direction (optional) to specify sync-directions
+                        pull: syncDir == SyncDirection.PULL || syncDir == SyncDirection.BOTH, // default=true
+                        push: syncDir == SyncDirection.PUSH || syncDir == SyncDirection.BOTH  // default=true
+                    },
+                    options: {                             // sync-options (optional) from https://pouchdb.com/api.html#replication
+                        live: false, // false means one shot
+                        retry: false
+                    },
+                    query: db.pit_scouting.find().where({eventKey}).eq(eventKey) // query (optional) only documents that match that query will be synchronised
+                });
+
+
+                // replicationState.
+                replicationState.change$.subscribe(change => {
+                    console.log("change", change);
+                });
+                replicationState.docs$.subscribe(docData => {
+                    console.log("docData", docData);
+                });
+                replicationState.denied$.subscribe(docData => {
+                    console.log("docData", docData);
+                });
+                replicationState.active$.subscribe(active => {
+                    console.log("active", active);
+                });
+                replicationState.alive$.subscribe(alive => {
+                    console.log("alive", alive);
+                });
+                replicationState.complete$.subscribe((completed: boolean | { ok: boolean, errors: string[], last_seq: number, start_time: string, end_time: string, docs_read: number, docs_written: number, doc_write_failures: number, status: string }) => {
+                    console.log("completed", completed);
+                    if (completed && typeof completed !== "boolean") {
+                        LogSyncMessage(`Sync Complete: read:${completed.docs_read} written:${completed.docs_written}`);
+                    }
+                    resolve();
+                    // undo our nasty hack
 //                 process.browser = undefined;
-            });
-            replicationState.error$.subscribe(error => {
-                console.log("error", error);
-                LogSyncMessage(`Error Syncing: ${error.message} ${error.stack} ${error}`);
+                });
+                replicationState.error$.subscribe(error => {
+                    console.log("error", error);
+                    LogSyncMessage(`Error Syncing: ${error.message} ${error.stack} ${error}`);
+                    resolve();
+                });
             });
         }
     }

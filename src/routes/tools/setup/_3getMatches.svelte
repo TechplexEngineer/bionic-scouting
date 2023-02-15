@@ -308,7 +308,7 @@
 </script>
 
 <div class="d-flex my-2">
-    <h2 class="flex-fill">3. Pull matches from TBA or load csv</h2>
+    <h2 class="flex-fill">2. Pull matches from TBA or load csv</h2>
     <button class="btn btn-outline-primary ms-2 btn-sm" type="button" on:click={()=>{fileInput.click();}}>Upload List
     </button>
     <input type="file" class="form-control d-none" bind:this={fileInput} on:change={uploadMatches}>
@@ -327,8 +327,8 @@
                 containerStyles="width:100%"
         />
     </div>
-
 </div>
+
 <div class="d-flex mb-3 justify-content-end">
     <SpinButton class="btn-primary ms-2" onClick={pullMatches}>Pull Matches</SpinButton>
     <SpinButton class="btn-info ms-2" onClick={pullTeams}>Pull Teams</SpinButton>

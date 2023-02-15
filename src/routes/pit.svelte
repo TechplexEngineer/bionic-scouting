@@ -32,6 +32,7 @@
         eventKey = await getCurrentEvent(db);
 
         const teams = await db.pit_scouting.find().where({eventKey}).sort({teamNumber: "asc"}).exec();
+        console.log("teams", teams);
         teamsToChoose = teams.map(t => {
             return {
                 value: `${t.teamNumber}`,
@@ -160,9 +161,6 @@
         saveStatusMessage = "Saved.";
     }
 
-    $: console.log("photos!", photosReady)
-
-
 </script>
 
 <div class="content">
@@ -181,7 +179,6 @@
             >Team Overview</a>
             <a href="/team"
                class="btn btn-info"
-               class:disabled={currentSelectedTeamItem == null}
             >Team List</a>
         </div>
     </div>

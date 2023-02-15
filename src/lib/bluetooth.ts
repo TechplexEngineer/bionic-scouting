@@ -123,6 +123,8 @@ async function handleIncomingMessage(info: { bytes: number[]; from: BTDevice }) 
 
 	const m: { msgId: string; data: { action: string; data } } = JSON.parse(msgStr);
 
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	const msg: Message = m.data;
 	msg.from = info.from;
 	msg.msgId = m.msgId;

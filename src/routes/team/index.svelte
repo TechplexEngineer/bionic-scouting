@@ -48,7 +48,7 @@
                     {#if t.notes && t.notes.length > 1}
                         <a class="btn btn-sm btn-success" href="/pit?team={t.teamNumber}">ReScout</a>
                     {:else}
-                        <a class="btn btn-sm btn-primary" href="/pit?team={t.teamNumber}">Scout</a>
+                        <a class="btn btn-sm btn-primary" href="/pit?team={t.teamNumber}">Pit Scout</a>
                     {/if}
                 </td>
             </tr>

@@ -25,9 +25,9 @@
 
     <GetMatches/>
 
-    <AssignMatches/>
+<!--    <AssignMatches/>-->
 
-    <MatchAssigner/>
+<!--    <MatchAssigner/>-->
 </div>
 
 

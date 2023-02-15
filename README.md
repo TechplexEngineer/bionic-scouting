@@ -109,4 +109,4 @@ The app uses RxDB with an underlying PouchDB for storage which supports sync wit
 run a CouchDB server on a Digital Ocean VPS.
 
 When running the app locally create a .env file at the root of the repository with content:
-`VITE_COUCHDB_URL=http://<USERNAME>:<PASSWORD>@<HOST>:5984/events_2022/`
+`VITE_COUCHDB_URL=http://<USERNAME>:<PASSWORD>@<HOST>:5984/events_<year>/`

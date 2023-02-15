@@ -12,6 +12,8 @@
 
     export let dbTable: string; //eg. scouts or super_scouts
 
+    let scoutNameType = dbTable == "scouts" ? "Scouts" : "Strategists";
+
     let db: MyDatabase;
 
     let scouts = [];
@@ -168,7 +170,7 @@
     </div>
 </div>
 <div class="d-flex">
-    <h3 class="flex-fill">Scouts: <small class="text-muted fs-5">({scouts.length})</small></h3>
+    <h3 class="flex-fill">{scoutNameType}: <small class="text-muted fs-5">({scouts.length})</small></h3>
     <button class="btn btn-outline-secondary" on:click={()=>{scoutsIsCollapsed = !scoutsIsCollapsed}}>
         {#if scoutsIsCollapsed}Expand{:else}Collapse{/if}
     </button>

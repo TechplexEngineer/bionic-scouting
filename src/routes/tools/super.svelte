@@ -17,6 +17,8 @@
     import Scouts from "./setup/_2scouts.svelte";
     import Select from "svelte-select";
     import {formatDate, getCurrentEvent, getOurTeamNumber} from "$lib/util";
+    import TeamNumber from "./setup/_1teamNumber.svelte";
+    import GetMatches from "./setup/_3getMatches.svelte";
 
 
     let db: MyDatabase;
@@ -202,13 +204,16 @@
 </script>
 
 <div class="container-fluid">
-    <h1>Super Scout Setup</h1>
+    <h1>Strategist Setup</h1>
 
-    <h2>1. Scouts <small class="text-muted fw-light fs-5">Enter scouts</small></h2>
+    <TeamNumber/>
+    <GetMatches/>
+
+    <h2>3. Strategists <small class="text-muted fw-light fs-5">Enter strategist names</small></h2>
     <Scouts dbTable="super_scouts"/>
 
 
-    <h2>2. Our Matches <small class="text-muted fw-light fs-5">Assign super scouts to teams</small></h2>
+    <h2>4. Our Matches <small class="text-muted fw-light fs-5">Assign super scouts to teams</small></h2>
 
     <label for="numMatchesToScout">Num Matches to Scout [1,5]</label>
     <input type="number" class="form-control" id="numMatchesToScout" min="1" max="5" bind:value={numMatchesToScout}>

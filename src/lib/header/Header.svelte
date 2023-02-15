@@ -21,6 +21,8 @@
     import {BluetoothSerial} from "bionic-bt-serial";
     import {AppUpdate, AppUpdateAvailability} from "@robingenz/capacitor-app-update";
     import Swal from "sweetalert2";
+    import {getDb, MyDatabase} from "$lib/store";
+    import {Settings} from "$lib/schema/settings-schema";
 
     let isOpen = false;
 
@@ -70,20 +72,21 @@
 
     let links = [
         {name: "Home", href: "/"},
-        {name: "Match Metrics", href: "/match/objective"},
-        {name: "Match Subjective", href: "/match/subjective"},
-        {name: "Pit Scout", href: "/pit"},
-        {name: "Teams", href: "/team"},
-        {name: "Match Preview", href: "/match/preview"},
+        // {name: "Match Metrics", href: "/match/objective"},
+        // {name: "Match Subjective", href: "/match/subjective"},
+        // {name: "Pit Scout", href: "/pit"},
+        {name: "Teams & Pit Scouting", href: "/team"},
+        // {name: "Match Preview", href: "/match/preview"},
         {name: "Match Schedule", href: "/match/schedule"},
+        {name: "Pick List", href: "/pick"},
         {
             name: "Tools",
             dropdown: [
-                {name: "Settings", href: "/settings"},
+                {name: "Sync", href: "/settings"},
                 {name: "Bluetooth", href: "/tools/bluetooth"},
                 {divider: true},
-                {name: "Setup", href: "/tools/setup"},
-                {name: "Super Setup", href: "/tools/super"},
+                // {name: "Setup", href: "/tools/setup"},
+                {name: "Strategist Setup", href: "/tools/super"},
                 {divider: true},
                 {name: "Reload", click: () => location.reload()},
                 {name: "Remove All Data", click: removeAllData},
@@ -130,6 +133,16 @@
         }
 
     }
+    let db: MyDatabase
+    let currentEvent = "";
+
+    onMount(async () => {
+        let db = await getDb();
+
+        db.settings.findOne({ selector: { key: Settings.CurrentEvent } }).$.subscribe(s => {
+            currentEvent = s.value
+        });
+    })
 
 
 </script>
@@ -155,7 +168,7 @@
     </div>
 
     <div class="flex-1 justify-content-center navbar-text text-center text-nowrap">
-        {$adapterName} | BT: {btMessage}
+        {$adapterName} | {currentEvent}
     </div>
 
     <div class="flex-1 justify-content-end text-end">
