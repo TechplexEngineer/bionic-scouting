@@ -62,12 +62,16 @@
     </div>
 
     {#each range(1,teamsToChoose.length) as i}
-        <div class="d-flex mb-2">
-            <div style="width: 50px">
+        <div class="row mb-2">
+            <div class="col-md-1">
                 {i}
             </div>
-            <div class="flex-grow-1">
+            <div class="col">
                 <Select id={`team-${i}`} items={teamsToChoose}  on:select={handleSelectTeam} class="mb-2"/>
+            </div>
+            <div class="col-md-3 ms-2 mt-1">
+                <button class="btn btn-info btn-sm">Notes</button>
+                <button class="btn btn-primary btn-sm">Mark Picked</button>
             </div>
         </div>
 
