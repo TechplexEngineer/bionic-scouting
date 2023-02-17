@@ -40,7 +40,7 @@
                 // this solves our sync problem
 
                 syncMessages = '';
-                let dbURL = import.meta.env.VITE_COUCHDB_URL;
+                let dbURL = `${import.meta.env.VITE_COUCHDB_URL}/events_2023/`;
                 LogSyncMessage(`Started Sync: Direction ${syncDir}`);
                 const url = new URL(dbURL);
                 url.password = "<REDACTED>";
