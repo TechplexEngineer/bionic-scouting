@@ -78,7 +78,7 @@
         {name: "Teams & Pit Scouting", href: "/team"},
         // {name: "Match Preview", href: "/match/preview"},
         {name: "Match Schedule", href: "/match/schedule"},
-        {name: "Pick List", href: "/pick"},
+        // {name: "Pick List", href: "/pick"}, //@todo
         {
             name: "Tools",
             dropdown: [
