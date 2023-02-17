@@ -27,7 +27,7 @@
 
 
         let [first, number] = $adapterName.split("-");
-        if (first.toUpperCase() !== "SS") {
+        if (first.toUpperCase() !== "SS" && first.toUpperCase() !== "STRATEGIST") {
             return; // nothing to do for non super scouts
         }
         if (number.toLowerCase() == "lead") {
