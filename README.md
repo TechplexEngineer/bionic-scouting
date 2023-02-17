@@ -89,7 +89,7 @@ To view a preview of the "production" build:
 npm run preview
 ```
 
-Once the frontend is built we can build the andorid app:
+Once the frontend is built we can build the android app:
 
 ```bash
 ./gradlew bundleRelease \
