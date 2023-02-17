@@ -18,6 +18,7 @@
     let ourTeamNumber;
 
     let scouts: RxDocument<SuperScout>[] = [];
+    let isStrategist = false;
 
     onMount(async () => {
 
@@ -27,9 +28,11 @@
 
 
         let [first, number] = $adapterName.split("-");
+        console.log(first, number);
         if (first.toUpperCase() !== "SS" && first.toUpperCase() !== "STRATEGIST") {
-            return; // nothing to do for non super scouts
+            return; // nothing to do for non-strategists
         }
+        isStrategist = true;
         if (number.toLowerCase() == "lead") {
             // show all
             scouts = await db.super_scouts.find().where({active: true}).sort({createdAt: "asc"}).exec();
@@ -46,7 +49,7 @@
     <a id="top" style="visibility: hidden">Top Anchor</a>
 
 
-    {#if $adapterName.toLowerCase().startsWith("ss")}
+    {#if isStrategist}
         {#if scouts.length > 1}
             <h3>Super Scouts</h3>
             <ul>
