@@ -21,7 +21,7 @@
         extractBlueTeamsFromMatch,
         extractRedTeamsFromMatch,
         extractTeamsFromMatch,
-        getCurrentEvent
+        getCurrentEvent, getDeviceNameQuery
     } from "$lib/util";
     import type {SuperScout} from "$lib/schema/super-scout-schema";
 
@@ -78,10 +78,6 @@
                 }
             }
         }
-
-
-        scout = await db.super_scouts.findOne().where({active: true}).sort({createdAt: "asc"}).skip(number - 1).exec();
-
     });
 
 
