@@ -153,3 +153,13 @@ export const getOurTeamNumber = async (db: MyDatabase, skipError?: true) => {
 	}
 	return parseInt(entry.value);
 };
+
+export const getDeviceNameQuery = (db: MyDatabase) => {
+	return db.settings.findOne({ selector: { key: Settings.DeviceName } });
+}
+
+export const getDeviceName = async (db: MyDatabase, skipError?: true) => {
+	const entry = await getDeviceNameQuery(db).exec();
+
+	return entry.value;
+};

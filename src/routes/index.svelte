@@ -3,12 +3,9 @@
 </svelte:head>
 
 <script lang="ts">
-    import {BluetoothSerial} from "bionic-bt-serial";
     import {onMount} from "svelte";
     import {getDb} from "$lib/store";
-    import {Settings} from "$lib/schema/settings-schema";
-    import {formatDateTime, getOurTeamNumber} from "$lib/util";
-    import {adapterName} from "$lib/bluetooth";
+    import {formatDateTime, getDeviceNameQuery, getOurTeamNumber} from "$lib/util";
     import MySchedule from "./_mySchedule.svelte";
     import type {RxDocument} from "rxdb";
     import type {SuperScout} from "$lib/schema/super-scout-schema";
@@ -16,6 +13,7 @@
 
 
     let ourTeamNumber;
+    let deviceName = "";
 
     let scouts: RxDocument<SuperScout>[] = [];
     let isStrategist = false;
@@ -26,8 +24,10 @@
 
         ourTeamNumber = getOurTeamNumber(db);
 
+        deviceName = (await getDeviceNameQuery(db).exec()).value;
 
-        let [first, number] = $adapterName.split("-");
+
+        let [first, number] = deviceName.split("-");
         console.log(first, number);
         if (first.toUpperCase() !== "SS" && first.toUpperCase() !== "STRATEGIST") {
             return; // nothing to do for non-strategists

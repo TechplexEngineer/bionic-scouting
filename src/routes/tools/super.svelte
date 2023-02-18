@@ -17,6 +17,7 @@
     import Scouts from "./setup/_2scouts.svelte";
     import Select from "svelte-select";
     import {formatDate, getCurrentEvent, getOurTeamNumber} from "$lib/util";
+    import DeviceName from "./setup/_0deviceName.svelte";
     import TeamNumber from "./setup/_1teamNumber.svelte";
     import GetMatches from "./setup/_3getMatches.svelte";
 
@@ -54,7 +55,7 @@
             }
         }
 
-        db.super_scouts.find().where({active: true}).sort({createdAt: "asc"}).$.subscribe((d: RxDocument<SuperScout>[]) => {
+        await db.super_scouts.find().where({active: true}).sort({createdAt: "asc"}).$.subscribe((d: RxDocument<SuperScout>[]) => {
             superScoutsLoaded = false;
             // console.log("Scouts Loaded");
             scoutsSelectOptions = d.map(s => ({label: s.name, value: s}));
@@ -207,6 +208,8 @@
 
 <div class="container-fluid">
     <h1>Strategist Setup</h1>
+
+    <DeviceName/>
 
     <TeamNumber/>
     <GetMatches/>

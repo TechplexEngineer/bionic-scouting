@@ -23,9 +23,8 @@
         extractTeamsFromMatch,
         getCurrentEvent
     } from "$lib/util";
-    import {adapterName} from "$lib/bluetooth";
     import type {SuperScout} from "$lib/schema/super-scout-schema";
-    import type {Team} from "tba-api-v3client-ts";
+
 
     let factNames = ["climber", "drivetrain"];
     let facts: { name: string, value: string }[] = [
@@ -80,10 +79,7 @@
             }
         }
 
-        let [first, number] = $adapterName.split("-");
-        if (first.toUpperCase() !== "SS" && !isNaN(parseInt(number))) {
-            return; // nothing to do for non super scouts or lead ss
-        }
+
         scout = await db.super_scouts.findOne().where({active: true}).sort({createdAt: "asc"}).skip(number - 1).exec();
 
     });

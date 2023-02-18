@@ -14,15 +14,17 @@
         Nav,
         Offcanvas, Dropdown, DropdownToggle, DropdownMenu, DropdownItem
     } from "sveltestrap";
-    import {adapterName, connections} from "$lib/bluetooth";
+
     import {goto} from "$app/navigation";
     import {page} from "$app/stores";
     import {onMount} from "svelte";
-    import {BluetoothSerial} from "bionic-bt-serial";
+
     import {AppUpdate, AppUpdateAvailability} from "@robingenz/capacitor-app-update";
     import Swal from "sweetalert2";
     import {getDb, MyDatabase} from "$lib/store";
     import {Settings} from "$lib/schema/settings-schema";
+    import {getDeviceNameQuery} from "$lib/util";
+    let deviceName = "UNKNOWN DEVICE";
 
     let isOpen = false;
 
@@ -33,17 +35,6 @@
     function toggle() {
         isOpen = !isOpen;
     }
-
-    let btMessage = "...";
-    connections.subscribe(devices => {
-        if (devices.length == 0) {
-            btMessage = "NC";
-        } else if (devices.length == 1) {
-            btMessage = "Con";
-        } else {
-            btMessage = `Con(${devices.length})`;
-        }
-    });
 
     async function removeAllData() {
         if (!confirm("Are you sure? there is no undo!")) {
@@ -134,7 +125,7 @@
 
     }
     let db: MyDatabase
-    let currentEvent = "";
+    let currentEvent = "UNKNOWN EVENT";
 
     onMount(async () => {
         let db = await getDb();
@@ -143,6 +134,9 @@
             if (!s) { return }
             currentEvent = s.value
         });
+        getDeviceNameQuery(db).$.subscribe(e => {
+            deviceName = e.value;
+        })
     })
 
     const brandClick = () => {
@@ -177,7 +171,7 @@
     </div>
 
     <div class="flex-1 justify-content-center navbar-text text-center text-nowrap">
-        {$adapterName} | {currentEvent}
+        {deviceName} | {currentEvent}
     </div>
 
     <div class="flex-1 justify-content-end text-end">
