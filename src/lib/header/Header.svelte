@@ -135,7 +135,9 @@
             currentEvent = s.value
         });
         getDeviceNameQuery(db).$.subscribe(e => {
-            deviceName = e.value;
+            if (e && e.value) {
+                deviceName = e.value;
+            }
         })
     })
 

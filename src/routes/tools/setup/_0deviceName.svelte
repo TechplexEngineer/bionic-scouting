@@ -7,6 +7,7 @@
 	export let deviceName: writable<number | null> = writable(null);
 
 	import type { MyDatabase } from "$lib/store";
+    import {Settings} from "$lib/schema/settings-schema";
 
 	let db: MyDatabase;
 

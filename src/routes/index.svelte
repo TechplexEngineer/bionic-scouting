@@ -24,9 +24,15 @@
 
         ourTeamNumber = getOurTeamNumber(db);
 
-        deviceName = (await getDeviceNameQuery(db).exec()).value;
+        const a = await getDeviceNameQuery(db).exec();
 
+        if (a) {
+            deviceName = a.value;
+        } else {
+            return
+        }
 
+        console.log("deviceName", deviceName);
         let [first, number] = deviceName.split("-");
         console.log(first, number);
         if (first.toUpperCase() !== "SS" && first.toUpperCase() !== "STRATEGIST") {
