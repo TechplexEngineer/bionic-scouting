@@ -16,6 +16,7 @@
     import {Match as TBAMatch} from "tba-api-v3client-ts";
     import comp_level = TBAMatch.comp_level;
     import {goto} from "$app/navigation";
+    import "bootstrap-icons/font/bootstrap-icons.css"
 
     // List of events to choose from
     type SelectOption = { label: string, value: string };
@@ -309,12 +310,31 @@
             }
         });
     }
+
+    const helpMatchList = () => {
+        Swal.fire({
+            icon: "info",
+            title: "Match List format",
+            text: "Comma Separated Values (CSV) with no headers. Columns are: Bue 1, Blue 2, Blue 3, Red 1, Red 2, Red 3",
+            showConfirmButton: false
+        });
+    }
+    const helpTeamList = () => {
+        Swal.fire({
+            icon: "info",
+            title: "Team List format",
+            text: "Comma Separated Values (CSV) with no headers, Columns are: Team Number, Team Name",
+            showConfirmButton: false
+        });
+    }
+
 </script>
 
 <div class="d-flex my-2">
     <h2 class="flex-fill">2. Pull matches from TBA or load csv</h2>
     <button class="btn btn-outline-primary ms-2 btn-sm" type="button" on:click={()=>{fileInput.click();}}>Upload Match List
     </button>
+    <button class="ms-2 btn btn-outline-primary" on:click={helpMatchList}><i class="bi bi-question-circle-fill"></i></button>
     <input type="file" class="form-control d-none" bind:this={fileInput} on:change={uploadMatches}>
     <input type="file" class="form-control d-none" bind:this={teamFileInput} on:change={uploadTeams}>
 </div>
@@ -339,4 +359,5 @@
     <SpinButton class="btn-info ms-2" onClick={pullTeams}>Pull Teams</SpinButton>
     <button class="btn btn-outline-primary ms-2 btn-sm" type="button" on:click={()=>{teamFileInput.click();}}>Upload Team List
     </button>
+    <button class="ms-2 btn btn-outline-primary" on:click={helpTeamList}><i class="bi bi-question-circle-fill"></i></button>
 </div>
