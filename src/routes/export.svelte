@@ -26,7 +26,9 @@
 
         eventKey = await getCurrentEvent(db);
 
-        collections = Object.keys(db.collections);
+        collections = Object.keys(db.collections).filter(c => {
+            return !["match_metrics", "scouts"].includes(c)
+        });
     });
 
     const makeNiceName = (name: string): string => {
