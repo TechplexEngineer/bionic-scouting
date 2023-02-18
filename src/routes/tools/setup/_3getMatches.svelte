@@ -180,6 +180,7 @@
     }
 
     let fileInput;
+    let teamFileInput;
 
     function onlyUnique(value, index, self) {
         return self.indexOf(value) === index;
@@ -215,24 +216,8 @@
             header: false,
             complete: async function (results) {
 
-                // console.log("parse", );
 
                 let eventKey = $selectedEvent.value;
-
-
-                // await db.pit_scouting.find().remove()
-                // for (let team of results.data.flat().filter(onlyUnique).filter(i => i.length > 0)) {
-                //     let r: PitReport = {
-                //         eventKey: eventKey,
-                //         createdAt: new Date().getTime(),
-                //         updatedAt: new Date().getTime(),
-                //         teamNumber: parseInt(team),
-                //         imageUrl: "",
-                //         notes: "",
-                //         facts: [],
-                //     };
-                //     await db.pit_scouting.insert(r);
-                // }
 
                 let counter = 1;
                 for (let teams of results.data) {
@@ -269,49 +254,65 @@
                     await db.matches.insert(m);
                 }
 
-
-                /*
-                if (scouts.length > 0) {
-                    // ask if we should merge or replace
-                    let response = await Swal.fire({
-                        title: "Should we merge the list with the existing scouts?",
-                        showDenyButton: true,
-                        showCancelButton: true,
-                        confirmButtonText: "Merge",
-                        denyButtonText: `Replace`
-                    });
-                    // console.log(response, results.data);
-                    if (response.isDismissed) {
-                        return; // nothing to do
-                    }
-                    if (response.isDenied) {
-                        scouts = []; //remove all scouts
-                    }
-                    //fallthrough, default behavior is merge
-                }
-                // console.log(results.data.map(i => i.name));
-
-                // scouts = scouts.concat(results.data.flat().filter(Boolean));
-                results.data.flat().filter(Boolean).map(s => {
-                    if (scouts.map(a => (a.name)).includes(s)) {
-                        console.log("skipping", s);
-                        return;
-                    }
-                    scoutName = s;
-                    addScout();
-                });*/
-
             }
         });
     }
 
+    async function uploadTeams(e) {
+        const papa = await import("papaparse");
+        let file = e.target.files[0];
+
+        if (!confirm("This will remove Pit Scouting Data. Proceed?")) {
+            return;
+        }
+
+        let pitData = await db.pit_scouting.find().exec()
+        if (pitData.length > 0) {
+            let res = await Swal.fire({
+                icon: "warning",
+                title: "Teams Already Loaded",
+                html: `Do you want to remove existing matches?`,
+                showCloseButton: true,
+                confirmButtonText: "Clear Existing Matches",
+                showCancelButton: true,
+                cancelButtonText: "Cancel. Make no changes."
+            });
+            if (!res.isConfirmed) {
+                return;
+            }
+            await db.matches.find().remove()
+        }
+
+        papa.parse(file, {
+            header: false,
+            complete: async function (results) {
+                let eventKey = $selectedEvent.value;
+
+                console.log(results.data);
+
+                for (let teamArr of results.data) {
+                    console.log(teamArr[0])
+
+                //
+                //     // let m: PitReport = {
+                //     //     eventKey: eventKey,
+                //     //     teamNumber:
+                //     // }
+                //     counter++
+                //     // await db.pit_scouting.insert(m);
+                }
+
+            }
+        });
+    }
 </script>
 
 <div class="d-flex my-2">
     <h2 class="flex-fill">2. Pull matches from TBA or load csv</h2>
-    <button class="btn btn-outline-primary ms-2 btn-sm" type="button" on:click={()=>{fileInput.click();}}>Upload List
+    <button class="btn btn-outline-primary ms-2 btn-sm" type="button" on:click={()=>{fileInput.click();}}>Upload Match List
     </button>
     <input type="file" class="form-control d-none" bind:this={fileInput} on:change={uploadMatches}>
+    <input type="file" class="form-control d-none" bind:this={teamFileInput} on:change={uploadTeams}>
 </div>
 
 <div class="d-flex mb-2">
@@ -332,4 +333,6 @@
 <div class="d-flex mb-3 justify-content-end">
     <SpinButton class="btn-primary ms-2" onClick={pullMatches}>Pull Matches</SpinButton>
     <SpinButton class="btn-info ms-2" onClick={pullTeams}>Pull Teams</SpinButton>
+    <button class="btn btn-outline-primary ms-2 btn-sm" type="button" on:click={()=>{teamFileInput.click();}}>Upload Team List
+    </button>
 </div>
