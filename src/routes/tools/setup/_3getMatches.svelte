@@ -291,16 +291,20 @@
                 console.log(results.data);
 
                 for (let teamArr of results.data) {
-                    console.log(teamArr[0])
+                    console.log(teamArr)
+                    let teamNumber = teamArr[0];
+                    let teamName = teamArr[1];
 
-                //
-                //     // let m: PitReport = {
-                //     //     eventKey: eventKey,
-                //     //     teamNumber:
-                //     // }
-                //     counter++
-                //     // await db.pit_scouting.insert(m);
+
+                    let m: PitReport = {
+                        eventKey: eventKey,
+                        teamNumber: parseInt(teamNumber),
+                        nickname: teamName
+                    }
+
+                    await db.pit_scouting.insert(m);
                 }
+                console.log("done inserting")
 
             }
         });
