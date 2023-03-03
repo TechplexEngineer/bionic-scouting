@@ -43,7 +43,14 @@
                     <a href="/team/{t.teamNumber}">{t.teamNumber}</a>
                 </td>
                 <td>{t.nickname}</td>
-                <td>{t.numAttachments || 0}</td>
+                <td>
+                    <span style="min-width: 10px" class="d-inline-block">{t.numAttachments || 0}</span>
+                    {#if (t.numAttachments || 0) > 0}
+                        <i class="bi bi-check-square text-success fw-bold"></i>
+                    {:else}
+                        <i class="bi bi-x-square text-danger"></i>
+                    {/if}
+                </td>
                 <td>
                     {#if t.notes && t.notes.length > 1}
                         <a class="btn btn-sm btn-success" href="/pit?team={t.teamNumber}">ReScout</a>

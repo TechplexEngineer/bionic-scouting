@@ -18,15 +18,11 @@
     import {Carousel, CarouselControl, CarouselIndicators, CarouselItem, Spinner} from "sveltestrap";
     import {CapacitorException} from "@capacitor/core";
 
-
     let db: MyDatabase;
     let eventKey: string; //eg. 2020week0 (current event)
-    // let teams: RxDocument<PitReport>[] = [];
     let teamData: RxDocument<PitReport>;
     let teamsToChoose: { label: string, value: string }[] = [];
     let currentSelectedTeamItem: { label: string, value: string } = null;
-
-
 
     onMount(async () => {
         db = await getDb();
@@ -34,7 +30,7 @@
         eventKey = await getCurrentEvent(db);
 
         const teams = await db.pit_scouting.find().where({eventKey}).sort({teamNumber: "asc"}).exec();
-        console.log("teams", teams);
+
         teamsToChoose = teams.map(t => {
             return {
                 value: `${t.teamNumber}`,
@@ -103,35 +99,35 @@
         teamData = await db.pit_scouting.findOne().where(query).exec();
         notes = teamData.notes || notesTemplate;
 
-        teamData.allAttachments$.subscribe(debounce(async (attachments) => {
-            console.log("Attachments Changed");
+        const imageHandler = async (attachments) => {
+            // console.log("imageHandler");
 
             // console.log("attachments: ", attachments);
 
+            //@todo seems like we could be smarter here and only change the photos list if there is a change
             let newPhotos = [];
+
+
             for (let a of attachments) {
                 let d = await a.getStringData()
+
                 newPhotos.push({
                     url: d,
-                })
+                });
             }
 
             robotPhotos = newPhotos;
             // photosReady = false;
 
             photosReady = true;
+        };
 
-            // setTimeout(() => {
-            //     console.log("attachments", robotPhotos);
-            // }, 500);
+        const debouncedImageHandler = debounce(imageHandler, 500)
 
-            // attachments.map(async (a) => {
-            //     return {
-            //         data: await a.getStringData(),
-            //     }
-            // })
-
-        }, 500));
+        teamData.allAttachments$.subscribe((arg) => {
+            // console.log("attachments");
+            imageHandler(arg);
+        });
     }
 
     let factNames = ["chassis", "placer", "intaker", "extension", "auto", "scoring place"];
@@ -173,14 +169,15 @@
     }
 
 
-
 </script>
 
 <div class="content">
 
     <div class="d-flex">
         <div class="flex-1">
-            <!--            First-->
+            <a href="/team"
+               class="btn btn-info"
+            >Team List</a>
         </div>
         <div class="flex-1 text-center">
             <h1>Pit Scout</h1>
@@ -190,9 +187,7 @@
                class="btn btn-primary"
                class:disabled={currentSelectedTeamItem == null}
             >Team Overview</a>
-            <a href="/team"
-               class="btn btn-info"
-            >Team List</a>
+
         </div>
     </div>
 
@@ -234,11 +229,11 @@
             </Carousel>
         {:else}
             {#if !photosReady}
-                <h4> &nbsp; &nbsp; &nbsp;Loading...
-                    <Spinner color="dark"/>
-                </h4>
+                <span> &nbsp; &nbsp; &nbsp; Loading...
+                    <Spinner color="dark" size="sm"/>
+                </span>
             {:else}
-                <h4> &nbsp; &nbsp; &nbsp;No Photos Yet</h4>
+                <span> &nbsp; &nbsp; &nbsp;No Photos Yet</span>
             {/if}
         {/if}
     </div>
@@ -255,38 +250,38 @@
     </div>
 
     <!-- Facts-->
-<!--    <div class="d-flex mb-2 mt-5">-->
-<!--        <h3 class="flex-fill">Facts</h3>-->
-<!--        <button on:click={addFact} class="btn btn-success"-->
-<!--                class:disabled={currentSelectedTeamItem==null}>+ Add Fact-->
-<!--        </button>-->
-<!--    </div>-->
+    <!--    <div class="d-flex mb-2 mt-5">-->
+    <!--        <h3 class="flex-fill">Facts</h3>-->
+    <!--        <button on:click={addFact} class="btn btn-success"-->
+    <!--                class:disabled={currentSelectedTeamItem==null}>+ Add Fact-->
+    <!--        </button>-->
+    <!--    </div>-->
 
 
-<!--    {#each facts as fact, idx}-->
-<!--        <div class="d-flex">-->
-<!--            <div class="flex-grow-1 pe-1">-->
-<!--                <Select items={factNames} bind:value={fact.value} isCreatable="true"/>-->
-<!--            </div>-->
-<!--            <button class="btn btn-warning" on:click={()=>{-->
-<!--                if (confirm("Are you sure?")) {-->
-<!--                    facts = facts.filter((f, idx) => f !== fact)-->
-<!--                }-->
-<!--            }}>Remove-->
-<!--            </button>-->
-<!--        </div>-->
+    <!--    {#each facts as fact, idx}-->
+    <!--        <div class="d-flex">-->
+    <!--            <div class="flex-grow-1 pe-1">-->
+    <!--                <Select items={factNames} bind:value={fact.value} isCreatable="true"/>-->
+    <!--            </div>-->
+    <!--            <button class="btn btn-warning" on:click={()=>{-->
+    <!--                if (confirm("Are you sure?")) {-->
+    <!--                    facts = facts.filter((f, idx) => f !== fact)-->
+    <!--                }-->
+    <!--            }}>Remove-->
+    <!--            </button>-->
+    <!--        </div>-->
 
-<!--        <div class="form-floating mt-1 mb-2">-->
-<!--                <textarea id="fact" class="form-control" placeholder="Leave a comment here"-->
-<!--                          style="height: 75px" on:change={factChanged(fact)}></textarea>-->
-<!--            <label for="fact">Notes</label>-->
-<!--        </div>-->
-<!--    {/each}-->
-<!--    <div class="d-flex">-->
-<!--        <button on:click={addFact} class="btn btn-success ms-auto"-->
-<!--                class:disabled={currentSelectedTeamItem==null}>+ Add Fact-->
-<!--        </button>-->
-<!--    </div>-->
+    <!--        <div class="form-floating mt-1 mb-2">-->
+    <!--                <textarea id="fact" class="form-control" placeholder="Leave a comment here"-->
+    <!--                          style="height: 75px" on:change={factChanged(fact)}></textarea>-->
+    <!--            <label for="fact">Notes</label>-->
+    <!--        </div>-->
+    <!--    {/each}-->
+    <!--    <div class="d-flex">-->
+    <!--        <button on:click={addFact} class="btn btn-success ms-auto"-->
+    <!--                class:disabled={currentSelectedTeamItem==null}>+ Add Fact-->
+    <!--        </button>-->
+    <!--    </div>-->
 
 
 </div>

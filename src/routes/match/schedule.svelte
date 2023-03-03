@@ -44,7 +44,7 @@
         <th>Match</th>
         <th colspan="3">Red Alliance</th>
         <th colspan="3">Blue Alliance</th>
-        <th colspan="4">Scores</th>
+<!--        <th colspan="4">Scores</th>-->
     </tr>
     </thead>
     <tbody>
@@ -56,44 +56,17 @@
 
             {#each m.alliances.red.teamKeys as t}
                 <td class="redbg" class:ourTeam={t.replace('frc','') == ourTeamNumber}>
-                    {t.replace('frc', '')}
+                    <a href="/match/subjective?match={m.matchKey}&team={t.replace('frc', '')}" class="text-reset text-decoration-none">{t.replace('frc', '')}</a>
                 </td>
             {/each}
 
             {#each m.alliances.blue.teamKeys as t}
                 <td class="bluebg" class:ourTeam={t.replace('frc','') == ourTeamNumber}>
-                    {t.replace('frc', '')}
+                    <a href="/match/subjective?match={m.matchKey}&team={t.replace('frc', '')}" class="text-reset text-decoration-none">{t.replace('frc', '')}</a>
                 </td>
             {/each}
 
-            {#if m?.alliances?.red?.score && m?.alliances?.blue?.score}
-                <td class="redbg"
-                    class:fw-bold={m.alliances.red.score > m.alliances.blue.score}>{m.alliances.red.score}</td>
-            {:else}
-                <td class="redbg">-</td>
-            {/if}
-            {#if m?.alliances?.red?.rp && m?.alliances?.blue?.rp}
-                <td class="redbg"
-                    class:fw-bold={m.scoreBreakdown.red.rp > m.scoreBreakdown.blue.rp}>{m.scoreBreakdown.red.rp}
-                    RP
-                </td>
-            {:else}
-                <td class="redbg">-</td>
-            {/if}
 
-            {#if m?.alliances?.red?.score && m?.alliances?.blue?.score}
-                <td class="bluebg"
-                    class:fw-bold={m.alliances.blue.score > m.alliances.red.score}>{m.alliances.blue.score}</td>
-            {:else}
-                <td class="bluebg">-</td>
-            {/if}
-            {#if m?.alliances?.red?.rp && m?.alliances?.blue?.rp}
-                <td class="bluebg"
-                    class:fw-bold={m.scoreBreakdown.blue.rp > m.scoreBreakdown.red.rp}>{m.scoreBreakdown.blue.rp} RP
-                </td>
-            {:else}
-                <td class="bluebg">-</td>
-            {/if}
         </tr>
     {/each}
     </tbody>

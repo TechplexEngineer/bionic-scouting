@@ -112,6 +112,8 @@
             return extractTeamsFromMatch(m).includes(teamNumber)
         }).map(m => ({label: m.matchKey, value: m}));
 
+        matchForSelections.push({label:"any", value: "any"});
+
         if ($page.query.get("for") && countMatchForChange++ == 0) {
             for (let m of matchForSelections) {
                 if (m.label == $page.query.get("for")) {
@@ -244,13 +246,13 @@
 
     <div class="d-flex">
         <div class="flex-1">
-            <a class="btn btn-info float-start" href="/">&lt; My Schedule</a>
+            <a class="btn btn-info float-start" href="/">My Schedule</a>
         </div>
         <div class="flex-1 text-center">
-            <h1>Match Subjective</h1>
+            <h1>Scouting</h1>
         </div>
         <div class="flex-1 text-end">
-            <!--			Nothing here yet-->
+           <a class="btn btn-warning float-end" href="/match/schedule">Match Schedule</a>
         </div>
     </div>
 

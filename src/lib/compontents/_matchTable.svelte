@@ -46,16 +46,16 @@
             {/each}
 
             <td class="redbg"
-                class:fw-bold={m.alliances.red.score > m.alliances.blue.score}>{m.alliances.red.score}</td>
+                class:fw-bold={m.alliances?.red.score > m.alliances.blue.score}>{m.alliances.red.score}</td>
             <td class="redbg"
-                class:fw-bold={m.scoreBreakdown.red.rp > m.scoreBreakdown.blue.rp}>{m.scoreBreakdown.red.rp}
+                class:fw-bold={m?.scoreBreakdown?.red?.rp > m?.scoreBreakdown?.blue?.rp}>{m?.scoreBreakdown?.red?.rp}
                 RP
             </td>
 
             <td class="bluebg"
-                class:fw-bold={m.alliances.blue.score > m.alliances.red.score}>{m.alliances.blue.score}</td>
+                class:fw-bold={m.alliances.blue.score > m?.alliances?.red.score}>{m.alliances.blue.score}</td>
             <td class="bluebg"
-                class:fw-bold={m.scoreBreakdown.blue.rp > m.scoreBreakdown.red.rp}>{m.scoreBreakdown.blue.rp}
+                class:fw-bold={m?.scoreBreakdown?.blue.rp > m?.scoreBreakdown?.red.rp}>{m?.scoreBreakdown?.blue.rp}
                 RP
             </td>
         </tr>

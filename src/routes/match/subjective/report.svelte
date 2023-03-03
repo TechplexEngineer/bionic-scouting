@@ -25,13 +25,17 @@
     import GSheetReader from 'g-sheets-api';
     import Line from "svelte-chartjs/src/Line.svelte"
     import type {PitReport} from "$lib/schema/pit-scout-schema";
+    import {RxAttachment} from "rxdb";
+
+    type PitReportWithAttachments = {doc: RxDocument<PitReport>, attachments: RxAttachment<PitReport, {}>}
 
     let matches: RxDocument<Match>[] = [];
     let matchSelections: { label: string, value: RxDocument<Match> }[] = [];
     let selectedPrepMatch: { label: string, value: RxDocument<Match> };
 
     let matchReports: RxDocument<MatchSubjReport>[] = [];
-    let teamPitScoutingData: RxDocument<PitReport>[] = [];
+    let teamPitScoutingDataDocs: RxDocument<PitReport>[] = [];
+    let teamPitScoutingData: PitReportWithAttachments[] = [];
 
     const defaultStatusMessage = "loading..."
     let statusMessage = defaultStatusMessage;
@@ -42,7 +46,7 @@
 
         const query = {
             eventKey: eventKey,
-            matchForKey: match.matchKey
+            // matchForKey: match.matchKey
         };
 
         matchReports = await db.match_subjective.find().where(query).exec();
@@ -50,10 +54,26 @@
 
         // console.log(extractTeamsFromMatch(match));
 
-        teamPitScoutingData = await db.pit_scouting.find().where({
+        teamPitScoutingDataDocs = await db.pit_scouting.find().where({
             eventKey: eventKey,
             teamNumber: {$in: extractTeamsFromMatch(match)}
         }).exec();
+
+        teamPitScoutingDataDocs.map((team:RxDocument<PitReport>) => {
+            let attachments = team.allAttachments()
+            let report: PitReportWithAttachments = {
+                doc: team,
+                attachments: attachments
+            }
+            // console.log("map", team.teamNumber, attachments, report)
+            teamPitScoutingData = [...teamPitScoutingData, report];
+            // teamPitScoutingData.push(report)
+        })
+
+        //     .allAttachments$.subscribe((arg) => {
+        //     console.log("attachments", arg);
+        //     // imageHandler(arg);
+        // });
 
         // console.log(teamPitScoutingData);
     }
@@ -151,25 +171,6 @@
         // console.log(data);
     }
 
-    const OnlyOurAlliance = (value: RxDocument<MatchSubjReport>, index, self) => {
-        if (!selectedPrepMatch) {
-            return true
-        } // can't filter if we don't have a selected match
-        let match = selectedPrepMatch.value;
-        let blueTeams = extractBlueTeamsFromMatch(match)
-        let weAreBlue = blueTeams.includes(ourTeamNumber)
-        return (weAreBlue && blueTeams.includes(value.teamNumber)) || (!weAreBlue && !blueTeams.includes(value.teamNumber))
-    }
-    const OnlyOpposingAlliance = (value: RxDocument<MatchSubjReport>, index, self) => {
-        if (!selectedPrepMatch) {
-            return true
-        } // can't filter if we don't have a selected match
-        let match = selectedPrepMatch.value;
-        let blueTeams = extractBlueTeamsFromMatch(match)
-        let weAreBlue = blueTeams.includes(ourTeamNumber)
-        return (weAreBlue && !blueTeams.includes(value.teamNumber)) || (!weAreBlue && blueTeams.includes(value.teamNumber))
-    }
-
     const weAreBlue = (match: RxDocument<Match>): boolean => {
         let blueTeams = extractBlueTeamsFromMatch(match)
         return blueTeams.includes(ourTeamNumber)
@@ -195,7 +196,7 @@
     }
 
     const onlyTeam = (teamNumber: number) => {
-        return (item: RxDocument<MatchSubjReport>, index, self) => {
+        return (item: RxDocument<MatchSubjReport> | PitReportWithAttachments, index, self) => {
             return item.teamNumber == teamNumber
         }
     }
@@ -477,7 +478,22 @@
             return `no notes for ${team}`
         }
         return teamPitReport[0].notes || ""
+    }
+    const getDataForTeam = (team: number, teamPitScoutingData: PitReportWithAttachments[]) => {
+        return teamPitScoutingData.find(o=> o.doc.teamNumber == team)
 
+    }
+
+    const getImageForTeam = async (team: number, teamPitScoutingData: PitReportWithAttachments[]) => {
+        let data = getDataForTeam(team, teamPitScoutingData);
+        console.log(data)
+
+
+        if (!data?.attachments.length) return Promise.reject("No Photo");
+
+        return await data.attachments[0].getStringData()
+
+        // return data?.attachments && data.attachments.length && data.attachments[0]
     }
 
 
@@ -691,17 +707,24 @@
     <h2 class="border-bottom border-4">Climb (Highest Reached)</h2>
     <Line data={calcDataForClimbGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}
           options={climbOptions}/>
-    <!--{#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}-->
-    <!--    <h3>{t}</h3>-->
-    <!--    -->
-    <!--{/each}-->
 
 
-    <h2 class="border-bottom border-4">Super Scout Notes</h2>
+    <h2 class="border-bottom border-4">Notes</h2>
 
     <h2 class="border-bottom border-4 text-end">Opposing Alliance</h2>
     {#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}
-        <h3><a href="/pit?team={t}">{t}</a></h3>
+        <div class="d-flex justify-content-between">
+            <h3><a href="/pit?team={t}">{t}</a></h3>
+            <div>
+                {#await getImageForTeam(t, teamPitScoutingData)}
+                    <p>...waiting</p>
+                {:then image}
+                    <img src="{image}" class="d-block" alt="Robot Photo" style="max-width: 500px; max-height: 50px; margin:auto"/>
+                {:catch msg}
+                    <p>{msg}</p>
+                {/await}
+            </div>
+        </div>
         <pre>Pit: {getNotesForTeam(t, teamPitScoutingData)}</pre>
 
         <ul>
@@ -715,8 +738,20 @@
 
     <h2 class="border-bottom border-4 text-end">Our Alliance</h2>
     {#each getOurAllianceMembers(selectedPrepMatch?.value) as t}
-        <h3><a href="/pit?team={t}">{t}</a></h3>
-        <pre>Pit: {getNotesForTeam(t, teamPitScoutingData)}</pre>
+        <div class="d-flex justify-content-between">
+            <h3><a href="/pit?team={t}">{t}</a></h3>
+            <div>
+                {#await getImageForTeam(t, teamPitScoutingData)}
+                    <p>...waiting</p>
+                {:then image}
+                    <img src="{image}" class="d-block" alt="Robot Photo" style="max-width: 500px; max-height: 50px; margin:auto"/>
+                {:catch msg}
+                    <p>{msg}</p>
+                {/await}
+            </div>
+        </div>
+
+        <pre>Pit: {getNotesForTeam(t, teamPitScoutingDataDocs)}</pre>
 
         <ul>
             {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumberReverse) as mr}
@@ -726,15 +761,7 @@
             {/each}
         </ul>
     {/each}
-    <!--{#each }-->
-    <!--{#each matchReports.filter(OnlyOurAlliance) as r}-->
-    <!--    <div class="row">-->
-    <!--        <div class="col">-->
-    <!--            <h3>In {r.matchKey} team {r.teamNumber} had these notes:</h3>-->
-    <!--            {r.notes}-->
-    <!--        </div>-->
-    <!--    </div>-->
-    <!--{/each}-->
+
 
 
 </div>
