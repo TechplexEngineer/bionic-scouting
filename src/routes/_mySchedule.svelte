@@ -153,7 +153,7 @@
                         {#if toWatch(m.matchKey, parseInt(t.replace('frc', '')))}
 
                             <a class={isScouted(m.matchKey, parseInt(t.replace('frc', '')), getPrepFor(m.matchKey, parseInt(t.replace('frc', ''))), matchReports) ? "btn btn-success" : "btn btn-warning"}
-                               href={`/match/subjective?match=${m.matchKey}&team=${t.replace('frc','')}&for=${getPrepFor(m.matchKey, parseInt(t.replace('frc', '')))}`}>
+                               href={`/match/subjective?match=${m.matchKey}&team=${t.replace('frc','')}&for=any`}>
                                 {#if isScouted(m.matchKey, parseInt(t.replace('frc', '')), getPrepFor(m.matchKey, parseInt(t.replace('frc', ''))), matchReports) }
                                     ReScout
                                 {:else}

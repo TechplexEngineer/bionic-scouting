@@ -486,14 +486,11 @@
 
     const getImageForTeam = async (team: number, teamPitScoutingData: PitReportWithAttachments[]) => {
         let data = getDataForTeam(team, teamPitScoutingData);
-        console.log(data)
-
+        // console.log(data)
 
         if (!data?.attachments.length) return Promise.reject("No Photo");
 
         return await data.attachments[0].getStringData()
-
-        // return data?.attachments && data.attachments.length && data.attachments[0]
     }
 
 
@@ -542,40 +539,7 @@
 
                 </tr>
             {/each}
-            <!--            <tr>-->
-            <!--                <td>Auto</td>-->
-            <!--                {#each ['red', 'blue'] as color}-->
-            <!--                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
-            <!--                        <td>-->
-            <!--                            {getFrom(scoutingData, t.replace('frc', ''), "Average Auto Balls")}-->
-            <!--                        </td>-->
-            <!--                    {/each}-->
-            <!--                {/each}-->
-            <!--            </tr>-->
-            <!--            <tr>-->
-            <!--                <td>Auto Lo</td>-->
-            <!--                {#each ['red', 'blue'] as color}-->
-            <!--                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
-            <!--                        <td>-->
-            <!--                            &lt;!&ndash;{getFrom(scoutingData, t.replace('frc', ''), "Min Auto Lo")} |&ndash;&gt;-->
-            <!--                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Auto Lo")}-->
-            <!--                            | {getFrom(scoutingData, t.replace('frc', ''), "Max Auto Lo")}-->
-            <!--                        </td>-->
-            <!--                    {/each}-->
-            <!--                {/each}-->
-            <!--            </tr>-->
-            <!--            <tr>-->
-            <!--                <td>Auto Hi</td>-->
-            <!--                {#each ['red', 'blue'] as color}-->
-            <!--                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
-            <!--                        <td>-->
-            <!--                            &lt;!&ndash;{getFrom(scoutingData, t.replace('frc', ''), "Min Auto Hi")} |&ndash;&gt;-->
-            <!--                            {getFrom(scoutingData, t.replace('frc', ''), "Avg Auto Hi")}-->
-            <!--                            | {getFrom(scoutingData, t.replace('frc', ''), "Max Auto Hi")}-->
-            <!--                        </td>-->
-            <!--                    {/each}-->
-            <!--                {/each}-->
-            <!--            </tr>-->
+
 
             <tr>
                 <td>Auto (a|m)</td>

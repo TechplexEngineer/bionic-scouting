@@ -218,7 +218,7 @@
     <Scouts dbTable="super_scouts"/>
 
 
-    <h2>4. Our Matches <small class="text-muted fw-light fs-5">Assign super scouts to teams</small></h2>
+    <h2>4. Our Matches <small class="text-muted fw-light fs-5">Assign strategists to teams</small></h2>
 
     <label for="numMatchesToScout">Num Matches to Scout [1,5]</label>
     <input type="number" class="form-control" id="numMatchesToScout" min="1" max="5" bind:value={numMatchesToScout}>

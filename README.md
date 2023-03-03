@@ -18,7 +18,7 @@ Goals:
 - Pull Match schedule and teams from The Blue Alliance
 - Provide a quick view for the drive coach to use for match preparation
 - Objective match metrics are easily configurable as they change season to season
-- Super scouts collect observations in preparations for upcoming matches
+- Strategists collect observations in preparations for upcoming matches
 - Robot specific pit scouting
 - Easy data export to excel
 - Make all data collected viewable in the app
@@ -27,10 +27,10 @@ Hardware:
 
 - Six 8" tablets for scouts in the stands (Red 1,2,3 and Blue 1,2,3)
 - One lead scout using a tablet 10"
-- Three super scouts using 8" tablets
+- Five Strategists using 8" tablets
 - One lead super scout using an 8" tablet
 
-We plan to have our Super scouts pit scout on the first day of the event collecting overall observations, drivetrain
+We plan to have our Strategists pit scout on the first day of the event collecting overall observations, drivetrain
 information and photos of each robot.
 
 The data collected by the system can be exported to CSV for analysis in Excel.

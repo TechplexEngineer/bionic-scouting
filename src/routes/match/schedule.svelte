@@ -44,7 +44,7 @@
         <th>Match</th>
         <th colspan="3">Red Alliance</th>
         <th colspan="3">Blue Alliance</th>
-<!--        <th colspan="4">Scores</th>-->
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -62,9 +62,13 @@
 
             {#each m.alliances.blue.teamKeys as t}
                 <td class="bluebg" class:ourTeam={t.replace('frc','') == ourTeamNumber}>
-                    <a href="/match/subjective?match={m.matchKey}&team={t.replace('frc', '')}" class="text-reset text-decoration-none">{t.replace('frc', '')}</a>
+                    <a href="/match/subjective?match={m.matchKey}&team={t.replace('frc', '')}&for=any" class="text-reset text-decoration-none">{t.replace('frc', '')}</a>
                 </td>
             {/each}
+
+            <td>
+                <a href="/match/subjective/report?for={m.matchKey}" class="btn btn-success">Report</a>
+            </td>
 
 
         </tr>

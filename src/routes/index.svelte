@@ -32,9 +32,9 @@
             return
         }
 
-        console.log("deviceName", deviceName);
+        // console.log("deviceName", deviceName);
         let [first, number] = deviceName.split("-");
-        console.log(first, number);
+        // console.log(first, number);
         if (first.toUpperCase() !== "SS" && first.toUpperCase() !== "STRATEGIST") {
             return; // nothing to do for non-strategists
         }
@@ -57,7 +57,7 @@
 
     {#if isStrategist}
         {#if scouts.length > 1}
-            <h3>Super Scouts</h3>
+            <h3>Strategists</h3>
             <ul>
                 {#each scouts as scout}
                     <li class="mt-2">Jump To <a href="#{scout.name}">{scout.name}</a></li>

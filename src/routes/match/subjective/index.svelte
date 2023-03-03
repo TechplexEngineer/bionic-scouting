@@ -125,7 +125,7 @@
     }
 
     async function handleSelectPrepForMatch(event) {
-        console.log("handleSelectPrepForMatch:", event.detail.label);
+        // console.log("handleSelectPrepForMatch:", event.detail.label);
     }
 
     const debouncedSaveNotes = debounce(async (notes) => { // probably should wait for the promise
