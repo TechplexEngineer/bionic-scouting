@@ -107,18 +107,23 @@
                 // replicationState.
                 replicationState.change$.subscribe(change => {
                     console.log("change", change);
+                    LogSyncMessage(`---> change ${change}`);
                 });
                 replicationState.docs$.subscribe(docData => {
                     console.log("docData", docData);
+                    LogSyncMessage(`---> docData ${docData}`);
                 });
                 replicationState.denied$.subscribe(docData => {
-                    console.log("docData", docData);
+                    console.log("denied", docData);
+                    LogSyncMessage(`---> denied ${docData}`);
                 });
                 replicationState.active$.subscribe(active => {
                     console.log("active", active);
+                    LogSyncMessage(`---> active ${active}`);
                 });
                 replicationState.alive$.subscribe(alive => {
                     console.log("alive", alive);
+                    LogSyncMessage(`---> alive ${alive}`);
                 });
                 replicationState.complete$.subscribe((completed: boolean | { ok: boolean, errors: string[], last_seq: number, start_time: string, end_time: string, docs_read: number, docs_written: number, doc_write_failures: number, status: string }) => {
                     console.log("completed", completed);
