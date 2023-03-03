@@ -479,7 +479,7 @@
         }
         return teamPitReport[0].notes || ""
     }
-    const getDataForTeam = (team: number, teamPitScoutingData: PitReportWithAttachments[]) => {
+    const getDataForTeam = (team: number, teamPitScoutingData: PitReportWithAttachments[]):PitReportWithAttachments => {
         return teamPitScoutingData.find(o=> o.doc.teamNumber == team)
 
     }
@@ -490,7 +490,12 @@
 
         if (!data?.attachments.length) return Promise.reject("No Photo");
 
-        return await data.attachments[0].getStringData()
+        return await data.attachments[0].getStringData();
+    }
+
+    const getTeamNickname = (team: number, teamPitScoutingData: PitReportWithAttachments[]) => {
+        let data = getDataForTeam(team, teamPitScoutingData);
+        return data?.doc?.nickname
     }
 
 
@@ -678,7 +683,7 @@
     <h2 class="border-bottom border-4 text-end">Opposing Alliance</h2>
     {#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}
         <div class="d-flex justify-content-between">
-            <h3><a href="/pit?team={t}">{t}</a></h3>
+            <h3><a href="/pit?team={t}">{t}</a> <small>{getTeamNickname(t, teamPitScoutingData)}</small></h3>
             <div>
                 {#await getImageForTeam(t, teamPitScoutingData)}
                     <p>...waiting</p>
@@ -703,7 +708,7 @@
     <h2 class="border-bottom border-4 text-end">Our Alliance</h2>
     {#each getOurAllianceMembers(selectedPrepMatch?.value) as t}
         <div class="d-flex justify-content-between">
-            <h3><a href="/pit?team={t}">{t}</a></h3>
+            <h3><a href="/pit?team={t}">{t}</a> <small>{getTeamNickname(t, teamPitScoutingData)}</small></h3>
             <div>
                 {#await getImageForTeam(t, teamPitScoutingData)}
                     <p>...waiting</p>
