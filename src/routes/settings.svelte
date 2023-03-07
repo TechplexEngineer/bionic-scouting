@@ -98,8 +98,10 @@
                     },
                     options: {                             // sync-options (optional) from https://pouchdb.com/api.html#replication
                         live: false, // false means one shot
-                        retry: false
+                        retry: false,
+                        batch_size: 5
                     },
+
                     // query: dbToSync.find().where({eventKey}).eq(eventKey) // query (optional) only documents that match that query will be synchronised
                 });
 
@@ -107,15 +109,15 @@
                 // replicationState.
                 replicationState.change$.subscribe(change => {
                     console.log("change", change);
-                    LogSyncMessage(`---> change ${change}`);
+                    LogSyncMessage(`---> change ${JSON.stringify(change)}`);
                 });
                 replicationState.docs$.subscribe(docData => {
                     console.log("docData", docData);
-                    LogSyncMessage(`---> docData ${docData}`);
+                    LogSyncMessage(`---> docData ${JSON.stringify(docData)}`);
                 });
                 replicationState.denied$.subscribe(docData => {
                     console.log("denied", docData);
-                    LogSyncMessage(`---> denied ${docData}`);
+                    LogSyncMessage(`---> denied ${JSON.stringify(docData)}`);
                 });
                 replicationState.active$.subscribe(active => {
                     console.log("active", active);

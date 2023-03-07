@@ -26,8 +26,10 @@
     import Line from "svelte-chartjs/src/Line.svelte"
     import type {PitReport} from "$lib/schema/pit-scout-schema";
     import {RxAttachment} from "rxdb";
+    import TeamReportWithPhoto from "./_teamReportWithPhoto.svelte"
+    import MatchNotes from "./_matchNotes.svelte"
 
-    type PitReportWithAttachments = {doc: RxDocument<PitReport>, attachments: RxAttachment<PitReport, {}>}
+    export type PitReportWithAttachments = { doc: RxDocument<PitReport>, attachments: RxAttachment<PitReport, {}> }
 
     let matches: RxDocument<Match>[] = [];
     let matchSelections: { label: string, value: RxDocument<Match> }[] = [];
@@ -59,7 +61,7 @@
             teamNumber: {$in: extractTeamsFromMatch(match)}
         }).exec();
 
-        teamPitScoutingDataDocs.map((team:RxDocument<PitReport>) => {
+        teamPitScoutingDataDocs.map((team: RxDocument<PitReport>) => {
             let attachments = team.allAttachments()
             let report: PitReportWithAttachments = {
                 doc: team,
@@ -195,23 +197,8 @@
         return extractRedTeamsFromMatch(match)
     }
 
-    const onlyTeam = (teamNumber: number) => {
-        return (item: RxDocument<MatchSubjReport> | PitReportWithAttachments, index, self) => {
-            return item.teamNumber == teamNumber
-        }
-    }
-    const byMatchNumber = (a: RxDocument<MatchSubjReport>, b: RxDocument<MatchSubjReport>) => {
-        //@todo make this work for matches above QM
-        let aMatchNumber = parseInt(a.matchKey.slice(2));
-        let bMatchNumber = parseInt(b.matchKey.slice(2));
-        return aMatchNumber - bMatchNumber;
-    }
-    const byMatchNumberReverse = (a: RxDocument<MatchSubjReport>, b: RxDocument<MatchSubjReport>) => {
-        //@todo make this work for matches above QM
-        let aMatchNumber = parseInt(a.matchKey.slice(2));
-        let bMatchNumber = parseInt(b.matchKey.slice(2));
-        return bMatchNumber - aMatchNumber;
-    }
+
+
 
     const getFrom = (scoutingData, team, field) => {
         let rows = scoutingData.filter(r => r.Team == team)
@@ -471,32 +458,11 @@
         return dataLine
     }
 
-    function getNotesForTeam(team: number, teams: RxDocument<PitReport>[]) {
-        const teamPitReport = teams.filter((t: RxDocument<PitReport>) => t.teamNumber == team);
-        // console.log(teamPitReport);
-        if (teamPitReport.length == 0) {
-            return `no notes for ${team}`
-        }
-        return teamPitReport[0].notes || ""
-    }
-    const getDataForTeam = (team: number, teamPitScoutingData: PitReportWithAttachments[]):PitReportWithAttachments => {
-        return teamPitScoutingData.find(o=> o.doc.teamNumber == team)
 
-    }
 
-    const getImageForTeam = async (team: number, teamPitScoutingData: PitReportWithAttachments[]) => {
-        let data = getDataForTeam(team, teamPitScoutingData);
-        // console.log(data)
 
-        if (!data?.attachments.length) return Promise.reject("No Photo");
 
-        return await data.attachments[0].getStringData();
-    }
 
-    const getTeamNickname = (team: number, teamPitScoutingData: PitReportWithAttachments[]) => {
-        let data = getDataForTeam(team, teamPitScoutingData);
-        return data?.doc?.nickname
-    }
 
 
 </script>
@@ -504,7 +470,7 @@
 <div class="content">
     <div class="d-flex">
         <div class="flex-1">
-            <a class="btn btn-info float-start" href="/">&lt; My Schedule</a>
+            <a class="btn btn-info float-start" href="/static">&lt; My Schedule</a>
         </div>
         <div class="flex-1 text-center text-nowrap">
             <h1>Report</h1>
@@ -515,222 +481,183 @@
         </div>
     </div>
 
-    {#if selectedPrepMatch}
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th>Match</th>
-                <th colspan="3">Red Alliance</th>
-                <th colspan="3">Blue Alliance</th>
-            </tr>
-            </thead>
-            <tbody>
-            {#each [selectedPrepMatch?.value] as m}
-                <tr>
-                    <td>
-                        <a href="/match/{m.matchKey}">{m.matchKey.toUpperCase()}</a>
-                    </td>
+    <!--{#if selectedPrepMatch}-->
+    <!--    <table class="table table-striped">-->
+    <!--        <thead>-->
+    <!--        <tr>-->
+    <!--            <th>Match</th>-->
+    <!--            <th colspan="3">Red Alliance</th>-->
+    <!--            <th colspan="3">Blue Alliance</th>-->
+    <!--        </tr>-->
+    <!--        </thead>-->
+    <!--        <tbody>-->
+    <!--        {#each [selectedPrepMatch?.value] as m}-->
+    <!--            <tr>-->
+    <!--                <td>-->
+    <!--                    <a href="/match/{m.matchKey}">{m.matchKey.toUpperCase()}</a>-->
+    <!--                </td>-->
 
-                    {#each ['red', 'blue'] as color}
-                        {#each m.alliances[color].teamKeys as t}
-                            <td class="{color}bg"
-                                class:ourTeam={t.replace('frc','') == ourTeamNumber}>
-                                {t.replace('frc', '')}
+    <!--                {#each ['red', 'blue'] as color}-->
+    <!--                    {#each m.alliances[color].teamKeys as t}-->
+    <!--                        <td class="{color}bg"-->
+    <!--                            class:ourTeam={t.replace('frc','') == ourTeamNumber}>-->
+    <!--                            {t.replace('frc', '')}-->
 
-                            </td>
-                        {/each}
-                        <!--                        <td></td>-->
-                    {/each}
+    <!--                        </td>-->
+    <!--                    {/each}-->
+    <!--                    &lt;!&ndash;                        <td></td>&ndash;&gt;-->
+    <!--                {/each}-->
 
-                </tr>
-            {/each}
-
-
-            <tr>
-                <td>Auto (a|m)</td>
-                {#each ['red', 'blue'] as color}
-                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
-                        <td>
-                            <!--{getFrom(scoutingData, t.replace('frc', ''), "Min Auto Hi")} |-->
-                            {Math.round(parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Auto Hi")) + parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Auto Lo")), 2)}
-                            | {Math.round(parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Auto Hi")) + parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Auto Lo")), 2)}
-                        </td>
-                    {/each}
-                    <!--                    <td></td>-->
-                {/each}
-            </tr>
-            <tr>
-                <td>Taxi</td>
-                {#each ['red', 'blue'] as color}
-                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
-                        <td>
-                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Taxi %")}
-                        </td>
-                    {/each}
-                    <!--                    <td></td>-->
-                {/each}
-            </tr>
-            <tr>
-                <td>Tele H (a|m)</td>
-                {#each ['red', 'blue'] as color}
-                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
-                        <td>
-                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Tele Hi")} |
-                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Tele Hi")}
-                        </td>
-                    {/each}
-                    <!--                    <td></td>-->
-                {/each}
-            </tr>
-            <tr>
-                <td>Tele L (a|m)</td>
-                {#each ['red', 'blue'] as color}
-                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
-                        <td>
-                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Tele Lo")} |
-                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Tele Lo")}
-                        </td>
-                    {/each}
-                    <!--                    <td></td>-->
-                {/each}
-            </tr>
-            <tr>
-                <td>Avg Climb</td>
-                {#each ['red', 'blue'] as color}
-                    {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}
-                        <td>
-                            {getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Rung Succ.")}
-                        </td>
-                    {/each}
-                    <!--                    <td></td>-->
-                {/each}
-            </tr>
-            <!--            <tr>-->
-            <!--                <td>Prediction</td>-->
-            <!--                <td colspan="3">-->
-            <!--                    <pre>{JSON.stringify(getSBData(statboticsData, selectedPrepMatch?.value.matchKey), null, 4)}</pre>-->
-            <!--                </td>-->
-            <!--                <td colspan="3"></td>-->
-            <!--            </tr>-->
-            <tr>
-                <td>W: {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.winner}</td>
-                <td colspan="3">
-                    <!--elo:{getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.elo_win_prob} &mdash;-->
-                    opr: {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.opr_win_prob * 100, 2)}
-                    % &mdash;
-                    mix: {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.mix_win_prob * 100, 2)}
-                    %
-                </td>
-                <!--                <td></td>-->
-                <td colspan="3">
-                    <!--elo:{getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.elo_win_prob} &mdash;-->
-                    opr: {Math.round((1 - getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.opr_win_prob) * 100, 2)}
-                    %
-                    &mdash;
-                    mix: {Math.round((1 - getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.mix_win_prob) * 100, 2)}
-                    %
-                </td>
-                <!--                <td></td>-->
-            </tr>
-
-            <tr>
-                <td>RP</td>
-                <td colspan="3">
-                    Cargo
-                    {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_1}:
-                    {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_1_prob * 100, 2)}%
-                    &mdash;
-                    Rung
-                    {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_2}:
-                    {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_2_prob * 100, 2)}%
-                </td>
-                <td colspan="3">
-                    Cargo
-                    {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_1}:
-                    {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_1_prob * 100, 2)}%
-                    &mdash;
-                    Rung
-                    {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_2}:
-                    {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_2_prob * 100, 2)}%
-                </td>
-            </tr>
-
-            </tbody>
-        </table>
-    {/if}
-    {#if statusMessage}
-        <div class="alert alert-danger" role="alert">
-            {@html statusMessage}
-        </div>
-    {/if}
+    <!--            </tr>-->
+    <!--        {/each}-->
 
 
-    <h2 class="border-bottom border-4">Teleop Goals</h2>
-    <Line data={calcDataForTeleGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}
-          options={teleOptions}/>
+    <!--        <tr>-->
+    <!--            <td>Auto (a|m)</td>-->
+    <!--            {#each ['red', 'blue'] as color}-->
+    <!--                {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
+    <!--                    <td>-->
+    <!--                        &lt;!&ndash;{getFrom(scoutingData, t.replace('frc', ''), "Min Auto Hi")} |&ndash;&gt;-->
+    <!--                        {Math.round(parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Auto Hi")) + parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Auto Lo")), 2)}-->
+    <!--                        | {Math.round(parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Auto Hi")) + parseFloat(getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Auto Lo")), 2)}-->
+    <!--                    </td>-->
+    <!--                {/each}-->
+    <!--                &lt;!&ndash;                    <td></td>&ndash;&gt;-->
+    <!--            {/each}-->
+    <!--        </tr>-->
+    <!--        <tr>-->
+    <!--            <td>Taxi</td>-->
+    <!--            {#each ['red', 'blue'] as color}-->
+    <!--                {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
+    <!--                    <td>-->
+    <!--                        {getFrom(scoutingDataAverages, t.replace('frc', ''), "Taxi %")}-->
+    <!--                    </td>-->
+    <!--                {/each}-->
+    <!--                &lt;!&ndash;                    <td></td>&ndash;&gt;-->
+    <!--            {/each}-->
+    <!--        </tr>-->
+    <!--        <tr>-->
+    <!--            <td>Tele H (a|m)</td>-->
+    <!--            {#each ['red', 'blue'] as color}-->
+    <!--                {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
+    <!--                    <td>-->
+    <!--                        {getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Tele Hi")} |-->
+    <!--                        {getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Tele Hi")}-->
+    <!--                    </td>-->
+    <!--                {/each}-->
+    <!--                &lt;!&ndash;                    <td></td>&ndash;&gt;-->
+    <!--            {/each}-->
+    <!--        </tr>-->
+    <!--        <tr>-->
+    <!--            <td>Tele L (a|m)</td>-->
+    <!--            {#each ['red', 'blue'] as color}-->
+    <!--                {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
+    <!--                    <td>-->
+    <!--                        {getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Tele Lo")} |-->
+    <!--                        {getFrom(scoutingDataAverages, t.replace('frc', ''), "Max Tele Lo")}-->
+    <!--                    </td>-->
+    <!--                {/each}-->
+    <!--                &lt;!&ndash;                    <td></td>&ndash;&gt;-->
+    <!--            {/each}-->
+    <!--        </tr>-->
+    <!--        <tr>-->
+    <!--            <td>Avg Climb</td>-->
+    <!--            {#each ['red', 'blue'] as color}-->
+    <!--                {#each selectedPrepMatch?.value.alliances[color].teamKeys as t}-->
+    <!--                    <td>-->
+    <!--                        {getFrom(scoutingDataAverages, t.replace('frc', ''), "Avg Rung Succ.")}-->
+    <!--                    </td>-->
+    <!--                {/each}-->
+    <!--                &lt;!&ndash;                    <td></td>&ndash;&gt;-->
+    <!--            {/each}-->
+    <!--        </tr>-->
+    <!--        &lt;!&ndash;            <tr>&ndash;&gt;-->
+    <!--        &lt;!&ndash;                <td>Prediction</td>&ndash;&gt;-->
+    <!--        &lt;!&ndash;                <td colspan="3">&ndash;&gt;-->
+    <!--        &lt;!&ndash;                    <pre>{JSON.stringify(getSBData(statboticsData, selectedPrepMatch?.value.matchKey), null, 4)}</pre>&ndash;&gt;-->
+    <!--        &lt;!&ndash;                </td>&ndash;&gt;-->
+    <!--        &lt;!&ndash;                <td colspan="3"></td>&ndash;&gt;-->
+    <!--        &lt;!&ndash;            </tr>&ndash;&gt;-->
+    <!--        <tr>-->
+    <!--            <td>W: {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.winner}</td>-->
+    <!--            <td colspan="3">-->
+    <!--                &lt;!&ndash;elo:{getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.elo_win_prob} &mdash;&ndash;&gt;-->
+    <!--                opr: {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.opr_win_prob * 100, 2)}-->
+    <!--                % &mdash;-->
+    <!--                mix: {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.mix_win_prob * 100, 2)}-->
+    <!--                %-->
+    <!--            </td>-->
+    <!--            &lt;!&ndash;                <td></td>&ndash;&gt;-->
+    <!--            <td colspan="3">-->
+    <!--                &lt;!&ndash;elo:{getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.elo_win_prob} &mdash;&ndash;&gt;-->
+    <!--                opr: {Math.round((1 - getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.opr_win_prob) * 100, 2)}-->
+    <!--                %-->
+    <!--                &mdash;-->
+    <!--                mix: {Math.round((1 - getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.mix_win_prob) * 100, 2)}-->
+    <!--                %-->
+    <!--            </td>-->
+    <!--            &lt;!&ndash;                <td></td>&ndash;&gt;-->
+    <!--        </tr>-->
 
-    <h2 class="border-bottom border-4">Auto Goals</h2>
-    <Line data={calcDataForAutoGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}
-          options={autoOptions}/>
+    <!--        <tr>-->
+    <!--            <td>RP</td>-->
+    <!--            <td colspan="3">-->
+    <!--                Cargo-->
+    <!--                {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_1}:-->
+    <!--                {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_1_prob * 100, 2)}%-->
+    <!--                &mdash;-->
+    <!--                Rung-->
+    <!--                {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_2}:-->
+    <!--                {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.red_rp_2_prob * 100, 2)}%-->
+    <!--            </td>-->
+    <!--            <td colspan="3">-->
+    <!--                Cargo-->
+    <!--                {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_1}:-->
+    <!--                {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_1_prob * 100, 2)}%-->
+    <!--                &mdash;-->
+    <!--                Rung-->
+    <!--                {getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_2}:-->
+    <!--                {Math.round(getSBData(statboticsData, selectedPrepMatch?.value.matchKey)?.blue_rp_2_prob * 100, 2)}%-->
+    <!--            </td>-->
+    <!--        </tr>-->
 
-    <h2 class="border-bottom border-4">Climb (Highest Reached)</h2>
-    <Line data={calcDataForClimbGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}
-          options={climbOptions}/>
+    <!--        </tbody>-->
+    <!--    </table>-->
+    <!--{/if}-->
+    <!--{#if statusMessage}-->
+    <!--    <div class="alert alert-danger" role="alert">-->
+    <!--        {@html statusMessage}-->
+    <!--    </div>-->
+    <!--{/if}-->
+
+
+    <!--    <h2 class="border-bottom border-4">Teleop Goals</h2>-->
+    <!--    <Line data={calcDataForTeleGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}-->
+    <!--          options={teleOptions}/>-->
+
+    <!--    <h2 class="border-bottom border-4">Auto Goals</h2>-->
+    <!--    <Line data={calcDataForAutoGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}-->
+    <!--          options={autoOptions}/>-->
+
+    <!--    <h2 class="border-bottom border-4">Climb (Highest Reached)</h2>-->
+    <!--    <Line data={calcDataForClimbGraph(handlerScoutingData, extractRedTeamsFromMatch(selectedPrepMatch?.value), extractBlueTeamsFromMatch(selectedPrepMatch?.value))}-->
+    <!--          options={climbOptions}/>-->
 
 
     <h2 class="border-bottom border-4">Notes</h2>
+    <MatchNotes/>
+
 
     <h2 class="border-bottom border-4 text-end">Opposing Alliance</h2>
     {#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}
-        <div class="d-flex justify-content-between">
-            <h3><a href="/pit?team={t}">{t}</a> <small>{getTeamNickname(t, teamPitScoutingData)}</small></h3>
-            <div>
-                {#await getImageForTeam(t, teamPitScoutingData)}
-                    <p>...waiting</p>
-                {:then image}
-                    <img src="{image}" class="d-block" alt="Robot Photo" style="max-width: 500px; max-height: 50px; margin:auto"/>
-                {:catch msg}
-                    <p>{msg}</p>
-                {/await}
-            </div>
-        </div>
-        <pre>Pit: {getNotesForTeam(t, teamPitScoutingData)}</pre>
+        <TeamReportWithPhoto {t} {teamPitScoutingData} {matchReports}/>
 
-        <ul>
-            {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumberReverse) as mr}
-                <li>{mr.matchKey}
-                    <pre>{mr.notes}</pre>
-                </li>
-            {/each}
-        </ul>
     {/each}
 
     <h2 class="border-bottom border-4 text-end">Our Alliance</h2>
     {#each getOurAllianceMembers(selectedPrepMatch?.value) as t}
-        <div class="d-flex justify-content-between">
-            <h3><a href="/pit?team={t}">{t}</a> <small>{getTeamNickname(t, teamPitScoutingData)}</small></h3>
-            <div>
-                {#await getImageForTeam(t, teamPitScoutingData)}
-                    <p>...waiting</p>
-                {:then image}
-                    <img src="{image}" class="d-block" alt="Robot Photo" style="max-width: 500px; max-height: 50px; margin:auto"/>
-                {:catch msg}
-                    <p>{msg}</p>
-                {/await}
-            </div>
-        </div>
-
-        <pre>Pit: {getNotesForTeam(t, teamPitScoutingDataDocs)}</pre>
-
-        <ul>
-            {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumberReverse) as mr}
-                <li>{mr.matchKey}
-                    <pre>{mr.notes}</pre>
-                </li>
-            {/each}
-        </ul>
+        <TeamReportWithPhoto {t} {teamPitScoutingData} {matchReports}/>
     {/each}
-
 
 
 </div>

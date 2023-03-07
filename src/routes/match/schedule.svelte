@@ -56,7 +56,7 @@
 
             {#each m.alliances.red.teamKeys as t}
                 <td class="redbg" class:ourTeam={t.replace('frc','') == ourTeamNumber}>
-                    <a href="/match/subjective?match={m.matchKey}&team={t.replace('frc', '')}" class="text-reset text-decoration-none">{t.replace('frc', '')}</a>
+                    <a href="/match/subjective?match={m.matchKey}&team={t.replace('frc', '')}&for=any" class="text-reset text-decoration-none">{t.replace('frc', '')}</a>
                 </td>
             {/each}
 
