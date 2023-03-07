@@ -57,7 +57,7 @@
         {
             name: "Tools",
             dropdown: [
-                {name: "Sync", href: "/settings"},
+                {name: "Sync", href: "/sync"},
                 // {name: "Bluetooth", href: "/tools/bluetooth"},
                 {divider: true},
                 // {name: "Setup", href: "/tools/setup"},
@@ -69,8 +69,8 @@
                 {name: "Notes", href: "/notes"},
                 {divider: true},
                 {name: "Export / Data", href: "/export"},
-                {divider: true},
-                {name: "Check For Updates", click: () => checkForUpdates()},
+                // {divider: true},
+                // {name: "Check For Updates", click: () => checkForUpdates()},
             ]
         }
     ];

@@ -16,7 +16,13 @@
     import type {Match} from "$lib/schema/match-schema";
     import Scouts from "./setup/_2scouts.svelte";
     import Select from "svelte-select";
-    import {formatDate, getCurrentEvent, getOurTeamNumber} from "$lib/util";
+    import {
+        formatDate,
+        getCurrentEvent,
+        getCurrentEventQuery,
+        getOurTeamNumber,
+        getOurTeamNumberQuery
+    } from "$lib/util";
     import DeviceName from "./setup/_0deviceName.svelte";
     import TeamNumber from "./setup/_1teamNumber.svelte";
     import GetMatches from "./setup/_3getMatches.svelte";
@@ -25,7 +31,7 @@
     let db: MyDatabase;
     let eventKey: string; //eg. 2020week0 (current event)
     let matches: RxDocument<Match>[] = [];
-    let ourTeamNumber; //eg. 4909
+    let ourTeamNumber: number; //eg. 4909
     let ourMatches: RxDocument<Match>[] = [];
     type ScoutSelect = { label: string, value: RxDocument<SuperScout> };
     let scoutsSelectOptions: ScoutSelect[] = [];
@@ -34,17 +40,28 @@
 
     let numMatchesToScout = 2;
 
+    let matchSubscription = null
+
     onMount(async () => {
         db = await getDb();
 
-        eventKey = await getCurrentEvent(db, true);
-        ourTeamNumber = await getOurTeamNumber(db, true);
-        console.log("eventKey", eventKey);
-        console.log("ourTeamNumber", ourTeamNumber);
+        getCurrentEventQuery(db).$.subscribe(d => {
+            eventKey = d.value;
 
-        matches = await db.matches.find().where({eventKey}).sort({order: "asc"}).exec();
+            // console.log("EventKey", eventKey);
+            if (matchSubscription != null) {
+                matchSubscription.unsubscribe();
+                matchSubscription = null;
+                // console.log("cancelling", eventKey);
+            }
+            matchSubscription = db.matches.find().where({eventKey}).sort({order: "asc"}).$.subscribe(d => {
+                matches = d
+            })
+        })
 
-        // console.log("Matches", matches, eventKey);
+        getOurTeamNumberQuery(db).$.subscribe(d => {
+            ourTeamNumber = parseInt(d.value);
+        })
 
         // Find our matches
         for (let match of matches) {
@@ -162,11 +179,12 @@
         return m;
     }
 
-    function matchContainsOurTeam(match: RxDocument<Match>) {
+    function matchContainsOurTeam(match: RxDocument<Match>, ourTeamNumber) {
         const teamKeys = match.alliances.red.teamKeys.concat(match.alliances.blue.teamKeys);
         const matchTeams = teamKeys.map(t => parseInt(t.replace("frc", "")));
-
-        return matchTeams.includes(ourTeamNumber);
+        const result = matchTeams.includes(ourTeamNumber);
+        console.log(result, matchTeams, ourTeamNumber);
+        return result;
     }
 
     function matchIsAssigned(match: RxDocument<Match>) {
@@ -237,7 +255,7 @@
                 <td rowspan="2">
                     <a href="/match/{m.matchKey}">{m.matchKey.toUpperCase()}</a><br>
                     {formatDate(m.scheduledTime)}
-                    {#if matchContainsOurTeam(m)}
+                    {#if matchContainsOurTeam(m, ourTeamNumber)}
                         {#if superScoutsLoaded && matchIsAssigned(m)}
                             <button class="btn btn-success" on:click={openModal(m)}>Change</button>
                             <br>
@@ -261,7 +279,7 @@
                     {#each m.alliances[color].teamKeys as t}
                         <td class="{color}bg">
                             {#if t !== `frc${ourTeamNumber}`}
-                                {matchContainsOurTeam(m) && getMatches(parseInt(t.replace('frc', '')), m.order, numMatchesToScout).join(", ") || ""}
+                                {matchContainsOurTeam(m, ourTeamNumber) && getMatches(parseInt(t.replace('frc', '')), m.order, numMatchesToScout).join(", ") || ""}
                             {/if}
                         </td>
                     {/each}

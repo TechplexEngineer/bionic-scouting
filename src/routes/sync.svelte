@@ -29,12 +29,12 @@
         BOTH = "BOTH"
     }
     const syncOptions: {label:string, value:string}[] = [
-        { label: "pitScouting", value:"pit_scouting"},
-        { label: "matches", value:"matches"},
-        { label: "matchSubjective", value:"match_subjective"},
-        { label: "notes", value:"notes"},
-        { label: "settings", value:"settings"}, //special case skip device name
-        { label: "superScouts", value:"super_scouts"},
+        { label: "Pit Scouting & Pics", value:"pit_scouting"},
+        { label: "Match Schedule", value:"matches"},
+        { label: "Match Observations", value:"match_subjective"},
+        // { label: "notes", value:"notes"},
+        // { label: "settings", value:"settings"}, //special case skip device name
+        { label: "Strategists & Assignments", value:"super_scouts"},
     ];
     let selectedSyncDb:{label:string, value:string} = syncOptions[0];
 
@@ -108,27 +108,33 @@
 
                 // replicationState.
                 replicationState.change$.subscribe(change => {
-                    console.log("change", change);
-                    LogSyncMessage(`---> change ${JSON.stringify(change, ["docs"])}`);
+                    // console.log("change", change);
+                    let msg =`---> change `;
+                    if (change.ok) {
+                        msg += `completed: ${change.docs_read} pending: ${change.pending} `
+                    } else {
+                        msg += JSON.stringify(change);
+                    }
+                    LogSyncMessage(msg);
                 });
                 replicationState.docs$.subscribe(docData => {
-                    console.log("docData", docData);
+                    // console.log("docData", docData);
                     LogSyncMessage(`---> docData ${JSON.stringify(docData)}`);
                 });
                 replicationState.denied$.subscribe(docData => {
-                    console.log("denied", docData);
+                    // console.log("denied", docData);
                     LogSyncMessage(`---> denied ${JSON.stringify(docData)}`);
                 });
                 replicationState.active$.subscribe(active => {
-                    console.log("active", active);
+                    // console.log("active", active);
                     LogSyncMessage(`---> active ${active}`);
                 });
                 replicationState.alive$.subscribe(alive => {
-                    console.log("alive", alive);
+                    // console.log("alive", alive);
                     LogSyncMessage(`---> alive ${alive}`);
                 });
                 replicationState.complete$.subscribe((completed: boolean | { ok: boolean, errors: string[], last_seq: number, start_time: string, end_time: string, docs_read: number, docs_written: number, doc_write_failures: number, status: string }) => {
-                    console.log("completed", completed);
+                    // console.log("completed", completed);
                     if (completed && typeof completed !== "boolean") {
                         LogSyncMessage(`Sync Complete: read:${completed.docs_read} written:${completed.docs_written}`);
                     }
@@ -137,7 +143,7 @@
 //                 process.browser = undefined;
                 });
                 replicationState.error$.subscribe(error => {
-                    console.log("error", error);
+                    // console.log("error", error);
                     LogSyncMessage(`Error Syncing: ${error.message} ${error.stack} ${error}`);
                     resolve();
                 });

@@ -45,7 +45,7 @@ const matchSubjectiveSchema: RxJsonSchema<MatchSubjReport> = {
 			// match being observed
 		},
 		matchForKey: {
-			type: 'string' // eg: qm4 qf1m1 sf2m1 f1m2
+			type: 'string' // eg: qm4 qf1m1 sf2m1 f1m2 any meeting
 			// observations for this match
 		},
 		createdAt: {

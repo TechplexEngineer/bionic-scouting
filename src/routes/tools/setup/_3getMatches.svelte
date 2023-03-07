@@ -87,7 +87,7 @@
             return;
         }
         let selectedEventKey = $selectedEvent.value;
-        let matches = await db.matches.find().exec()
+        let matches = await db.matches.find().where({eventKey: selectedEventKey}).exec()
         if (matches.length > 0) {
             let res = await Swal.fire({
                 icon: "error",
@@ -195,7 +195,7 @@
             return;
         }
 
-        let matches = await db.matches.find().exec()
+        let matches = await db.matches.find().where({eventKey: $selectedEvent.value}).exec()
         if (matches.length > 0) {
             let res = await Swal.fire({
                 icon: "warning",
@@ -360,4 +360,5 @@
     <button class="btn btn-outline-primary ms-2 btn-sm" type="button" on:click={()=>{teamFileInput.click();}}>Upload Team List
     </button>
     <button class="ms-2 btn btn-outline-primary" on:click={helpTeamList}><i class="bi bi-question-circle-fill"></i></button>
+    <a href="/sync" class="btn btn-warning ms-2">Go to Sync</a>
 </div>

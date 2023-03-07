@@ -109,10 +109,12 @@ export const extractBlueTeamsFromMatch = (match: RxDocument<Match>) => {
 	return teamKeys.map((t) => parseInt(t.replace('frc', '')));
 };
 
+export const getCurrentEventQuery = (db: MyDatabase) => {
+	return db.settings.findOne({ selector: { key: Settings.CurrentEvent } });
+}
+
 export const getCurrentEvent = async (db: MyDatabase, skipError?: boolean) => {
-	const settingEvent = await db.settings
-		.findOne({ selector: { key: Settings.CurrentEvent } })
-		.exec();
+	const settingEvent = await getCurrentEventQuery(db).exec();
 	if (!settingEvent) {
 		if (skipError) {
 			return;
@@ -132,8 +134,12 @@ export const getCurrentEvent = async (db: MyDatabase, skipError?: boolean) => {
 	return settingEvent.value;
 };
 
+export const getOurTeamNumberQuery = (db: MyDatabase) => {
+	return db.settings.findOne({ selector: { key: Settings.TeamNumber } });
+}
+
 export const getOurTeamNumber = async (db: MyDatabase, skipError?: true) => {
-	const entry = await db.settings.findOne({ selector: { key: Settings.TeamNumber } }).exec();
+	const entry = await getOurTeamNumberQuery(db).exec();
 
 	if (!entry) {
 		if (skipError) {

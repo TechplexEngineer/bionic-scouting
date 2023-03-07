@@ -25,6 +25,7 @@
 
         return await data.attachments[0].getStringData();
     }
+
     function getNotesForTeam(team: number, teams: RxDocument<PitReport>[]) {
         const teamPitReport = teams.filter((t: RxDocument<PitReport>) => t.teamNumber == team);
         // console.log(teamPitReport);
@@ -33,6 +34,7 @@
         }
         return teamPitReport[0].notes || ""
     }
+
     const onlyTeam = (teamNumber: number) => {
         return (item: RxDocument<MatchSubjReport> | PitReportWithAttachments, index, self) => {
             return item.teamNumber == teamNumber
@@ -53,25 +55,31 @@
 </script>
 
 <h3><a href="/pit?team={t}">{t}</a> <small>{getTeamNickname(t, teamPitScoutingData)}</small></h3>
-        <div class="d-flex">
-            <div class="flex-grow-1 me-2">
-                <pre>Pit: {getNotesForTeam(t, teamPitScoutingData)}</pre>
+<div class="d-flex">
+    <div class="flex-grow-1 me-2">
+        <pre>Pit: {getNotesForTeam(t, teamPitScoutingData)}</pre>
 
-                <ul>
-                    {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumberReverse) as mr}
-                        <li>{mr.matchKey}
-                            <pre>{mr.notes}</pre>
-                        </li>
-                    {/each}
-                </ul>
-            </div>
-            <div style="max-width: 45%">
-                {#await getImageForTeam(t, teamPitScoutingData)}
-                    <p>...waiting</p>
-                {:then image}
-                    <img src="{image}" class="d-block" alt="Robot Photo" style="max-width: 100%; margin:auto"/>
-                {:catch msg}
-                    <p>{msg}</p>
-                {/await}
-            </div>
-        </div>
+        <ul>
+            {#each matchReports.filter(onlyTeam(t)).sort(byMatchNumberReverse) as mr}
+                <li>{mr.matchKey}
+                    <pre>{mr.notes}</pre>
+                </li>
+            {/each}
+        </ul>
+    </div>
+    <div style="max-width: 45%">
+        {#await getImageForTeam(t, teamPitScoutingData)}
+            <p>...waiting</p>
+        {:then image}
+            <img src="{image}" class="d-block" alt="Robot Photo" style="max-width: 100%; margin:auto"/>
+        {:catch msg}
+            <p>{msg}</p>
+        {/await}
+    </div>
+</div>
+
+<style>
+    pre {
+        white-space: pre-wrap;
+    }
+</style>

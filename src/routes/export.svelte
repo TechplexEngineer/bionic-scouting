@@ -184,8 +184,6 @@
     };
 
     const doExportAll = async () => {
-        console.log("Export All");
-
         const zip = new JSZip();
 
         for (let table of collections) {
@@ -271,13 +269,21 @@
              });
             if (result.isConfirmed) {
                 console.log(`Deleting ${collection}`);
-                indexedDB.deleteDatabase(collection);
+
+                const dbs = await indexedDB.databases();
+                dbs.forEach(db => {
+                    if (db.name.includes(`-${collection}`)) {
+                        // console.log("Delete", db);
+                        indexedDB.deleteDatabase(db.name);
+                    }
+                });
+                location.reload(); // total hack
             }
         }
     }
 </script>
 
-<h1>Data Export</h1>
+<h1>Data Management</h1>
 
 <div class="row">
     <div class="col col-12 card">
