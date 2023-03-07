@@ -24,6 +24,10 @@ export type PitReport = {
 	schoolName?: string;
 	stateProv?: string;
 	numAttachments?: number;
+	// pickListNotes?: string;
+	// pickListPicked?: boolean;
+	// pickListOrder?: number;
+	//@todo https://rxdb.info/data-migration.html
 };
 
 export type PitReportCollection = RxCollection<PitReport>;
@@ -104,7 +108,16 @@ const pitSchema: RxJsonSchema<PitReport> = {
 		numAttachments: {
 			default: 0,
 			type: 'number'
-		}
+		},
+		// pickListNotes: {
+		// 	type: 'string'
+		// },
+		// pickListPicked: {
+		// 	type: 'boolean'
+		// },
+		// pickListOrder: {
+		// 	type: 'number'
+		// },
 	},
 	required: ['eventKey', 'teamNumber'],
 	attachments: {}

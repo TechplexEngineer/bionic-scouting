@@ -28,6 +28,7 @@
     import TeamReportWithPhoto from "./_teamReportWithPhoto.svelte"
     import MatchNotes from "./_matchNotes.svelte"
     import MatchTable from "./_matchTable.svelte"
+    import Statbotics from "./_statbotics.svelte"
 
     export type PitReportWithAttachments = { doc: RxDocument<PitReport>, attachments: RxAttachment<PitReport, {}> }
 
@@ -112,6 +113,21 @@
         return extractRedTeamsFromMatch(match)
     }
 
+    const getOpposingAllianceColor = (match: RxDocument<Match>) => {
+        if (weAreBlue(match)) {
+            return "Red"
+        } else {
+            return "Blue"
+        }
+    }
+    const getOurAllianceColor = (match: RxDocument<Match>) => {
+        if (weAreBlue(match)) {
+            return "Blue"
+        } else {
+            return "Red"
+        }
+    }
+
 </script>
 
 <div class="content">
@@ -130,16 +146,18 @@
 
     <MatchTable/>
 
+    <Statbotics/>
+
     <MatchNotes currentMatch={selectedPrepMatch?.value}/>
 
 
 
-    <h2 class="border-bottom border-4 text-end">Opposing Alliance</h2>
+    <h2 class="border-bottom border-4 text-end">Opposing Alliance &mdash; {getOpposingAllianceColor(selectedPrepMatch?.value)}</h2>
     {#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}
         <TeamReportWithPhoto {t} {teamPitScoutingData} {matchReports}/>
     {/each}
 
-    <h2 class="border-bottom border-4 text-end">Our Alliance</h2>
+    <h2 class="border-bottom border-4 text-end">Our Alliance  &mdash; {getOurAllianceColor(selectedPrepMatch?.value)}</h2>
     {#each getOurAllianceMembers(selectedPrepMatch?.value) as t}
         <TeamReportWithPhoto {t} {teamPitScoutingData} {matchReports}/>
     {/each}
