@@ -23,7 +23,7 @@
     import Swal from "sweetalert2";
     import {getDb, MyDatabase} from "$lib/store";
     import {Settings} from "$lib/schema/settings-schema";
-    import {getDeviceNameQuery} from "$lib/util";
+    import {getDeviceNameQuery, removeAllData} from "$lib/util";
     let deviceName = "UNKNOWN DEVICE";
 
     let isOpen = false;
@@ -35,22 +35,6 @@
     function toggle() {
         isOpen = !isOpen;
     }
-
-    async function removeAllData() {
-        if (!confirm("Are you sure? there is no undo!")) {
-            return;
-        }
-        // console.log("Removing all databases");
-        const dbs = await indexedDB.databases();
-        dbs.forEach(db => {
-            // console.log("Delete", db);
-            indexedDB.deleteDatabase(db.name);
-        });
-
-        localStorage.clear();
-        location.reload();
-    }
-
 
     function back() {
         history.back();
@@ -74,7 +58,7 @@
             name: "Tools",
             dropdown: [
                 {name: "Sync", href: "/settings"},
-                {name: "Bluetooth", href: "/tools/bluetooth"},
+                // {name: "Bluetooth", href: "/tools/bluetooth"},
                 {divider: true},
                 // {name: "Setup", href: "/tools/setup"},
                 {name: "Strategist Setup", href: "/tools/super"},
@@ -84,7 +68,7 @@
                 {divider: true},
                 {name: "Notes", href: "/notes"},
                 {divider: true},
-                {name: "Export", href: "/export"},
+                {name: "Export / Data", href: "/export"},
                 {divider: true},
                 {name: "Check For Updates", click: () => checkForUpdates()},
             ]

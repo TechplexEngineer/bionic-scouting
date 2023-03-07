@@ -15,7 +15,7 @@
     import type {RxDocument} from "rxdb";
     import type {PitReport} from "$lib/schema/pit-scout-schema";
     import SpinButton from "$lib/compontents/SpinButton.svelte";
-    import {getCurrentEvent} from "$lib/util";
+    import {getCurrentEvent,removeAllData} from "$lib/util";
 
 
     let db: MyDatabase;
@@ -41,6 +41,26 @@
     enum ExportType {
         CSV = "CSV",
         JSON = "JSON",
+    }
+    const dbDescriptions = {
+        matches: {
+            desc: "Match Schedule"
+        },
+        match_subjective: {
+            desc: "Strategist Match Observations"
+        },
+        notes: {
+            desc: "Generic notes (not used)"
+        },
+        pit_scouting: {
+            desc: "Notes and Photos"
+        },
+        settings: {
+            desc: "Runtime settings, eg. currentEvent, deviceName, ourTeamNumber"
+        },
+        super_scouts: {
+            desc: "Strategists and assigned matches"
+        }
     }
 
     const doExport = (colName: string, format: ExportType) => {
@@ -239,6 +259,22 @@
 
         }
     }
+
+    const deleteCollection = (collection) => {
+        return async () => {
+             let result = await Swal.fire({
+                 icon: "question",
+                 title: `Remove all ${collection}?`,
+                 showCancelButton: true,
+                 confirmButtonText: "Remove All",
+                 confirmButtonColor: "#dd6b55"
+             });
+            if (result.isConfirmed) {
+                console.log(`Deleting ${collection}`);
+                indexedDB.deleteDatabase(collection);
+            }
+        }
+    }
 </script>
 
 <h1>Data Export</h1>
@@ -248,15 +284,18 @@
         <div class="card-body">
             <h5 class="card-title">Export All</h5>
             <SpinButton class="btn btn-primary" onClick={doExportAll}>Export All</SpinButton>
+            <button class="btn btn-danger float-end" on:click={() => removeAllData()}>Delete All Data</button>
         </div>
     </div>
     {#each collections as col}
         <div class="col col-6 card">
             <div class="card-body">
-                <h5 class="card-title">{makeNiceName(col)}<br><small>
+                <h5 class="card-title">{makeNiceName(col)} &mdash; <small>
                     {#await getData(col)}...{:then data}{data.length}{:catch error}Error{/await} records</small></h5>
-                <button class="btn btn-primary" on:click={doExport(col, ExportType.CSV)}>Export CSV</button>
+                <p>{dbDescriptions[col].desc}</p>
+                <button class="btn btn-secondary" on:click={doExport(col, ExportType.CSV)}>Export CSV</button>
                 <button class="btn btn-primary" on:click={doExport(col, ExportType.JSON)}>Export JSON</button>
+                <button class="btn btn-danger float-end" on:click={deleteCollection(col)}>Delete</button>
             </div>
         </div>
     {/each}

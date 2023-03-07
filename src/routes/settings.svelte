@@ -109,7 +109,7 @@
                 // replicationState.
                 replicationState.change$.subscribe(change => {
                     console.log("change", change);
-                    LogSyncMessage(`---> change ${JSON.stringify(change)}`);
+                    LogSyncMessage(`---> change ${JSON.stringify(change, ["docs"])}`);
                 });
                 replicationState.docs$.subscribe(docData => {
                     console.log("docData", docData);

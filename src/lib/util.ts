@@ -163,3 +163,18 @@ export const getDeviceName = async (db: MyDatabase, skipError?: true) => {
 
 	return entry.value;
 };
+
+export async function removeAllData(): Promise<void> {
+	if (!confirm("Are you sure? there is no undo!")) {
+		return;
+	}
+	// console.log("Removing all databases");
+	const dbs = await indexedDB.databases();
+	dbs.forEach(db => {
+		// console.log("Delete", db);
+		indexedDB.deleteDatabase(db.name);
+	});
+
+	localStorage.clear();
+	location.reload();
+}
