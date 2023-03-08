@@ -146,7 +146,7 @@
 
     <MatchTable/>
 
-    <Statbotics/>
+    <Statbotics currentMatch={selectedPrepMatch?.value}/>
 
     <MatchNotes currentMatch={selectedPrepMatch?.value}/>
 
