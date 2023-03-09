@@ -1,76 +1,91 @@
-
-
 <script lang="ts">
     import {onMount} from "svelte";
     import type {RxDocument} from "rxdb";
     import type {Match} from "$lib/schema/match-schema";
+
     export let currentMatch: RxDocument<Match>;
 
     export interface StatboticsMatchData {
-    key:                  string;
-    year:                 number;
-    event:                string;
-    comp_level:           string;
-    set_number:           number;
-    match_number:         number;
-    offseason:            boolean;
-    status:               string;
-    video:                string;
-    red_1:                number;
-    red_2:                number;
-    red_3:                number;
-    red_dq:               string;
-    red_surrogate:        string;
-    red_epa_sum:          number;
-    red_auto_epa_sum:     number;
-    red_teleop_epa_sum:   number;
-    red_endgame_epa_sum:  number;
-    red_rp_1_epa_sum:     number;
-    red_rp_2_epa_sum:     number;
-    blue_1:               number;
-    blue_2:               number;
-    blue_3:               number;
-    blue_dq:              string;
-    blue_surrogate:       string;
-    blue_epa_sum:         number;
-    blue_auto_epa_sum:    number;
-    blue_teleop_epa_sum:  number;
-    blue_endgame_epa_sum: number;
-    blue_rp_1_epa_sum:    number;
-    blue_rp_2_epa_sum:    number;
-    winner:               string;
-    epa_winner:           string;
-    epa_win_prob:         number;
-    red_rp_1_prob:        number;
-    red_rp_2_prob:        number;
-    blue_rp_1_prob:       number;
-    blue_rp_2_prob:       number;
-    playoff:              boolean;
-    time:                 number;
-    predicted_time:       number;
-    red_score:            number;
-    blue_score:           number;
-    red_auto:             number;
-    red_auto_movement:    number;
-    red_teleop:           number;
-    red_endgame:          number;
-    red_no_fouls:         number;
-    red_fouls:            number;
-    red_rp_1:             number;
-    red_rp_2:             number;
-    red_tiebreaker:       number;
-    blue_auto:            number;
-    blue_auto_movement:   number;
-    blue_teleop:          number;
-    blue_endgame:         number;
-    blue_no_fouls:        number;
-    blue_fouls:           number;
-    blue_rp_1:            number;
-    blue_rp_2:            number;
-    blue_tiebreaker:      number;
-}
+        key: string;
+        year: number;
+        event: string;
+        comp_level: string;
+        set_number: number;
+        match_number: number;
+        offseason: boolean;
+        status: string;
+        video: string;
+        red_1: number;
+        red_2: number;
+        red_3: number;
+        red_dq: string;
+        red_surrogate: string;
+        red_epa_sum: number;
+        red_auto_epa_sum: number;
+        red_teleop_epa_sum: number;
+        red_endgame_epa_sum: number;
+        red_rp_1_epa_sum: number;
+        red_rp_2_epa_sum: number;
+        blue_1: number;
+        blue_2: number;
+        blue_3: number;
+        blue_dq: string;
+        blue_surrogate: string;
+        blue_epa_sum: number;
+        blue_auto_epa_sum: number;
+        blue_teleop_epa_sum: number;
+        blue_endgame_epa_sum: number;
+        blue_rp_1_epa_sum: number;
+        blue_rp_2_epa_sum: number;
+        winner: string;
+        epa_winner: string;
+        epa_win_prob: number;
+        red_rp_1_prob: number;
+        red_rp_2_prob: number;
+        blue_rp_1_prob: number;
+        blue_rp_2_prob: number;
+        playoff: boolean;
+        time: number;
+        predicted_time: number;
+        red_score: number;
+        blue_score: number;
+        red_auto: number;
+        red_auto_movement: number;
+        red_teleop: number;
+        red_endgame: number;
+        red_no_fouls: number;
+        red_fouls: number;
+        red_rp_1: number;
+        red_rp_2: number;
+        red_tiebreaker: number;
+        blue_auto: number;
+        blue_auto_movement: number;
+        blue_teleop: number;
+        blue_endgame: number;
+        blue_no_fouls: number;
+        blue_fouls: number;
+        blue_rp_1: number;
+        blue_rp_2: number;
+        blue_tiebreaker: number;
+    }
 
-    let data: StatboticsMatchData;
+    interface sbTeam {
+        teamNumber: number
+        auto: number
+        teleop: number,
+        endGame: number,
+        fouls: number,
+        rp1: number,
+        rp2: number,
+        total: number,
+    }
+
+    interface sbDisplay {
+        red: sbTeam[],
+        blue: sbTeam[]
+    }
+
+    let data: sbDisplay;
 
     export interface StatboticsTeamMatch {
         alliance: string;
@@ -85,31 +100,54 @@
     onMount(async () => {
         // data = await getStatboticsMatchData("2023week0", "qm5");
         // console.log(data);
+
+        // console.log("currentMatch", currentMatch)
     });
 
-    const init = (currentMatch: RxDocument<Match>) => {
+
+    const init = async (currentMatch: RxDocument<Match>) => {
         if (!currentMatch) return;
         console.log("matchKey", currentMatch.matchKey);
         console.log("eventKey", currentMatch.eventKey);
         console.log("alliances", currentMatch.alliances);
 
+        const mapTeams = async (t):Promise<sbTeam> => {
+            const teamNumber = parseInt(t.replace("frc", ""));
+            const sb = await getStatboticsTeamMatchData(teamNumber, currentMatch.eventKey, currentMatch.matchKey)
+            return {
+                teamNumber,
+                auto: sb.auto_epa,
+                teleop: sb.teleop_epa,
+                endGame: sb.endgame_epa,
+                fouls: 1,
+                rp1: sb.rp_1_epa,
+                rp2: sb.rp_2_epa,
+                total: sb.epa
+            }
+        }
 
+        data = {
+            red: await Promise.all(currentMatch.alliances.red.teamKeys.map(mapTeams)),
+            blue: await Promise.all(currentMatch.alliances.blue.teamKeys.map(mapTeams))
+        }
+        console.log(data)
     }
 
     $: init(currentMatch)
 
-    async function getStatboticsMatchData(eventKey: string, matchKey: string): Promise<StatboticsMatchData> {
-        try {
-            const res = await fetch(`https://api.statbotics.io/v2/match/${eventKey}_${matchKey}`);
-            if (!res.ok) {
-                return
-            }
-            return await res.json()
-        } catch (e) {
-            console.log("Error: ", e);
-        }
-        return {} as any;
-    }
+    // async function getStatboticsMatchData(eventKey: string, matchKey: string): Promise<StatboticsMatchData> {
+    //     try {
+    //         const res = await fetch(`https://api.statbotics.io/v2/match/${eventKey}_${matchKey}`);
+    //         if (!res.ok) {
+    //             return
+    //         }
+    //         return await res.json()
+    //     } catch (e) {
+    //         console.log("Error: ", e);
+    //     }
+    //     return {} as any;
+    // }
+
     async function getStatboticsTeamMatchData(team: number, eventKey: string, matchKey: string): Promise<StatboticsTeamMatch> {
         try {
             const res = await fetch(`https://api.statbotics.io/v2/team_match/${team}/${eventKey}_${matchKey}`);
@@ -135,71 +173,73 @@
 </ul>
 
 
-
 <table class="table table-striped text-center ">
     <thead>
-        <tr>
-            <th class="redbg">Red1 {currentMatch?.alliances.red.teamKeys[0]}</th>
-            <th class="redbg">Red2 {currentMatch?.alliances.red.teamKeys[1]}</th>
-            <th class="redbg">Red3 {currentMatch?.alliances.red.teamKeys[2]}</th>
-            <th class="redbg">Predicted</th>
-            <th></th>
-            <th class="bluebg">Predicted</th>
-            <th class="bluebg">Blue1 {currentMatch?.alliances.blue.teamKeys[0]}</th>
-            <th class="bluebg">Blue2 {currentMatch?.alliances.blue.teamKeys[1]}</th>
-            <th class="bluebg">Blue3 {currentMatch?.alliances.blue.teamKeys[2]}</th>
-        </tr>
+    <tr>
+        <th class="redbg">Red1 {data?.red[0].teamNumber}</th>
+        <th class="redbg">Red2 {data?.red[1].teamNumber}</th>
+        <th class="redbg">Red3 {data?.red[2].teamNumber}</th>
+        <th class="redbg">Predicted</th>
+        <th></th>
+        <th class="bluebg">Predicted</th>
+        <th class="bluebg">Blue1 {data?.blue[0].teamNumber}</th>
+        <th class="bluebg">Blue2 {data?.blue[1].teamNumber}</th>
+        <th class="bluebg">Blue3 {data?.blue[2].teamNumber}</th>
+    </tr>
     </thead>
     <tbody>
     {#each metrics as metric}
         <tr>
-            <td>Red1</td>
-            <td>Red2</td>
-            <td>Red3</td>
-            <td>Predicted</td>
+            <td>{data?.red[0][metric.toLowerCase()]||"n/a"}</td>
+            <td>{data?.red[1][metric.toLowerCase()]||"n/a"}</td>
+            <td>{data?.red[2][metric.toLowerCase()]||"n/a"}</td>
+            <td>{round2(data?.red[0][metric.toLowerCase()] + data?.red[1][metric.toLowerCase()] + data?.red[2][metric.toLowerCase()])||"n/a"}</td>
             <td>{metric}</td>
-            <td>Predicted</td>
-            <td>Blue1</td>
-            <td>Blue2</td>
-            <td>Blue3</td>
+            <td>{round2(data?.blue[0][metric.toLowerCase()] + data?.blue[1][metric.toLowerCase()] + data?.blue[2][metric.toLowerCase()])||"n/a"}</td>
+            <td>{data?.blue[0][metric.toLowerCase()]||"n/a"}</td>
+            <td>{data?.blue[1][metric.toLowerCase()]||"n/a"}</td>
+            <td>{data?.blue[2][metric.toLowerCase()]||"n/a"}</td>
         </tr>
     {/each}
     <tr class="bg-gray-300">
-        <td>Red1</td>
-        <td>Red2</td>
-        <td>Red3</td>
-        <td>Predicted</td>
+        <td>{data?.red[0].total||"n/a"}</td>
+        <td>{data?.red[1].total||"n/a"}</td>
+        <td>{data?.red[2].total||"n/a"}</td>
+        <td>{round2(data?.red[0].total + data?.red[1].total + data?.red[2].total) || "n/a"}</td>
         <td>Total</td>
-        <td>Predicted</td>
-        <td>Blue1</td>
-        <td>Blue2</td>
-        <td>Blue3</td>
+        <td>{round2(data?.blue[0].total + data?.blue[1].total + data?.blue[2].total) || "n/a"}</td>
+        <td>{data?.blue[0].total||"n/a"}</td>
+        <td>{data?.blue[1].total||"n/a"}</td>
+        <td>{data?.blue[2].total||"n/a"}</td>
     </tr>
     </tbody>
 </table>
 
-<div class="w-100 d-flex flex-wrap justify-content-center">
-    <p class="me-2">Key (Percentile):</p>
-    <div>
-        <span class="rounded text-red-700 bg-red-100 p-1">0 - 25</span>
-        <span class="rounded text-gray-800 p-1">25 - 75</span>
-        <span class="rounded text-green-800 bg-green-50 p-1">75 - 90</span>
-        <span class="rounded text-green-800 bg-green-100 p-1">90 - 99</span>
-        <span class="rounded text-blue-800 bg-blue-200 p-1">99 - 100</span>
-    </div>
-</div>
+<!--<div class="w-100 d-flex flex-wrap justify-content-center">-->
+<!--    <p class="me-2">Key (Percentile):</p>-->
+<!--    <div>-->
+<!--        <span class="rounded text-red-700 bg-red-100 p-1">0 - 25</span>-->
+<!--        <span class="rounded text-gray-800 p-1">25 - 75</span>-->
+<!--        <span class="rounded text-green-800 bg-green-50 p-1">75 - 90</span>-->
+<!--        <span class="rounded text-green-800 bg-green-100 p-1">90 - 99</span>-->
+<!--        <span class="rounded text-blue-800 bg-blue-200 p-1">99 - 100</span>-->
+<!--    </div>-->
+<!--</div>-->
 
 <style>
     .redbg {
         background-color: rgb(244, 204, 204);
     }
+
     .bluebg {
         background-color: rgb(201, 218, 248);
     }
+
     .text-red-700 {
         --tw-text-opacity: 1;
         color: rgb(185 28 28/var(--tw-text-opacity));
     }
+
     .bg-red-100 {
         --tw-bg-opacity: 1;
         background-color: rgb(254 226 226/var(--tw-bg-opacity));
@@ -219,10 +259,12 @@
         --tw-bg-opacity: 1;
         background-color: rgb(240 253 244/var(--tw-bg-opacity))
     }
+
     .bg-green-100 {
         --tw-bg-opacity: 1;
         background-color: rgb(220 252 231/var(--tw-bg-opacity))
     }
+
     .bg-gray-300 {
         --tw-bg-opacity: 1;
         background-color: rgb(209 213 219/var(--tw-bg-opacity))
