@@ -9,8 +9,6 @@
 
     export let currentMatch: RxDocument<Match>;
 
-    $: console.log("props", currentMatch?.matchKey);
-
     let notes = "";
     let notesSaveStatusMessage = "";
     let isReady = false;
@@ -23,7 +21,6 @@
 
     onMount(async () => {
         db = await getDb();
-        console.log("Mount");
     });
 
     const init = async (db, currentMatch) => {

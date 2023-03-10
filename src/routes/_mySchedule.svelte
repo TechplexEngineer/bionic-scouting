@@ -2,7 +2,7 @@
     import {onMount} from "svelte";
     import {getDb} from "$lib/store";
     import {Settings} from "$lib/schema/settings-schema";
-    import {formatDateTime, getOurTeamNumber} from "$lib/util";
+    import {formatDateTime, getCurrentEventQuery, getOurTeamNumber} from "$lib/util";
     import {matchSort} from "$lib/matches";
     import type {RxDocument} from "rxdb";
     import type {Match} from "$lib/schema/match-schema";
@@ -27,20 +27,19 @@
     onMount(async () => {
 
         const db = await getDb();
-        let eventName = "...";
-        db.settings.findOne({selector: {key: Settings.CurrentEvent}}).$.subscribe(v => {
-            // console.log(v);
+        let eventKey = "...";
+
+        getCurrentEventQuery(db).$.subscribe(v => {
             if (v && v.value) {
-                eventName = v.value;
+                eventKey = v.value;
             }
         });
-
 
         ourTeamNumber = getOurTeamNumber(db);
 
 
         let assignedMatchKeys = scout.assignedMatches.map(am => am.assignedMatch)
-        db.matches.find().where({matchKey: {$in: assignedMatchKeys}}).$.subscribe(m => {
+        db.matches.find().where({matchKey: {$in: assignedMatchKeys}, eventKey}).$.subscribe(m => {
             myAssignedMatches = m.sort(matchSort);
             // console.log(myAssignedMatches);
         });
@@ -50,11 +49,11 @@
         let myMatches = myTeamMatchesToScout.map(tm => tm.match).flat();
         myMatches = myMatches.filter(onlyUnique);
         // console.log("myMatches", myMatches);
-        db.matches.find().where({matchKey: {$in: myMatches}}).$.subscribe(m => {
+        db.matches.find().where({matchKey: {$in: myMatches}, eventKey}).$.subscribe(m => {
             scoutMatches = m.sort(matchSort);
         });
 
-        db.match_subjective.find().where({eventKey: eventName}).$.subscribe(mr => {
+        db.match_subjective.find().where({eventKey: eventKey}).$.subscribe(mr => {
             matchReports = mr;
             // console.log("matchReports", matchReports);
         })

@@ -147,8 +147,7 @@
         }
         let selectedEventKey = $selectedEvent.value;
 
-
-        let teams = await db.pit_scouting.find().exec()
+        let teams = await db.pit_scouting.find().where({eventKey: selectedEventKey}).exec()
         if (teams.length > 0) {
             let res = await Swal.fire({
                 icon: "error",
@@ -162,7 +161,7 @@
             if (!res.isConfirmed) {
                 return;
             }
-            await db.pit_scouting.find().remove()
+            await db.pit_scouting.find().where({eventKey: selectedEventKey}).remove()
         }
 
         const tbaTeams = await tba.getTeams(selectedEventKey);

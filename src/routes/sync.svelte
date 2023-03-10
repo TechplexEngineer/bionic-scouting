@@ -102,7 +102,7 @@
                         batch_size: 5
                     },
 
-                    // query: dbToSync.find().where({eventKey}).eq(eventKey) // query (optional) only documents that match that query will be synchronised
+                    query: dbToSync.find().where({eventKey}) // query (optional) only documents that match that query will be synchronised
                 });
 
 
@@ -111,10 +111,14 @@
                     // console.log("change", change);
                     let msg =`---> change `;
                     if (change.ok) {
-                        msg += `completed: ${change.docs_read} pending: ${change.pending} `
+                        msg += `completed: ${change.docs_read}`
+                        if (change.pending) {
+                            msg += ` pending: ${change.pending} `;
+                        }
                     } else {
                         msg += JSON.stringify(change);
                     }
+                    console.log(JSON.stringify(change));
                     LogSyncMessage(msg);
                 });
                 replicationState.docs$.subscribe(docData => {

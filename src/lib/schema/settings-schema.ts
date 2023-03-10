@@ -39,5 +39,6 @@ export default settingsSchema;
 export enum Settings {
 	CurrentEvent = 'currentEvent',
 	TeamNumber = 'ourTeamNumber',
-	DeviceName = 'deviceName'
+	DeviceName = 'deviceName',
+	SheetsLink = 'sheetsLink'
 }

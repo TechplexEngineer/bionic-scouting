@@ -9,6 +9,8 @@ export type SuperScout = {
 		assignedMatch: string;
 		teamMatches: { team: number; match: string }[];
 	}[];
+	// eventKey: string; //@todo
+
 };
 
 // let a = {

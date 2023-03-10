@@ -109,6 +109,11 @@ export const extractBlueTeamsFromMatch = (match: RxDocument<Match>) => {
 	return teamKeys.map((t) => parseInt(t.replace('frc', '')));
 };
 
+export const getSettingQuery = (db: MyDatabase, settingKey: Settings) => {
+	return db.settings.findOne({ selector: { key: settingKey } });
+}
+
+
 export const getCurrentEventQuery = (db: MyDatabase) => {
 	return db.settings.findOne({ selector: { key: Settings.CurrentEvent } });
 }

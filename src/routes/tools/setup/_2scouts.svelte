@@ -9,6 +9,7 @@
     import {Button} from "sveltestrap";
     import type {RxDocument} from "rxdb";
     import type {SuperScout} from "$lib/schema/super-scout-schema";
+    import {getCurrentEventQuery} from "$lib/util";
 
     export let dbTable: string; //eg. scouts or super_scouts
 
@@ -17,9 +18,15 @@
     let db: MyDatabase;
 
     let scouts = [];
+    let eventKey:string;
 
     onMount(async () => {
         db = await getDb();
+
+        getCurrentEventQuery(db).$.subscribe(d => {
+            if (!d.value) return
+            eventKey = d.value
+        })
 
         let sort = {name: "asc"};
         // Super Scouts are ordered by Peyton, First scout by creation is SS1
@@ -28,6 +35,7 @@
         }
 
         await db[dbTable].find()
+            // .where({eventKey}) @todo
             .sort(sort)
             .$.subscribe((s) => {
                 scouts = s;
@@ -46,7 +54,7 @@
             updatedAt: new Date().getTime()
         };
 
-        if (await db[dbTable].findOne({selector: {name: scoutName}}).exec() != null) {
+        if (await db[dbTable].findOne({selector: {name: scoutName, eventKey}}).exec() != null) {
             Swal.fire({
                 icon: "error",
                 title: "Oops...",

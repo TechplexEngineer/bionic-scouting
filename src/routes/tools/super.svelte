@@ -26,6 +26,7 @@
     import DeviceName from "./setup/_0deviceName.svelte";
     import TeamNumber from "./setup/_1teamNumber.svelte";
     import GetMatches from "./setup/_3getMatches.svelte";
+    import ScoutingDataSheet from "./setup/_scoutingDataSheet.svelte";
 
 
     let db: MyDatabase;
@@ -72,9 +73,9 @@
             }
         }
 
-        await db.super_scouts.find().where({active: true}).sort({createdAt: "asc"}).$.subscribe((d: RxDocument<SuperScout>[]) => {
+        await db.super_scouts.find().where({active: true, eventKey: eventKey}).sort({createdAt: "asc"}).$.subscribe((d: RxDocument<SuperScout>[]) => {
             superScoutsLoaded = false;
-            // console.log("Scouts Loaded");
+
             scoutsSelectOptions = d.map(s => ({label: s.name, value: s}));
             superScouts = d;
 
@@ -183,7 +184,6 @@
         const teamKeys = match.alliances.red.teamKeys.concat(match.alliances.blue.teamKeys);
         const matchTeams = teamKeys.map(t => parseInt(t.replace("frc", "")));
         const result = matchTeams.includes(ourTeamNumber);
-        console.log(result, matchTeams, ourTeamNumber);
         return result;
     }
 
@@ -228,6 +228,7 @@
     <h1>Strategist Setup</h1>
 
     <DeviceName/>
+    <ScoutingDataSheet/>
 
     <TeamNumber/>
     <GetMatches/>

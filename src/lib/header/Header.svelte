@@ -54,10 +54,10 @@
         // {name: "Match Preview", href: "/match/preview"},
         {name: "Match Schedule", href: "/match/schedule"},
         // {name: "Pick List", href: "/pick"}, //@todo
+        {name: "Sync", href: "/sync"},
         {
             name: "Tools",
             dropdown: [
-                {name: "Sync", href: "/sync"},
                 // {name: "Bluetooth", href: "/tools/bluetooth"},
                 {divider: true},
                 // {name: "Setup", href: "/tools/setup"},

@@ -68,6 +68,7 @@
         blue_rp_2: number;
         blue_tiebreaker: number;
     }
+    let matchData: StatboticsMatchData;
 
     interface sbTeam {
         teamNumber: number
@@ -84,7 +85,6 @@
         red: sbTeam[],
         blue: sbTeam[]
     }
-
     let data: sbDisplay;
 
     export interface StatboticsTeamMatch {
@@ -107,9 +107,6 @@
 
     const init = async (currentMatch: RxDocument<Match>) => {
         if (!currentMatch) return;
-        console.log("matchKey", currentMatch.matchKey);
-        console.log("eventKey", currentMatch.eventKey);
-        console.log("alliances", currentMatch.alliances);
 
         const mapTeams = async (t):Promise<sbTeam> => {
             const teamNumber = parseInt(t.replace("frc", ""));
@@ -130,23 +127,25 @@
             red: await Promise.all(currentMatch.alliances.red.teamKeys.map(mapTeams)),
             blue: await Promise.all(currentMatch.alliances.blue.teamKeys.map(mapTeams))
         }
-        console.log(data)
+        // console.log(data);
+
+        matchData = await getStatboticsMatchData(currentMatch.eventKey, currentMatch.matchKey)
     }
 
     $: init(currentMatch)
 
-    // async function getStatboticsMatchData(eventKey: string, matchKey: string): Promise<StatboticsMatchData> {
-    //     try {
-    //         const res = await fetch(`https://api.statbotics.io/v2/match/${eventKey}_${matchKey}`);
-    //         if (!res.ok) {
-    //             return
-    //         }
-    //         return await res.json()
-    //     } catch (e) {
-    //         console.log("Error: ", e);
-    //     }
-    //     return {} as any;
-    // }
+    async function getStatboticsMatchData(eventKey: string, matchKey: string): Promise<StatboticsMatchData> {
+        try {
+            const res = await fetch(`https://api.statbotics.io/v2/match/${eventKey}_${matchKey}`);
+            if (!res.ok) {
+                return
+            }
+            return await res.json()
+        } catch (e) {
+            console.log("Error: ", e);
+        }
+        return {} as any;
+    }
 
     async function getStatboticsTeamMatchData(team: number, eventKey: string, matchKey: string): Promise<StatboticsTeamMatch> {
         try {
@@ -165,11 +164,34 @@
         return Math.round(num * 100) / 100
     }
 
-    const metrics = ["Auto", "Teleop", "EndGame", "Fouls", "RP1", "RP2"]
+    const metrics = ["Auto", "Teleop", "EndGame", "Fouls", "RP1", "RP2"];
+
+    const formatPercent = (val:number) => {
+        return round2(val * 100) + "%"
+    }
+
+    const metricMap = {
+        "Auto": "auto",
+        "Teleop": "teleop",
+        "EndGame": "endGame",
+        "Fouls": "fouls",
+        "RP1": "rp1",
+        "RP2": "rp2"
+    };
+    function metricNameLookup(metric:string) {
+        return metricMap[metric];
+    }
 </script>
 
+
+<h2 class="border-bottom border-4">Statbotics Predictions</h2>
+
 <ul>
-    <li>EPA winner: {data?.epa_winner} &mdash; {round2(data?.epa_win_prob * 100)}%</li>
+    <li>EPA winner: {matchData?.epa_winner} &mdash; {round2(matchData?.epa_win_prob * 100)}%</li>
+    <li>red_rp_1_prob: &mdash; {formatPercent(matchData?.red_rp_1_prob)}</li>
+    <li>red_rp_2_prob: &mdash; {formatPercent(matchData?.red_rp_2_prob)}</li>
+    <li>blue_rp_1_prob: &mdash; {formatPercent(matchData?.blue_rp_1_prob)}</li>
+    <li>blue_rp_2_prob: &mdash; {formatPercent(matchData?.blue_rp_2_prob)}</li>
 </ul>
 
 
@@ -190,15 +212,27 @@
     <tbody>
     {#each metrics as metric}
         <tr>
-            <td>{data?.red[0][metric.toLowerCase()]||"n/a"}</td>
-            <td>{data?.red[1][metric.toLowerCase()]||"n/a"}</td>
-            <td>{data?.red[2][metric.toLowerCase()]||"n/a"}</td>
-            <td>{round2(data?.red[0][metric.toLowerCase()] + data?.red[1][metric.toLowerCase()] + data?.red[2][metric.toLowerCase()])||"n/a"}</td>
-            <td>{metric}</td>
-            <td>{round2(data?.blue[0][metric.toLowerCase()] + data?.blue[1][metric.toLowerCase()] + data?.blue[2][metric.toLowerCase()])||"n/a"}</td>
-            <td>{data?.blue[0][metric.toLowerCase()]||"n/a"}</td>
-            <td>{data?.blue[1][metric.toLowerCase()]||"n/a"}</td>
-            <td>{data?.blue[2][metric.toLowerCase()]||"n/a"}</td>
+            {#if ["RP1", "RP2"].includes(metric)}
+                <td>{formatPercent(data?.red[0][metricNameLookup(metric)])||"n/a"}</td>
+                <td>{formatPercent(data?.red[1][metricNameLookup(metric)])||"n/a"}</td>
+                <td>{formatPercent(data?.red[2][metricNameLookup(metric)])||"n/a"}</td>
+                <td>{formatPercent((data?.red[0][metricNameLookup(metric)] + data?.red[1][metricNameLookup(metric)] + data?.red[2][metricNameLookup(metric)]))||"n/a"}</td>
+                <td>{metric}</td>
+                <td>{formatPercent((data?.blue[0][metricNameLookup(metric)] + data?.blue[1][metricNameLookup(metric)] + data?.blue[2][metricNameLookup(metric)]))||"n/a"}</td>
+                <td>{formatPercent(data?.blue[0][metricNameLookup(metric)])||"n/a"}</td>
+                <td>{formatPercent(data?.blue[1][metricNameLookup(metric)])||"n/a"}</td>
+                <td>{formatPercent(data?.blue[2][metricNameLookup(metric)])||"n/a"}</td>
+            {:else}
+                <td>{data?.red[0][metricNameLookup(metric)]||"n/a"}</td>
+                <td>{data?.red[1][metricNameLookup(metric)]||"n/a"}</td>
+                <td>{data?.red[2][metricNameLookup(metric)]||"n/a"}</td>
+                <td>{round2(data?.red[0][metricNameLookup(metric)] + data?.red[1][metricNameLookup(metric)] + data?.red[2][metricNameLookup(metric)])||"n/a"}</td>
+                <td>{metric}</td>
+                <td>{round2(data?.blue[0][metricNameLookup(metric)] + data?.blue[1][metricNameLookup(metric)] + data?.blue[2][metricNameLookup(metric)])||"n/a"}</td>
+                <td>{data?.blue[0][metricNameLookup(metric)]||"n/a"}</td>
+                <td>{data?.blue[1][metricNameLookup(metric)]||"n/a"}</td>
+                <td>{data?.blue[2][metricNameLookup(metric)]||"n/a"}</td>
+            {/if}
         </tr>
     {/each}
     <tr class="bg-gray-300">

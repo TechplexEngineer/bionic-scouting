@@ -144,20 +144,21 @@
         </div>
     </div>
 
-    <MatchTable/>
-
     <Statbotics currentMatch={selectedPrepMatch?.value}/>
 
+<!--    <MatchTable currentMatch={selectedPrepMatch?.value}/>-->
+
+    <h2 class="border-bottom border-4">Match Notes</h2>
     <MatchNotes currentMatch={selectedPrepMatch?.value}/>
 
 
 
-    <h2 class="border-bottom border-4 text-end">Opposing Alliance &mdash; {getOpposingAllianceColor(selectedPrepMatch?.value)}</h2>
+    <h2 class="border-bottom border-4 mt-3">Opposing Alliance &mdash; {getOpposingAllianceColor(selectedPrepMatch?.value)}</h2>
     {#each getOpposingAllianceMembers(selectedPrepMatch?.value) as t}
         <TeamReportWithPhoto {t} {teamPitScoutingData} {matchReports}/>
     {/each}
 
-    <h2 class="border-bottom border-4 text-end">Our Alliance  &mdash; {getOurAllianceColor(selectedPrepMatch?.value)}</h2>
+    <h2 class="border-bottom border-4 mt-3">Our Alliance  &mdash; {getOurAllianceColor(selectedPrepMatch?.value)}</h2>
     {#each getOurAllianceMembers(selectedPrepMatch?.value) as t}
         <TeamReportWithPhoto {t} {teamPitScoutingData} {matchReports}/>
     {/each}

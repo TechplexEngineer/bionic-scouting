@@ -2,20 +2,19 @@
 	import { writable } from "svelte/store";
 	import { onMount } from "svelte";
 	import { getDb } from "$lib/store";
-	import { debounce } from "$lib/util";
+    import {debounce, getOurTeamNumberQuery} from "$lib/util";
 
 	export let ourTeamNumber: writable<number | null> = writable(null);
 
 	import type { MyDatabase } from "$lib/store";
+    import {Settings} from "$lib/schema/settings-schema";
 
 	let db: MyDatabase;
 
 	onMount(async () => {
 		db = await getDb();
 
-		const query = db.settings.findOne({ selector: { key: "ourTeamNumber" } });
-
-		let entry = await query.exec();
+		let entry = await getOurTeamNumberQuery(db).exec();
 		if (entry !== null) {
 			ourTeamNumber.set(entry.value);
 		}
@@ -25,7 +24,7 @@
 				return;
 			}
 			db.settings.atomicUpsert({
-				key: "ourTeamNumber",
+				key: Settings.TeamNumber,
 				value: v.toString(),
 				updatedAt: new Date().getTime()
 			});
