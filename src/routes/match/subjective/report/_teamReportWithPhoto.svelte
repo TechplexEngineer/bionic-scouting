@@ -1,12 +1,15 @@
 <script lang="ts">
-    import type {PitReportWithAttachments} from "./index.svelte";
     import type {RxDocument} from "rxdb";
     import type {PitReport} from "$lib/schema/pit-scout-schema";
     import type {MatchSubjReport} from "$lib/schema/match-subj-schema";
+    import {RxAttachment} from "rxdb";
+    import type {PitReportWithAttachments} from "$lib/util";
 
     export let t: number;
-    export let teamPitScoutingData;
+    export let teamPitScoutingData: PitReportWithAttachments[];
     export let matchReports;
+
+    // $: console.log("teamPitScoutingData", teamPitScoutingData)
 
     const getTeamNickname = (team: number, teamPitScoutingData: PitReportWithAttachments[]) => {
         let data = getDataForTeam(team, teamPitScoutingData);
@@ -26,13 +29,20 @@
         return await data.attachments[0].getStringData();
     }
 
-    function getNotesForTeam(team: number, teams: RxDocument<PitReport>[]) {
-        const teamPitReport = teams.filter((t: RxDocument<PitReport>) => t.teamNumber == team);
-        // console.log(teamPitReport);
-        if (teamPitReport.length == 0) {
+    function getNotesForTeam(team: number, teams: PitReportWithAttachments[]) {
+        // if (!teams) {
+        //     return "..."
+        // }
+        console.log("teams", teams)
+        const teamPitReport = teams?.find((t: PitReportWithAttachments) => {
+            console.log("compare", t.doc.teamNumber, team, t.doc.teamNumber == team)
+            return t.doc.teamNumber == team
+        });
+        console.log("teamPitReport",teamPitReport);
+        if (teamPitReport?.doc?.notes.length == 0) {
             return `no notes for ${team}`
         }
-        return teamPitReport[0].notes || ""
+        return teamPitReport?.doc?.notes || ""
     }
 
     const onlyTeam = (teamNumber: number) => {

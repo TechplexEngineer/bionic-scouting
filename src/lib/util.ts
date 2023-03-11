@@ -4,6 +4,8 @@ import type { MyDatabase } from '$lib/store';
 import { Settings } from '$lib/schema/settings-schema';
 import Swal from 'sweetalert2';
 import { goto } from '$app/navigation';
+import type {PitReport} from "$lib/schema/pit-scout-schema";
+import type {RxAttachment} from "rxdb";
 
 export const capitalizeFirst = function (str: string): string {
 	return str.charAt(0).toUpperCase() + str.slice(1);
@@ -189,3 +191,5 @@ export async function removeAllData(): Promise<void> {
 	localStorage.clear();
 	location.reload();
 }
+
+export type PitReportWithAttachments = { doc: RxDocument<PitReport>, attachments: RxAttachment<PitReport> }

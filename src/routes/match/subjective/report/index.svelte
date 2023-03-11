@@ -20,7 +20,7 @@
         extractBlueTeamsFromMatch,
         extractRedTeamsFromMatch, extractTeamsFromMatch,
         getCurrentEvent,
-        getOurTeamNumber
+        getOurTeamNumber, PitReportWithAttachments
     } from "$lib/util";
 
     import type {PitReport} from "$lib/schema/pit-scout-schema";
@@ -29,8 +29,6 @@
     import MatchNotes from "./_matchNotes.svelte"
     import MatchTable from "./_matchTable.svelte"
     import Statbotics from "./_statbotics.svelte"
-
-    export type PitReportWithAttachments = { doc: RxDocument<PitReport>, attachments: RxAttachment<PitReport, {}> }
 
     let matches: RxDocument<Match>[] = [];
     let matchSelections: { label: string, value: RxDocument<Match> }[] = [];
@@ -62,6 +60,7 @@
             }
             teamPitScoutingData = [...teamPitScoutingData, report];
         })
+        // console.log("teamPitScoutingData", teamPitScoutingData)
     }
 
     let db: MyDatabase;
