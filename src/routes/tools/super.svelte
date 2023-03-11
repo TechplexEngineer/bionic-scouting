@@ -39,7 +39,7 @@
     let superScouts: RxDocument<SuperScout>[] = [];
     let superScoutsLoaded = false;
 
-    let numMatchesToScout = 2;
+    let numMatchesToScout = 3;
 
     let matchSubscription = null
 
