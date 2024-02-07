@@ -24,7 +24,7 @@
         db = await getDb();
 
         getCurrentEventQuery(db).$.subscribe(d => {
-            if (!d.value) return
+            if (!d?.value) return
             eventKey = d.value
         })
 

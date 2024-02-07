@@ -21,7 +21,7 @@
     // List of events to choose from
     type SelectOption = { label: string, value: string };
     let eventsToSelect: SelectOption[] = [];
-    let currentYear = 2023; //@todo change to new Date().getFullYear() if unset or use localstorage setting
+    let currentYear = 2024; //@todo change to new Date().getFullYear() if unset or use localstorage setting
     let db: MyDatabase;
 
     async function getEventList(): Promise<SelectOption[]> {

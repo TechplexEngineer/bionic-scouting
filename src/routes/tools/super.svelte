@@ -47,7 +47,8 @@
         db = await getDb();
 
         getCurrentEventQuery(db).$.subscribe(d => {
-            eventKey = d.value;
+            eventKey = d?.value;
+            if (!eventKey) return;
 
             // console.log("EventKey", eventKey);
             if (matchSubscription != null) {
@@ -61,7 +62,9 @@
         })
 
         getOurTeamNumberQuery(db).$.subscribe(d => {
-            ourTeamNumber = parseInt(d.value);
+            const v = d.value;
+            if (!v) return;
+            ourTeamNumber = parseInt(v);
         })
 
         // Find our matches
