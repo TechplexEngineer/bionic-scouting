@@ -40,9 +40,6 @@ The data collected by the system can be exported to CSV for analysis in Excel.
 Bionic Scouting is a web app that uses [SvelteKit](https://kit.svelte.dev/) with Vite for the frontend and is packaged
 for android with [Capacitor.js](https://capacitorjs.com/)
 
-For bluetooth sync a custom Capacitor plugin was created which support android
-called [bionic-bt-serial](https://github.com/TechplexEngineer/bionic-bt-serial)
-
 ## Developing
 
 Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a

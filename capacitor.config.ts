@@ -21,7 +21,8 @@ const config: CapacitorConfig = {
 
 	// A Boolean value that determines whether to hide native logs for iOS and Android. The preference is ignored if it's also declared inside ios or android
 	// Default is false
-	hideLogs: true
+	// hideLogs: true
+	loggingBehavior: 'none'
 };
 
 // for development Hot Module Reload

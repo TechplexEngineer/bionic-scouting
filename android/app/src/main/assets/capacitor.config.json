@@ -3,5 +3,5 @@
 	"appName": "The Green Alliance",
 	"webDir": "build",
 	"bundledWebRuntime": false,
-	"hideLogs": true
+	"loggingBehavior": "none"
 }
