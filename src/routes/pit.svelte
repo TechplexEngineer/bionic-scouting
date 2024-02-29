@@ -87,7 +87,7 @@
     ];
     let activeRobotPhotoIndex = 0;
     let photosReady = false;
-    const notesTemplate = `Chassis:\n\nPlacer:\n\nIntaker:\n\nExtension:\n\nAuto:\n\nScoring Place:\n\n`
+    const notesTemplate = `Chassis:\n\nShooter:\n\nIntaker:\n\nExtension:\n\nAuto:\n\nScoring Place:\n\n`
 
     // When the team dropdown select changes.
     // Also triggers when loading from query string
