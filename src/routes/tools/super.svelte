@@ -62,6 +62,7 @@
         })
 
         getOurTeamNumberQuery(db).$.subscribe(d => {
+            if (!d) return;
             const v = d.value;
             if (!v) return;
             ourTeamNumber = parseInt(v);

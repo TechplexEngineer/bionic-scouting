@@ -164,7 +164,7 @@ export const getOurTeamNumber = async (db: MyDatabase, skipError?: true) => {
 			return;
 		}
 	}
-	return parseInt(entry.value);
+	return parseInt(entry?.value);
 };
 
 export const getDeviceNameQuery = (db: MyDatabase) => {
