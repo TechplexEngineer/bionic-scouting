@@ -11,5 +11,3 @@ node_modules
 .idea
 *.aab
 aab/
-
-CreateDB.sh
